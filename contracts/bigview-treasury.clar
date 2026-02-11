@@ -2,7 +2,7 @@
 ;; BigView Dashboard Contract in Clarity
 
 ;; Developer address (replace with actual principal)
-(define-constant developer 'SP2C2FJY0XK8ZQ0Z8Y5X9Z8Y5X9Z8Y5X9Z8Y5X9Z)
+(define-constant developer 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
 
 
 ;; User wallets
@@ -138,6 +138,6 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                         votes-against: (+ (get votes-against proposal) u1) })
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       (ok "Voted against"))))
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               (err "Proposal not found")))
-                                                                                                                                                                              )))))
-                                                            )))
-                      })
+                                                                                                                                                                              
+                                                            
+                      
