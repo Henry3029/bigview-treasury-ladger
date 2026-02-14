@@ -1,53 +1,52 @@
 ;; SPDX-License-Identifier: MIT
-;; BigView Dashboard Contract in Clarity
+;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
 
-;; Developer address (replace with actual principal)
+;; ---------------------------------------------------------
+;; Constants & Data Variables
+;; ---------------------------------------------------------
+
+;; Developer address (STX wallet for fees)
 (define-constant developer 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
 
+;; Error Codes
+(define-constant ERR-NOT-AUTHORIZED (err u100))
+(define-constant ERR-NO-STAKE (err u101))
+(define-constant ERR-NO-REWARD (err u102))
 
-;; User wallets
-(define-map user-wallets
-  { user: principal }
-    { wallet: principal })
+;; Tracking totals for the dashboard (Since maps aren't iterable)
+(define-data-var total-members-count uint u0)
+(define-data-var total-staked-amount uint u0)
+(define-data-var total-rewards-amount uint u0)
+(define-data-var proposal-counter uint u0)
 
-    ;; Members
-    (define-map members 
-      { account: principal }
-        { is-member: bool })
+;; ---------------------------------------------------------
+;; Data Maps
+;; ---------------------------------------------------------
 
-        ;; Stakes
-        (define-map stakes 
-          { account: principal }
-            { amount: uint })
+(define-map user-wallets { user: principal } { wallet: principal })
+(define-map members { account: principal } { is-member: bool })
+(define-map stakes { account: principal } { amount: uint })
+(define-map rewards { account: principal } { amount: uint })
+(define-map proposals { id: uint } { description: (string-ascii 64), votes-for: uint, votes-against: uint })
 
-            ;; Rewards
-            (define-map rewards 
-              { account: principal }
-                { amount: uint })
+;; ---------------------------------------------------------
+;; Read-Only Functions
+;; ---------------------------------------------------------
 
-                ;; Governance
-                (define-map proposals 
-                  { id: uint }
-                    { description: (string-ascii 64), votes-for: uint, votes-against: uint })
-                    (define-data-var proposal-counter uint u0)
+(define-read-only (dashboard-summary)
+  {
+      total-members: (var-get total-members-count),
+          total-stakes: (var-get total-staked-amount),
+              total-rewards: (var-get total-rewards-amount),
+                  proposals-count: (var-get proposal-counter)
+                    })
 
-                    ;; Read-only dashboard summary
-                    (define-read-only (dashboard-summary)
-                      {
-                            total-members: (len (map-keys members)),
-                                total-stakes: (fold
-                                      (lambda (acc stake)
-                                              (+ acc (get amount stake)))
-                                                    u0
-                                                          (map-values stakes)),
-                                                              total-rewards: (fold
-                                                                    (lambda (acc reward)
-                                                                            (+ acc (get amount reward)))
-                                                                                  u0
-                                                                                        (map-values rewards)),
-                                                                                            proposals-count: (var-get proposal-counter)
-                      })
+                    (define-read-only (is-member? (user principal))
+                      (default-to false (get is-member (map-get? members { account: user }))))
 
+                      ;; ---------------------------------------------------------
+                      ;; Public Functions
+                      ;; ---------------------------------------------------------
 
                       ;; Wallet Registration
                       (define-public (register-wallet (user principal) (wallet principal))
@@ -55,89 +54,51 @@
                             (map-insert user-wallets { user: user } { wallet: wallet })
                                 (ok "Wallet Registered")))
 
-                                ;; Membership
+                                ;; Membership Management
                                 (define-public (add-member (user principal))
                                   (begin
-                                      (map-insert members { account: user } { is-member: true })
-                                          (ok "Member added")))
+                                      (asserts! (map-insert members { account: user } { is-member: true }) ERR-NOT-AUTHORIZED)
+                                          (var-set total-members-count (+ (var-get total-members-count) u1))
+                                              (ok "Member added")))
 
-                                          (define-read-only (is-member? (user principal))
-                                            (default-to false (get is-member (map-get? members { account: user }))))
+                                              (define-public (remove-member (user principal))
+                                                (begin
+                                                    (asserts! (map-delete members { account: user }) ERR-NOT-AUTHORIZED)
+                                                        (var-set total-members-count (- (var-get total-members-count) u1))
+                                                            (ok "Member removed")))
 
-                                            (define-public (remove-member (user principal))
-                                              (begin
-                                                  (map-delete members { account: user })
-                                                      (ok "Member removed")))
 
-                                                      ;; Staking
-                                                      (define-public (stake (amount uint))
-                                                        (let
-                                                            (
-                                                                      (fee (/ amount u20)) ;; 5% fee
-                                                                            (net-amount (- amount fee))
-                                                            )
-                                                                (begin
-                                                                      (stx-transfer? amount tx-sender (as-contract tx-sender))
-                                                                            (stx-transfer? fee (as-contract tx-sender) developer)
-                                                                                  (map-insert stakes { account: tx-sender } { amount: net-amount })
-                                                                                        (ok "Stake recorded with developer fee"))))
+                                                            ;; Rewards Logic
+                                                            (define-public (credit-reward (user principal) (amount uint))
+                                                              (begin 
+                                                                  (map-set rewards { account: user } { amount: amount })
+                                                                      (var-set total-rewards-amount (+ (var-get total-rewards-amount) amount))
+                                                                          (ok "Reward credited")))
 
-                                                                                        (define-public (unstake)
-                                                                                          (let ((stake (map-get? stakes { account: tx-sender })))
-                                                                                              (if stake
-                                                                                                      (begin
-                                                                                                                (map-delete stakes { account: tx-sender })
-                                                                                                                          (stx-transfer? (get amount stake) (as-contract tx-sender) tx-sender)
-                                                                                                                                    (ok "Stake withdrawn"))
-                                                                                                                                            (err "No stake found"))))
 
-                                                                                                                                            ;; Rewards
-                                                                                                                                            (define-public (credit-reward (user principal) (amount uint))
-                                                                                                                                              (begin 
-                                                                                                                                                  (map-insert rewards { account: user } { amount: amount })
-                                                                                                                                                      (ok "Reward credited")))
+                                                                          ;; Governance Logic
+                                                                          (define-public (create-proposal (desc (string-ascii 64)))
+                                                                            (let ((id (+ (var-get proposal-counter) u1)))
+                                                                                (begin
+                                                                                      (map-insert proposals { id: id }
+                                                                                              { description: desc, votes-for: u0, votes-against: u0 })
+                                                                                                    (var-set proposal-counter id)
+                                                                                                          (ok id))))
 
-                                                                                                                                                      (define-public (claim-reward) 
-                                                                                                                                                        (let ((reward (map-get? rewards { account: tx-sender })))
-                                                                                                                                                            (if reward
-                                                                                                                                                                    (let
-                                                                                                                                                                              (
-                                                                                                                                                                                            (fee (/ (get amount reward) u20)) ;; 5% fee
-                                                                                                                                                                                                        (net-amount (- (get amount reward) fee))
-                                                                                                                                                                              )
-                                                                                                                                                                                        (begin
-                                                                                                                                                                                                    (stx-transfer? fee (as-contract tx-sender) developer)
-                                                                                                                                                                                                                (map-delete rewards { account: tx-sender })
-                                                                                                                                                                                                                            (stx-transfer? net-amount (as-contract tx-sender) tx-sender)
-                                                                                                                                                                                                                                        (ok "Reward claimed with developer fee")))
-                                                                                                                                                                                                                                                (err "No reward to claim"))))
-
-                                                                                                                                                                                                                                                ;; Governance
-                                                                                                                                                                                                                                                (define-public (create-proposal (desc (string-ascii 64)))
-                                                                                                                                                                                                                                                  (let ((id (+ (var-get proposal-counter) u1)))
-                                                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                                                            (map-insert proposals { id: id }
-                                                                                                                                                                                                                                                                    { description: desc, votes-for: u0, votes-against: u0 })
-                                                                                                                                                                                                                                                                          (var-set proposal-counter id)
-                                                                                                                                                                                                                                                                                (ok id))))
-
-                                                                                                                                                                                                                                                                                (define-public (vote (id uint) (support bool))
-                                                                                                                                                                                                                                                                                  (let ((proposal (map-get? proposals { id: id })))
-                                                                                                                                                                                                                                                                                      (if proposal
-                                                                                                                                                                                                                                                                                              (if support
-                                                                                                                                                                                                                                                                                                          (begin
-                                                                                                                                                                                                                                                                                                                        (map-insert proposals { id: id }
-                                                                                                                                                                                                                                                                                                                                        { description: (get description proposal),
-                                                                                                                                                                                                                                                                                                                                                          votes-for: (+ (get votes-for proposal) u1),
-                                                                                                                                                                                                                                                                                                                                                                            votes-against: (get votes-against proposal) })
-                                                                                                                                                                                                                                                                                                                                                                                          (ok "Voted for"))
-                                                                                                                                                                                                                                                                                                                                                                                                      (begin
-                                                                                                                                                                                                                                                                                                                                                                                                                    (map-insert proposals { id: id }
-                                                                                                                                                                                                                                                                                                                                                                                                                                    { description: (get description proposal),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      votes-for: (get votes-for proposal),
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        votes-against: (+ (get votes-against proposal) u1) })
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      (ok "Voted against"))))
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              (err "Proposal not found")))
-                                                                                                                                                                              
-                                                            
-                      
+                                                                                                          (define-public (vote (id uint) (support bool))
+                                                                                                            ;; 1. Use unwrap! to immediately exit if the proposal ID is invalid
+                                                                                                              (let ((proposal (unwrap! (map-get? proposals { id: id }) (err "Proposal not found"))))
+                                                                                                                  (begin
+                                                                                                                        ;; 2. Update the map directly using a more compact if logic
+                                                                                                                              (map-set proposals { id: id }
+                                                                                                                                      { 
+                                                                                                                                                description: (get description proposal),
+                                                                                                                                                          votes-for: (if support 
+                                                                                                                                                                                   (+ (get votes-for proposal) u1) 
+                                                                                                                                                                                                            (get votes-for proposal)),
+                                                                                                                                                                                                                      votes-against: (if support 
+                                                                                                                                                                                                                                                   (get votes-against proposal) 
+                                                                                                                                                                                                                                                                                (+ (get votes-against proposal) u1)) 
+                                                                                                                                                                                                                                                                                        })
+                                                                                                                                                                                                                                                                                              (ok "Vote recorded"))))
+                                                                                                                                                                                                                                                                                              

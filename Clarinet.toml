@@ -7,6 +7,7 @@ cache_dir = "./.cache"
 
 [contracts.bigview-treasury]
 path = "contracts/bigview-treasury.clar"
+clarity_version = 2
 epoch = "latest"
 
 [repl.analysis]
