@@ -3,7 +3,7 @@ import { PrivyClient } from "@privy-io/react-auth";
 import Dashboard from "../components/Dashboard"; // your main dashboard component
 
 const privy = new PrivyClient({
-  appId: "your_app_id", // replace with your Privy app ID
+  appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
   });
 
   export default function HomePage() {
