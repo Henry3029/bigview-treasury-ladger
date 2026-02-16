@@ -1,33 +1,29 @@
 import { useState } from "react";
-import { PrivyClient } from "@privy-io/react-auth";
-import Dashboard from "../components/Dashboard"; // your main dashboard component
+import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
+import Dashboard from "./dashboard"; // Ensure this path matches your file structure
 
-const privy = new PrivyClient({
-  appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
-  });
+export default function HomePage() {
+  const { login, authenticated, user } = usePrivy();
 
-  export default function HomePage() {
-    const [user, setUser] = useState(null);
+    const handleLogin = async () => {
+        try {
+              await login();
+                    // Privy handles the session, we'll extract the wallet inside the Dashboard
+                        } catch (error) {
+                              console.error("Login failed", error);
+                                  }
+                                    };
 
-      async function handleLogin() {
-          const loggedInUser = await privy.login({ provider: "google" });
-              console.log("User Logged In:", loggedInUser);
-
-                  // Save wallet address to localStorage
-                      localStorage.setItem("userWallet", loggedInUser.wallet.address);
-
-                          setUser(loggedInUser);
-                            }
-
-                              return (
-                                  <div>
-                                        <button onClick={handleLogin}>Login with Privy</button>
-
-                                              {user ? (
-                                                      <Dashboard /> // show your dashboard once logged in
-                                                            ) : (
-                                                                    <p>Please log in to access the dashboard.</p>
-                                                                          )}
-                                                                              </div>
-                                                                                );
-                                                                                }
+                                      return (
+                                          <div style={{ padding: "2rem", textAlign: "center" }}>
+                                                {!authenticated ? (
+                                                        <div>
+                                                                  <h1>Welcome to BigView</h1>
+                                                                            <button onClick={handleLogin}>Login with Privy</button>
+                                                                                    </div>
+                                                                                          ) : (
+                                                                                                  <Dashboard user={user} />
+                                                                                                        )}
+                                                                                                            </div>
+                                                                                                              );
+                                                                                                              }
