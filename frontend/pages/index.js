@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PrivyProvider, usePrivy } from "@privy-io/react-auth";
-import Dashboard from "./dashboard"; // Ensure this path matches your file structure
+import Dashboard from  "../components/Dashboard"; // Ensure this path matches your file structure
 
 export default function HomePage() {
   const { login, authenticated, user } = usePrivy();
