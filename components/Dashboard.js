@@ -4,8 +4,13 @@ import { StacksNetworks } from "@stacks/network";
 import * as StacksTransactions from "@stacks/transactions";
 import { openContractCall } from "@stacks/connect";
 
+if (!user || !user.wallet) {
+        return <div>Loading Privy Wallet...</div>;
+        }
+
+
 // --- CONFIGURATION ---
-const CONTRACT_ADDRESS = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM";
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 const CONTRACT_NAME = "bigview-treasury";
 
 // Select network safely

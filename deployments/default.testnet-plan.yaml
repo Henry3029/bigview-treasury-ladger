@@ -11,7 +11,7 @@ plan:
         - contract-publish:
             contract-name: bigview-treasury
             expected-sender: ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA
-            cost: 795340
+            cost: 85790
             path: contracts/bigview-treasury.clar
             anchor-block-only: true
             clarity-version: 2
