@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@privy-io/react-auth": "^3.13.1",
+    "@privy-io/react-auth": "^3.14.1",
     "@stacks/clarinet-sdk": "^3.9.0",
     "@stacks/connect": "^8.2.4",
     "@stacks/network": "^7.3.1",
@@ -28,6 +28,7 @@
     "vitest-environment-clarinet": "^3.0.0"
   },
   "devDependencies": {
-    "@types/react": "19.2.14"
+    "@types/react": "19.2.14",
+    "patch-package": "^8.0.1"
   }
 }
