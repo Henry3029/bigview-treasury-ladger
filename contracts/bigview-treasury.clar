@@ -6,7 +6,7 @@
 ;; ---------------------------------------------------------
 
 ;; Developer address (STX wallet for fees)
-(define-constant developer 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
+(define-constant developer 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
 
 ;; Error Codes
 (define-constant ERR-NOT-AUTHORIZED (err u100))

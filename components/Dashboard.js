@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { StacksNetworks } from "@stacks/network"; 
+import { STACKS_TESTNET } from "@stacks/network"; 
 import * as StacksTransactions from "@stacks/transactions";
 import { openContractCall } from "@stacks/connect";
+import { TestsNotFoundError } from "vitest/node";
 
 // --- CONFIGURATION ---
 // I've added your deployed contract details here
-const CONTRACT_ADDRESS = "ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM"; 
+const CONTRACT_ADDRESS = "ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA";
 const CONTRACT_NAME = "bigview-treasury";
-const network = StacksNetworks.testnet; 
+const network = 'testnet';
 
 export default function Dashboard() {
   const [stake, setStake] = useState(0);
@@ -15,7 +16,7 @@ export default function Dashboard() {
       const [message, setMessage] = useState("Ready");
 
         // PASTE YOUR REAL TESTNET ADDRESS HERE
-          const userAddress = "ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA";
+          const userAddress = "ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE";
 
             async function fetchMySummary() {
                 if (!userAddress) return;
@@ -24,7 +25,7 @@ export default function Dashboard() {
                               const result = await StacksTransactions.fetchCallReadOnlyFunction({
                                       contractAddress: CONTRACT_ADDRESS,
                                               contractName: CONTRACT_NAME,
-                                                      functionName: "my-summary",
+                                                      functionName: "dashboard-summary",
                                                               functionArgs: [],
                                                                       network,
                                                                               senderAddress: userAddress,
