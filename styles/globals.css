@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root { 
+      --sidebar-width: 260px;
+        --bank-blue: #002D72;
+          --bg-subtle: #f4f7fa;
+          }
+
+          body {
+            background-color: var(--bg-subtle);
+              margin: 0;
+                font-family: 'Inter', sans-serif;
+                }
+
+                /* The Main Wrapper */
+                .dashboard-layout {
+                  display: grid;
+                    grid-template-areas: 
+                        "header"
+                            "main"
+                                "footer";
+                                  min-height: 100vh;
+                                  }
+
+                                  /* Tablet & Desktop Layout */
+                                  @media (min-width: 1024px) {
+                                    .dashboard-layout {
+                                        grid-template-columns: var(--sidebar-width) 1fr;
+                                            grid-template-rows: 70px 1fr 50px;
+                                                grid-template-areas: 
+                                                      "sidebar header"
+                                                            "sidebar main"
+                                                                  "sidebar footer";
+                                                                    }
+                                                                    }
+
+                                                                    .main-content {
+                                                                      grid-area: main;
+                                                                        padding: 2rem;
+                                                                          max-width: 1200px; /* Prevents stretching on big screens */
+                                                                            margin: 0 auto;    /* Centers the dashboard */
+                                                                              width: 100%;
+                                                                              }
