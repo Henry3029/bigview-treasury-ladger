@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { STACKS_TESTNET } from "@stacks/network"; 
 import * as StacksTransactions from "@stacks/transactions";
-import { openContractCall } from "@stacks/connect";
 import { TestsNotFoundError } from "vitest/node";
 import DashboardData from '../components/DashboardData';
 import StatusBadge from '../components/StatusBadge';
 import DashboardButtons from '../components/DashboardButtons';
+import { AppConfig, UserSession, showConnect, openContractCall } from '@stacks/connect'; 
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+export const userSession = new UserSession({ appConfig });
 
 // --- CONFIGURATION ---
 // I've added your deployed contract details here
@@ -18,8 +20,22 @@ export default function Dashboard() {
     const [reward, setReward] = useState(0);
       const [message, setMessage] = useState("Ready");
 
-        // PASTE YOUR REAL TESTNET ADDRESS HERE
-          const userAddress = "ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE";
+        // PASTE YOUR REAL TESTNET ADDRESS HERE 
+        const userData = userSession.isUserSignedIn() ? userSession.loadUserData() : null;
+          const userAddress = userData ? userData.profile.stxAddress.testnet : null;
+
+const authenticate = () => {
+  showConnect({
+      appDetails: {
+            name: "BigView Treasury",
+                  icon: window.location.origin + "/logo.png", // Path to your logo
+                      },
+                          onFinish: () => {
+                                window.location.reload(); // Refresh to pick up the new address
+                                    },
+                                        userSession,
+                                          });
+                                          };
 
             async function fetchMySummary() {
                 if (!userAddress) return;
@@ -73,6 +89,11 @@ export default function Dashboard() {
                                                                                                                                                                                                                                                           };
 
                                                                                                                                                                                                                                                             const handleStake = () => {
+                                                                                                                                                                                                                                                                  if (!userSession.isUserSignedIn()) {
+                                                                                                                                                                                                                                                                            authenticate();
+                                                                                                                                                                                                                                                                                return;
+                                                                                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                                                                  
                                                                                                                                                                                                                                                                 const amount = StacksTransactions.uintCV(1000000); // 1 STX
                                                                                                                                                                                                                                                                     executeContractCall("stake", [amount], "Stake successful");
                                                                                                                                                                                                                                                                       };
