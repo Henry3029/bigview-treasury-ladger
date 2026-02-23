@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { STACKS_TESTNET } from "@stacks/network"; 
 import * as StacksTransactions from "@stacks/transactions";
-import { TestsNotFoundError } from "vitest/node";
 import DashboardData from '../components/DashboardData';
 import StatusBadge from '../components/StatusBadge';
 import DashboardButtons from '../components/DashboardButtons';
