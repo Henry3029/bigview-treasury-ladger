@@ -9,6 +9,16 @@ import DashboardButtons from '../components/DashboardButtons';
 // Line 8: Import everything individually to be safe
 import { AppConfig, UserSession, showConnect, openContractCall } from '@stacks/connect';
 
+// Line 9: Use the names directly
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+
+// Line 10: Export the session
+export const userSession = new UserSession({ appConfig });
+
+// NEW Line 11: This is the "Magic Trick"
+// It creates a 'backup' so your handleStake function doesn't crash
+const StacksConnect = { showConnect, openContractCall };
+
 // --- CONFIGURATION ---
 // I've added your deployed contract details here
 const CONTRACT_ADDRESS = "ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA";
@@ -16,16 +26,13 @@ const CONTRACT_NAME = "bigview-treasury";
 const network = 'testnet';
 
 function Dashboard() {
-      const appConfig = new AppConfig(['store_write', 'publish_data']);
-        const userSession = new UserSession({ appConfig });
-          const StacksConnect = { showConnect, openContractCall };
   const [stake, setStake] = useState(0);
     const [reward, setReward] = useState(0);
       const [message, setMessage] = useState("Ready");
 
         // PASTE YOUR REAL TESTNET ADDRESS HERE 
         const userData = userSession.isUserSignedIn() ? userSession.loadUserData() : null;
-         const userAddress = userData?.profile?.stxAddress?.testnet || null; 
+          const userAddress = userData ? userData.profile.stxAddress.testnet : null;
                               
                                     
                                     
