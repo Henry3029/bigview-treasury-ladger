@@ -1,4 +1,6 @@
+"use client";
 import React, { useState, useEffect } from "react";
+import dynamic from 'next/dynamic';
 import { STACKS_TESTNET } from "@stacks/network"; 
 import * as StacksTransactions from "@stacks/transactions";
 import DashboardData from '../components/DashboardData';
@@ -23,7 +25,7 @@ const CONTRACT_ADDRESS = "ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA";
 const CONTRACT_NAME = "bigview-treasury";
 const network = 'testnet';
 
-export default function Dashboard() {
+function Dashboard() {
   const [stake, setStake] = useState(0);
     const [reward, setReward] = useState(0);
       const [message, setMessage] = useState("Ready");
@@ -286,6 +288,15 @@ export default function Dashboard() {
                                                                                                                                                                                                                                                                                                                                                                                                                                           </div>
                                                                                                                                                                                                                                                                                                                                                                                                                                           );
                                                                                                                                                                                                                                                                                                                                                                                                                                         }
+
+
+
+                                                                                                                                                                                                                                                                                                                                                                                                                              
+
+                                                                                                                                                                                                                                                                                                                                                                                                                              // This forces the dashboard to load ONLY in the browser
+                                                                                                                                                                                                                                                                                                                                                                                                                              export default dynamic(() => Promise.resolve(Dashboard), {
+                                                                                                                                                                                                                                                                                                                                                                                                                                ssr: false,
+                                                                                                                                                                                                                                                                                                                                                                                                                                });
                                                                                                                                                                                                                                                                           
                                                                                                                                                                                                                                                                     
                                                                                                                                                                                                                                                     
