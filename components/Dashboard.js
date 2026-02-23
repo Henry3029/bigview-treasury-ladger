@@ -5,8 +5,13 @@ import { TestsNotFoundError } from "vitest/node";
 import DashboardData from '../components/DashboardData';
 import StatusBadge from '../components/StatusBadge';
 import DashboardButtons from '../components/DashboardButtons';
+// Line 8: This creates the "StacksConnect" box your function is looking for
 import * as StacksConnect from '@stacks/connect';
+
+// Line 9: Now this works because "StacksConnect" exists
 const appConfig = new StacksConnect.AppConfig(['store_write', 'publish_data']);
+
+// Line 10: This also works now
 export const userSession = new StacksConnect.UserSession({ appConfig });
 
 // --- CONFIGURATION ---
