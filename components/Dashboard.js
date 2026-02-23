@@ -5,14 +5,18 @@ import { TestsNotFoundError } from "vitest/node";
 import DashboardData from '../components/DashboardData';
 import StatusBadge from '../components/StatusBadge';
 import DashboardButtons from '../components/DashboardButtons';
-// Line 8: This creates the "StacksConnect" box your function is looking for
-import * as StacksConnect from '@stacks/connect';
+// Line 8: Import everything individually to be safe
+import { AppConfig, UserSession, showConnect, openContractCall } from '@stacks/connect';
 
-// Line 9: Now this works because "StacksConnect" exists
-const appConfig = new StacksConnect.AppConfig(['store_write', 'publish_data']);
+// Line 9: Use the names directly
+const appConfig = new AppConfig(['store_write', 'publish_data']);
 
-// Line 10: This also works now
-export const userSession = new StacksConnect.UserSession({ appConfig });
+// Line 10: Export the session
+export const userSession = new UserSession({ appConfig });
+
+// NEW Line 11: This is the "Magic Trick"
+// It creates a 'backup' so your handleStake function doesn't crash
+const StacksConnect = { showConnect, openContractCall };
 
 // --- CONFIGURATION ---
 // I've added your deployed contract details here
