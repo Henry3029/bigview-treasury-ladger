@@ -1,173 +1,116 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import dynamic from 'next/dynamic';
-import { STACKS_TESTNET } from "@stacks/network"; 
-import * as StacksTransactions from "@stacks/transactions";
-import DashboardData from '../components/DashboardData';
-import StatusBadge from '../components/StatusBadge';
-import DashboardButtons from '../components/DashboardButtons';
-// Line 8: Import everything individually to be safe
-import { AppConfig, UserSession, showConnect, openContractCall } from '@stacks/connect';
-
-// Line 9: Use the names directly
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-
-// Line 10: Export the session
-export const userSession = new UserSession({ appConfig });
-
-// NEW Line 11: This is the "Magic Trick"
-// It creates a 'backup' so your handleStake function doesn't crash
-const StacksConnect = { showConnect, openContractCall };
+// 1. Import necessary types
+import { StacksTestnet } from "@stacks/network";
+import { fetchCallReadOnlyFunction, Cl } from "@stacks/transactions";
+// Import userSession from where you defined it (e.g., config.ts or auth.ts)
+import { userSession } from "@/components/privyProvider"; 
 
 // --- CONFIGURATION ---
-// I've added your deployed contract details here
 const CONTRACT_ADDRESS = "ST414MTX2NQ4MVMRE2J9CQATKDEWVXT3DA96XHHA";
 const CONTRACT_NAME = "bigview-treasury";
-const network = 'testnet';
+const network = new StacksTestnet();
 
-function Dashboard() {
-  const [stake, setStake] = useState(0);
-    const [reward, setReward] = useState(0);
-      const [message, setMessage] = useState("Ready");
+export default function Dashboard() {
+  const [stake, setStake] = useState<number>(0);
+  const [reward, setReward] = useState<number>(0);
+  const [message, setMessage] = useState<string>("Ready");
 
-        // PASTE YOUR REAL TESTNET ADDRESS HERE 
-        const userData = userSession.isUserSignedIn() ? userSession.loadUserData() : null;
-          const userAddress = userData ? userData.profile.stxAddress.testnet : null;
-                              
-                                    
-                                    
+  // 2. Define data fetching function
+  const fetchMySummary = async () => {
+    if (!userSession.isUserSignedIn()) return;
+    
+    const userData = userSession.loadUserData();
+    const userAddress = userData.profile.stxAddress.testnet;
 
-            async function fetchMySummary() {
-                if (!userAddress) return;
-                    setMessage("Fetching real contract data...");
-                        try {
-                              const result = await StacksTransactions.fetchCallReadOnlyFunction({
-                                      contractAddress: CONTRACT_ADDRESS,
-                                              contractName: CONTRACT_NAME,
-                                                      functionName: "dashboard-summary",
-                                                              functionArgs: [],
-                                                                      network,
-                                                                              senderAddress: userAddress,
-                                                                                    });
-                                                                                          
-                                                                                                // This will print the actual data from your deployed contract!
-                                                                                                      console.log("REAL CONTRACT DATA:", result);
-                                                                                                            setMessage("Data Loaded from Testnet");
-                                                                                                                  
-                                                                                                                        // If you want to see the numbers in the UI, we'd parse 'result' here
-                                                                                                                            } catch (e) { 
-                                                                                                                                  console.error("Contract Fetch Error:", e);
-                                                                                                                                        setMessage("Error fetching from contract.");
-                                                                                                                                            }
-                                                                                                                                              }
+    setMessage("Fetching real contract data...");
 
-                                                                                                                                                useEffect(() => {
-                                                                                                                                                    fetchMySummary();
-                                                                                                                                                      }, []);
+    try {
+      // 3. Call the read-only function
+      const result = await fetchCallReadOnlyFunction({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: "dashboard-summary",
+        functionArgs: [], // Add arguments here if needed
+        network,
+        senderAddress: userAddress,
+      });
 
-                                                                                                                                                        const executeContractCall = async (functionName, functionArgs, successMsg) => {
-                                                                                                                                                            setMessage(`Calling ${functionName}...`);
+      console.log("REAL CONTRACT DATA:", result);
+      setMessage("Data Loaded from Testnet");
+      
+      // 4. Parse result (Example: assuming result is a Tuple)
+      // if (result.type === 'tuple') {
+      //    setStake(Number(result.data['total-staked'].value));
+      //    setReward(Number(result.data['total-rewards'].value));
+      // }
+      
+    } catch (e) {
+      console.error("Contract Fetch Error:", e);
+      setMessage("Error fetching from contract.");
+    }
+  };
 
-                                                                                                                                                                const options = {
-                                                                                                                                                                      contractAddress: CONTRACT_ADDRESS,
-                                                                                                                                                                            contractName: CONTRACT_NAME,
-                                                                                                                                                                                  functionName,
-                                                                                                                                                                                        functionArgs,
-                                                                                                                                                                                              network,
-                                                                                                                                                                                                    onFinish: (data) => {
-                                                                                                                                                                                                            setMessage(`${successMsg}! TX: ${data.txId.substring(0, 10)}`);
-                                                                                                                                                                                                                  },
-                                                                                                                                                                                                                        onCancel: () => setMessage("Transaction cancelled."),
-                                                                                                                                                                                                                            };
+  // 5. Fetch data on component mount
+  useEffect(() => {
+    fetchMySummary();
+  }, []);
+  
 
-                                                                                                                                                                                                                                // This will trigger your Leather/Xverse wallet if you have it
-                                                                                                                                                                                                                                    if (window.StacksProvider || window.LeatherProvider) {
-                                                                                                                                                                                                                                          await openContractCall(options);
-                                                                                                                                                                                                                                              } else {
-                                                                                                                                                                                                                                                    setMessage("Wallet not found. Use a Stacks-compatible browser.");
-                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                          };
+const handleStake = async (amount: number, setMessage: (msg: string) => void, successMsg: string) => {
+    // 1. Check if the user is signed in
+    if (!userSession.isUserSignedIn()) {
+        alert("Please connect your wallet first.");
+        return;
+    }
 
-                                                                                                                                                                                                             const handleStake = async () => {
-                                                                                                                                                                                                                      // 1. Check if the tools are available (The Search Party)
-                                                                                                                                                                                                                          const showConnectTool = StacksConnect?.showConnect || window?.StacksProvider?.showConnect;
+    // 2. Prepare transaction options with types
+    // Example: Staking a uint amount
+    const functionArgs: ClarityValue[] = [uintCV(amount)];
 
-                                                                                                                                                                                                                              if (!userSession.isUserSignedIn()) {
-                                                                                                                                                                                                                                    if (typeof showConnectTool === 'function') {
-                                                                                                                                                                                                                                            showConnectTool({
-                                                                                                                                                                                                                                                      appDetails: {
-                                                                                                                                                                                                                                                                  name: "BigView Treasury",
-                                                                                                                                                                                                                                                                              icon: window.location.origin + "/logo.png",
-                                                                                                                                                                                                                                                                                        },
-                                                                                                                                                                                                                                                                                                  userSession,
-                                                                                                                                                                                                                                                                                                            redirectTo: window.location.origin, // This handles the return trip correctly
-                                                                                                                                                                                                                                                                                                                      onFinish: () => {
-                                                                                                                                                                                                                                                                                                                                  window.location.reload();
-                                                                                                                                                                                                                                                                                                                                            },
-                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                          } else {
-                                                                                                                                                                                                                                                                                                                                                                  alert("Stacks connection tool not found. Please ensure you are using a Stacks-compatible wallet browser.");
-                                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                                              return;
-                                                                                                                                                                                                                                                                                                                                                                                  }
+    const options = {
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: FUNCTION_NAME,
+        functionArgs: functionArgs,
+        network: new StacksTestnet(), // Switch to StacksMainnet() for production
+        appDetails: {
+            name: "BigView Treasury",
+            icon: window.location.origin + "/logo.png",
+        },
+        onFinish: (data: { txId: string }) => {
+            console.log("Transaction ID:", data.txId);
+            setMessage(`${successMsg}! TX: ${data.txId.substring(0, 10)}...`);
+            // Optional: window.location.reload();
+        },
+        onCancel: () => {
+            setMessage("Transaction cancelled.");
+        },
+    };
 
-                                                                                                                                                                                                                                                                                                                                                                                      // 2. The Staking Logic
-                                                                                                                                                                                                                                                                                                                                                                                          const openCallTool = StacksConnect?.openContractCall || window?.StacksProvider?.openContractCall;
+    // 3. Trigger wallet
+    const windowWithStacks = window as WindowWithStacks;
+    try {
+        if (windowWithStacks.StacksProvider || windowWithStacks.LeatherProvider) {
+            await openContractCall(options);
+        } else {
+            setMessage("Wallet not found. Use a Stacks-compatible browser.");
+        }
+    } catch (error) {
+        console.error("Transaction error:", error);
+        setMessage("Transaction failed.");
+    }
+};
 
-                                                                                                                                                                                                                                                                                                                                                                                              if (typeof openCallTool === 'function') {
-                                                                                                                                                                                                                                                                                                                                                                                                    const amount = StacksTransactions.uintCV(1000000); // 1 STX
+  return (
+    <div>
+      <h1>Treasury Dashboard</h1>
+      <p>Status: {message}</p>
+      <p>Staked: {stake} STX</p>
+      <p>Rewards: {reward} BTC</p>
+    </div>
+  );
+}
 
-                                                                                                                                                                                                                                                                                                                                                                                                          await openCallTool({
-                                                                                                                                                                                                                                                                                                                                                                                                                  contractAddress: CONTRACT_ADDRESS,
-                                                                                                                                                                                                                                                                                                                                                                                                                          contractName: CONTRACT_NAME,
-                                                                                                                                                                                                                                                                                                                                                                                                                                  functionName: "stake",
-                                                                                                                                                                                                                                                                                                                                                                                                                                          functionArgs: [amount],
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  network,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                          onFinish: (data) => {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    console.log("Transaction ID:", data.txId);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            },
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      } else {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            alert("Contract call tool not found. Try refreshing the page in your wallet browser.");
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  };
-                                                                                                                                                                                                              return (
-                                                                                                                                                                                                                                                                              /* This 'dashboard' class connects to your globals.css */
-                                                                                                                                                                                                                                                                                <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center py-10">
-                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                        {/* THE MAIN CONTAINER: This centers everything so it doesn't look 'anyhow' */}
-                                                                                                                                                                                                                                                                                            <div className="w-full max-w-4xl px-4 flex flex-col gap-6">
-                                                                                                                                                                                                                                                                                                  
-                                                                                                                                                                                                                                                                                                        {/* 1. HEADER COMPONENT */}
-                                                                                                                                                                                                                                                                                                              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
-                                                                                                                                                                                                                                                                                                                      <h1 className="text-xl font-bold text-[#002D72]">BIGVIEW TREASURY</h1>
-                                                                                                                                                                                                                                                                                                                              {/* CALL YOUR COMPONENT HERE */}
-                                                                                                                                                                                                                                                                                                                                      <StatusBadge /> 
-                                                                                                                                                                                                                                                                                                                                            </div>
-
-                                                                                                                                                                                                                                                                                                                                                  {/* 2. DATA COMPONENT */}
-                                                                                                                                                                                                                                                                                                                                                        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                                                                                                                                                                                                                                                                                                                                                                {/* CALL YOUR COMPONENT HERE - Pass the data as props */}
-                                                                                                                                                                                                                                                                                                                                                                        <DashboardData stake={stake} reward={reward} />
-                                                                                                                                                                                                                                                                                                                                                                              </div>
-
-                                                                                                                                                                                                                                                                                                                                                                                    {/* 3. BUTTONS COMPONENT */}
-                                                                                                                                                                                                                                                                                                                                                                                          <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                                                                                                                                                                                                                                                                                                                                                                                                  {/* CALL YOUR COMPONENT HERE - Pass your function */}
-                                                                                                                                                                                                                                                                                                                                                                                                          <DashboardButtons onStake={handleStake} />
-                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-
-                                                                                                                                                                                                                                                                                                                                                                                                                      <footer className="text-center text-[10px] text-slate-400 font-mono mt-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                              CONNECTED ADDRESS: {userAddress?.slice(0, 10)}...
-                                                                                                                                                                                                                                                                                                                                                                                                                                    </footer>
-                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                          </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                          );
-                                                                                                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                              // This forces the dashboard to load ONLY in the browser
-                                                                                                                                                                                                                                                                                                                                                                                                                              export default dynamic(() => Promise.resolve(Dashboard), {
-                                                                                                                                                                                                                                                                                                                                                                                                                                ssr: false,
-                                                                                                                                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      

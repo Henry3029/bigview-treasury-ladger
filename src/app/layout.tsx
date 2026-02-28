@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { PrivyProviderWrapper } from '../components/privyProvider';
+import AppPrivyProvider from '../components/privyProvider';
 
 export default function RootLayout({
   children,
