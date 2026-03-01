@@ -1,43 +1,63 @@
-import React from 'react';
-import WalletButton from '@/components/WalletButton'; // So they can connect if they haven't
+'use client';
+
+import React, { useState } from 'react';
+import { useConnect } from '@stacks/connect-react';
+import { 
+  uintCV, 
+  PostConditionMode, 
+  FungibleConditionCode,
+  createAssetInfo,
+  makeStandardSTXPostCondition
+} from '@stacks/transactions';
+import { StacksTestnet } from '@stacks/network';
 
 export default function StakePage() {
+  const { doContractCall } = useConnect();
+  const [amount, setAmount] = useState('');
+
+  const handleStake = async () => {
+    if (!amount || isNaN(Number(amount))) return alert("Enter a valid amount");
+
+    // Convert STX to micro-STX (multiply by 1,000,000)
+    const microStacks = Number(amount) * 1000000;
+
+    await doContractCall({
+      network: new StacksTestnet(),
+      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+      contractName: 'bigview-treasury',
+      functionName: 'stake-tokens', // <--- MAKE SURE THIS MATCHES YOUR CLARITY FUNCTION
+      functionArgs: [uintCV(microStacks)],
+      postConditionMode: PostConditionMode.Allow, 
+      onFinish: (data) => {
+        console.log("Transaction sent!", data);
+        alert("Transaction submitted to the blockchain!");
+      },
+      onCancel: () => {
+        console.log("User cancelled");
+      },
+    });
+  };
+
   return (
     <main className="min-h-screen p-8 bg-slate-50">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">Stack your STX</h1>
-        <p className="text-slate-600 mb-8">Lock your STX to support the network and earn rewards.</p>
+      <div className="max-w-md mx-auto mt-20 bg-white p-8 rounded-2xl shadow-lg border border-gold-100">
+        <h2 className="text-2xl font-bold mb-6 text-slate-800">Stake your STX</h2>
+        
+        <div className="space-y-4">
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Amount in STX"
+            className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-500 outline-none"
+          />
 
-        {/* --- STAKING CARD --- */}
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Stake STX</h2>
-            <WalletButton /> {/* Quick way to connect */}
-          </div>
-
-          <div className="space-y-4">
-            {/* Input Field */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Amount to Stake
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  placeholder="0.00"
-                  className="w-full p-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-500"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">
-                  STX
-                </span>
-              </div>
-            </div>
-
-            {/* Action Button */}
-            <button className="w-full bg-orange-600 text-white py-4 rounded-xl font-semibold hover:bg-orange-700 transition">
-              Stake Now
-            </button>
-          </div>
+          <button 
+            onClick={handleStake}
+            className="w-full bg-orange-600 text-white py-4 rounded-xl font-bold hover:bg-orange-700 transition-all active:scale-95"
+          >
+            Confirm Stake
+          </button>
         </div>
       </div>
     </main>
