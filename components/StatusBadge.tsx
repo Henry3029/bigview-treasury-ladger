@@ -1,41 +1,18 @@
-// src/components/StatusBadge.tsx
-import React from 'react';
+"use client";
+import { usePrivy } from '@privy-io/react-auth';
 
-// 1. Define the possible status types
-type DashboardStatus = 'online' | 'pending' | 'error';
-
-interface StatusBadgeProps {
-  status: DashboardStatus;
-  label?: string; // Optional custom text
-}
-
-export default function StatusBadge({ status, label }: StatusBadgeProps) {
-  // 2. Map status to specific Tailwind colors and icons
-  const statusConfig = {
-    online: {
-      color: 'bg-green-100 text-green-700 border-green-200',
-      dot: 'bg-green-500',
-      text: label || 'System Operational'
-    },
-    pending: {
-      color: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      dot: 'bg-yellow-500',
-      text: label || 'Syncing Blocks...'
-    },
-    error: {
-      color: 'bg-red-100 text-red-700 border-red-200',
-      dot: 'bg-red-500',
-      text: label || 'Wallet Disconnected'
-    }
-  };
-
-  const config = statusConfig[status];
+export default function StatusBadge() {
+  // 1. Get authentication state from Privy
+  const { authenticated, user } = usePrivy();
+  
+  // 2. Identify the connected Stacks address
+  const stacksAddress = user?.wallet?.address; // This depends on how Privy maps it
 
   return (
-    <div className={`inline-flex items-center px-3 py-1 rounded-full border text-xs font-medium ${config.color}`}>
-      {/* Visual indicator dot with a pulse effect for 'online' */}
-      <span className={`mr-2 h-2 w-2 rounded-full ${config.dot} ${status === 'online' ? 'animate-pulse' : ''}`}></span>
-      {config.text}
+    <div className={`flex items-center gap-2 p-2 rounded-full text-sm font-medium
+      ${authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+      <span className={`h-2 w-2 rounded-full ${authenticated ? 'bg-green-500' : 'bg-red-500'}`}></span>
+      {authenticated ? `Connected: ${stacksAddress?.slice(0,6)}...` : "Disconnected"}
     </div>
   );
 }

@@ -1,49 +1,52 @@
 // src/components/DashboardData.tsx
-import React from 'react';
+"use client";
+import { useEffect, useState } from 'react';
+import { DashboardSummary } from '@/types/contract'
+import { callReadOnlyFunction, cvToJSON } from '@stacks/transactions';
+import { StacksTestnet } from '@stacks/network'; // or StacksMainnet()
+import { usePrivy } from '@privy-io/react-auth';
 
-// 1. Define the shape of your data
-interface DashboardDataProps {
-  stake: number | string;
-  reward: number | string;
-  proposal: string;
-  votesFor: number;
-  votesAgainst: number;
-}
+export default function DashboardData() {
+  const [summary, setSummary] = useState<any>(null);
+  const { user } = usePrivy();
 
-// 2. Apply the interface to the component
-export default function DashboardData({ 
-  stake, 
-  reward, 
-  proposal, 
-  votesFor, 
-  votesAgainst 
-}: DashboardDataProps) {
+  useEffect(() => {
+    async function fetchSummary() {
+      if (!user) return;
+
+      const network = new StacksTestnet();
+      // Ensure these are in your .env.local
+      const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+      const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
+
+      try {
+        const response = await callReadOnlyFunction({
+          network,
+          contractAddress,
+          contractName,
+          functionName: 'dashboard-summary',
+          functionArgs: [], // No arguments needed
+          senderAddress: user.wallet?.address!,
+        });
+        
+        // Convert Clarity Value to JSON
+        setSummary(cvToJSON(response));
+        console.log("Contract Data:", cvToJSON(response));
+      } catch (error) {
+        console.error("Error fetching summary:", error);
+      }
+    }
+
+    fetchSummary();
+  }, [user]);
+
+  if (!summary) return <div>Loading...</div>;
+
   return (
-    <div className="space-y-2 p-6 bg-white rounded-xl shadow-sm border border-gray-100">
-      <p className="flex justify-between">
-        <span className="text-gray-500">Current Stake:</span> 
-        <span className="font-bold text-orange-600">{stake} STX</span>
-      </p>
-      <p className="flex justify-between">
-        <span className="text-gray-500">Available Reward:</span> 
-        <span className="font-bold text-green-600">{reward} BTC</span>
-      </p>
-      
-      <hr className="my-4 border-gray-100" />
-      
-      <p className="text-sm font-medium text-gray-400 uppercase tracking-wider">Governance</p>
-      <p className="flex justify-between">
-        <span className="text-gray-500">Latest Proposal:</span> 
-        <span className="font-medium italic">"{proposal}"</span>
-      </p>
-      <div className="flex gap-4 mt-2">
-        <p className="text-sm">
-          <span className="text-green-500">✔ For:</span> {votesFor}
-        </p>
-        <p className="text-sm">
-          <span className="text-red-500">✖ Against:</span> {votesAgainst}
-        </p>
-      </div>
+    <div className="grid grid-cols-2 gap-4 p-6 bg-white rounded-xl shadow-sm border">
+      <div>Total Members: <span className="font-bold">{summary.value['total-members'].value}</span></div>
+      <div>Total Staked: <span className="font-bold">{summary.value['total-stakes'].value} STX</span></div>
+      {/* ... add more fields ... */}
     </div>
   );
 }
