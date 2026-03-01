@@ -2,6 +2,8 @@ import Link from 'next/link';
 import AppPrivyProvider from '../components/privyProvider';
 // 1. Import your new Client Component
 import WalletButton from '../components/WalletButton';
+// 1. Import the Image component from next
+import Image from 'next/image';
 
 export default function RootLayout({
   children,
@@ -14,8 +16,15 @@ export default function RootLayout({
         <AppPrivyProvider>
           {/* --- NAVIGATION BAR --- */}
           <nav className="flex items-center justify-between p-6 bg-white shadow-sm border-b">
-            <div className="text-2xl font-bold text-orange-600">
-                Bigview <span className='text-slate-900'>Treasury</span>
+          <Link href="/" className="flex items-center gap-2">
+              <Image 
+                src="/images/logo.png" // Path starts from /public
+                alt="Bigview Treasury Logo"
+                width={40}  // Set desired width
+                height={40} // Set desired height
+                className="rounded-full" // Optional styling
+              />
+ <span className='text-slate-900'>Treasury</span>
             </div>
             
             <div className="space-x-6 font-medium text-slate-700">
