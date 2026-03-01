@@ -29,10 +29,11 @@ export default function RootLayout({
             </div>
             
             <div className="space-x-6 font-medium text-slate-700">
-              <Link href="/" className="hover:text-orange-500">Dashboard</Link>
+              <Link href="/homePage" className="hover:text-orange-500">Home page</Link>
               <Link href="/history" className="hover:text-orange-500">Ledger</Link>
               <Link href="/stake" className="hover:text-orange-500">Staking</Link>
               <Link href="/governance" className="hover:text-orange-500">Governance</Link>
+                <Link href="/about" className="hover:text-orange-500">About Us</Link>
             </div>
 
             {/* 2. Use the new Client Component here */}
