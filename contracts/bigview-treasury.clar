@@ -12,8 +12,10 @@
 (define-constant ERR-NOT-AUTHORIZED (err u100))
 (define-constant ERR-NO-STAKE (err u101))
 (define-constant ERR-NO-REWARD (err u102))
+(define-constant ERR-INSUFFICIENT-STAKE (err u103)) ;; Added
+(define-constant ERR-TRANSFER-FAILED (err u104))   ;; Added
 
-;; Tracking totals for the dashboard (Since maps aren't iterable)
+;; Tracking totals for the dashboard
 (define-data-var total-members-count uint u0)
 (define-data-var total-staked-amount uint u0)
 (define-data-var total-rewards-amount uint u0)
@@ -25,7 +27,7 @@
 
 (define-map user-wallets { user: principal } { wallet: principal })
 (define-map members { account: principal } { is-member: bool })
-(define-map stakes { account: principal } { amount: uint })
+(define-map stakes { account: principal } { amount: uint }) ;; Tracks STX staked per user
 (define-map rewards { account: principal } { amount: uint })
 (define-map proposals { id: uint } { description: (string-ascii 64), votes-for: uint, votes-against: uint })
 
@@ -35,70 +37,135 @@
 
 (define-read-only (dashboard-summary)
   {
-      total-members: (var-get total-members-count),
-          total-stakes: (var-get total-staked-amount),
-              total-rewards: (var-get total-rewards-amount),
-                  proposals-count: (var-get proposal-counter)
-                    })
+    total-members: (var-get total-members-count),
+    total-stakes: (var-get total-staked-amount),
+    total-rewards: (var-get total-rewards-amount),
+    proposals-count: (var-get proposal-counter)
+  }
+)
 
-                    (define-read-only (is-member? (user principal))
-                      (default-to false (get is-member (map-get? members { account: user }))))
+(define-read-only (is-member? (user principal))
+  (default-to false (get is-member (map-get? members { account: user })))
+)
 
-                      ;; ---------------------------------------------------------
-                      ;; Public Functions
-                      ;; ---------------------------------------------------------
+;; Added: Read a specific user's stake
+(define-read-only (get-user-stake (user principal))
+  (default-to u0 (get amount (map-get? stakes { account: user })))
+)
 
-                      ;; Wallet Registration
-                      (define-public (register-wallet (user principal) (wallet principal))
-                        (begin
-                            (map-insert user-wallets { user: user } { wallet: wallet })
-                                (ok "Wallet Registered")))
+;; ---------------------------------------------------------
+;; Public Functions
+;; ---------------------------------------------------------
 
-                                ;; Membership Management
-                                (define-public (add-member (user principal))
-                                  (begin
-                                      (asserts! (map-insert members { account: user } { is-member: true }) ERR-NOT-AUTHORIZED)
-                                          (var-set total-members-count (+ (var-get total-members-count) u1))
-                                              (ok "Member added")))
+;; Wallet Registration
+(define-public (register-wallet (user principal) (wallet principal))
+  (begin
+    (map-insert user-wallets { user: user } { wallet: wallet })
+    (ok "Wallet Registered")
+  )
+)
 
-                                              (define-public (remove-member (user principal))
-                                                (begin
-                                                    (asserts! (map-delete members { account: user }) ERR-NOT-AUTHORIZED)
-                                                        (var-set total-members-count (- (var-get total-members-count) u1))
-                                                            (ok "Member removed")))
+;; Membership Management
+(define-public (add-member (user principal))
+  (begin
+    (asserts! (map-insert members { account: user } { is-member: true }) ERR-NOT-AUTHORIZED)
+    (var-set total-members-count (+ (var-get total-members-count) u1))
+    (ok "Member added")
+  )
+)
 
+(define-public (remove-member (user principal))
+  (begin
+    (asserts! (map-delete members { account: user }) ERR-NOT-AUTHORIZED)
+    (var-set total-members-count (- (var-get total-members-count) u1))
+    (ok "Member removed")
+  )
+)
 
-                                                            ;; Rewards Logic
-                                                            (define-public (credit-reward (user principal) (amount uint))
-                                                              (begin 
-                                                                  (map-set rewards { account: user } { amount: amount })
-                                                                      (var-set total-rewards-amount (+ (var-get total-rewards-amount) amount))
-                                                                          (ok "Reward credited")))
+;; ---------------------------------------------------------
+;; New Staking Logic
+;; ---------------------------------------------------------
 
+;; 1. User Staking STX
+(define-public (stake-tokens (amount uint))
+  (let (
+    (user tx-sender)
+    (current-stake (get-user-stake user))
+  )
+    ;; 1. Transfer STX from user to this contract
+    (try! (stx-transfer? amount user (as-contract tx-sender)))
+    
+    ;; 2. Update user's stake map
+    (map-set stakes { account: user } { amount: (+ current-stake amount) })
+    
+    ;; 3. Update total staked variable
+    (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
+    
+    (ok "Tokens staked successfully")
+  )
+)
 
-                                                                          ;; Governance Logic
-                                                                          (define-public (create-proposal (desc (string-ascii 64)))
-                                                                            (let ((id (+ (var-get proposal-counter) u1)))
-                                                                                (begin
-                                                                                      (map-insert proposals { id: id }
-                                                                                              { description: desc, votes-for: u0, votes-against: u0 })
-                                                                                                    (var-set proposal-counter id)
-                                                                                                          (ok id))))
+;; 2. User Unstaking STX
+(define-public (unstake-tokens (amount uint))
+  (let (
+    (user tx-sender)
+    (current-stake (get-user-stake user))
+  )
+    ;; 1. Ensure user has enough stake
+    (asserts! (>= current-stake amount) ERR-INSUFFICIENT-STAKE)
+    
+    ;; 2. Transfer STX from contract back to user
+    (try! (as-contract (stx-transfer? amount tx-sender user)))
+    
+    ;; 3. Update user's stake map
+    (map-set stakes { account: user } { amount: (- current-stake amount) })
+    
+    ;; 4. Update total staked variable
+    (var-set total-staked-amount (- (var-get total-staked-amount) amount))
+    
+    (ok "Tokens unstaked successfully")
+  )
+)
 
-                                                                                                          (define-public (vote (id uint) (support bool))
-                                                                                                            ;; 1. Use unwrap! to immediately exit if the proposal ID is invalid
-                                                                                                              (let ((proposal (unwrap! (map-get? proposals { id: id }) (err "Proposal not found"))))
-                                                                                                                  (begin
-                                                                                                                        ;; 2. Update the map directly using a more compact if logic
-                                                                                                                              (map-set proposals { id: id }
-                                                                                                                                      { 
-                                                                                                                                                description: (get description proposal),
-                                                                                                                                                          votes-for: (if support 
-                                                                                                                                                                                   (+ (get votes-for proposal) u1) 
-                                                                                                                                                                                                            (get votes-for proposal)),
-                                                                                                                                                                                                                      votes-against: (if support 
-                                                                                                                                                                                                                                                   (get votes-against proposal) 
-                                                                                                                                                                                                                                                                                (+ (get votes-against proposal) u1)) 
-                                                                                                                                                                                                                                                                                        })
-                                                                                                                                                                                                                                                                                              (ok "Vote recorded"))))
-                                                                                                                                                                                                                                                                                              
+;; Rewards Logic
+(define-public (credit-reward (user principal) (amount uint))
+  (begin 
+    (map-set rewards { account: user } { amount: amount })
+    (var-set total-rewards-amount (+ (var-get total-rewards-amount) amount))
+    (ok "Reward credited")
+  )
+)
+
+;; ---------------------------------------------------------
+;; Governance Logic
+;; ---------------------------------------------------------
+
+(define-public (create-proposal (desc (string-ascii 64)))
+  (let ((id (+ (var-get proposal-counter) u1)))
+    (begin
+      (map-insert proposals { id: id }
+        { description: desc, votes-for: u0, votes-against: u0 })
+      (var-set proposal-counter id)
+      (ok id)
+    )
+  )
+)
+
+(define-public (vote (id uint) (support bool))
+  (let ((proposal (unwrap! (map-get? proposals { id: id }) (err "Proposal not found"))))
+    (begin
+      (map-set proposals { id: id }
+        { 
+          description: (get description proposal),
+          votes-for: (if support 
+                       (+ (get votes-for proposal) u1) 
+                       (get votes-for proposal)),
+          votes-against: (if support 
+                          (get votes-against proposal) 
+                          (+ (get votes-against proposal) u1))
+        }
+      )
+      (ok "Vote recorded")
+    )
+  )
+)
