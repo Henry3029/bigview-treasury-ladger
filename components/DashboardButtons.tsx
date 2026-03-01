@@ -1,55 +1,85 @@
-// src/components/DashboardButtons.tsx
+"use client";
 import React from 'react';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { openContractCall } from '@stacks/connect';
+import { 
+  uintCV, 
+  boolCV, 
+  stringAsciiCV, 
+  PostConditionMode 
+} from '@stacks/transactions';
+import { StacksTestnet } from '@stacks/network';
 
-// 1. Define an interface for the component props
-interface DashboardButtonsProps {
-  onStake: () => void;
-  onUnstake: () => void;
-  onClaim: () => void;
-  onProposal: () => void;
-  onVote: () => void;
-}
+export default function DashboardButtons() {
+  const { authenticated } = usePrivy();
+  const { wallets } = useWallets();
 
-// 2. Apply the interface to the component
-export default function DashboardButtons({
-  onStake,
-  onUnstake,
-  onClaim,
-  onProposal,
-  onVote,
-}: DashboardButtonsProps) {
+  const handleContractCall = async (functionName: string, args: any[]) => {
+    if (!authenticated) return alert("Please login via email first!");
+
+    // 1. Find the Privy Embedded Wallet
+    const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
+    if (!embeddedWallet) return alert("No embedded wallet found.");
+
+    // 2. Define the Stacks Transaction
+    const network = new StacksTestnet(); 
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
+    const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
+
+    const options = {
+      contractAddress,
+      contractName,
+      functionName,
+      functionArgs: args,
+      network,
+      postConditionMode: PostConditionMode.Allow,
+      onFinish: (data: any) => {
+        console.log("TX Success:", data.txId);
+        alert(`Transaction Sent! ID: ${data.txId}`);
+      },
+      onCancel: () => console.log("User dismissed the prompt"),
+    };
+
+    // 3. Trigger the call
+    // Stacks.js automatically detects the provider when using Privy
+    await openContractCall(options);
+  };
+
   return (
-    <div className="flex flex-wrap gap-4 justify-center">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Button to Vote Yes on Proposal #1 */}
       <button 
-        onClick={onStake}
-        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+        onClick={() => handleContractCall('vote', [uintCV(1), boolCV(true)])}
+        className="bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition"
       >
-        Stake STX
+        Vote Yes (#1)
       </button>
+      
+      {/* Button to Vote No on Proposal #1 */}
       <button 
-        onClick={onUnstake}
-        className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+        onClick={() => handleContractCall('vote', [uintCV(1), boolCV(false)])}
+        className="bg-red-600 text-white p-3 rounded-lg hover:bg-red-700 transition"
       >
-        Unstake
+        Vote No (#1)
       </button>
+
+      {/* Button to Register a Wallet */}
       <button 
-        onClick={onClaim}
-        className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+        onClick={() => handleContractCall('register-wallet', [
+          /* principalCV(userAddress), principalCV(walletAddress) */
+        ])}
+        className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
       >
-        Claim Rewards
+        Register Wallet
       </button>
+
+      {/* Button to Add Member */}
       <button 
-        onClick={onProposal}
-        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+        onClick={() => handleContractCall('add-member', [/* principalCV(userAddress) */])}
+        className="bg-purple-600 text-white p-3 rounded-lg hover:bg-purple-700 transition"
       >
-        Create Proposal
-      </button>
-      <button 
-        onClick={onVote}
-        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-      >
-        Vote
+        Become Member
       </button>
     </div>
-  );
+    );
 }
