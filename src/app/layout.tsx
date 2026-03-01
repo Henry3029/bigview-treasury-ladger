@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import '../styles/globals.css';
 import AppPrivyProvider from '../components/privyProvider';
 // 1. Import your new Client Component
 import WalletButton from '../components/WalletButton';
