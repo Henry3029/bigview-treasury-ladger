@@ -7,10 +7,16 @@
           }
 
           body {
-            background-color: var(--bg-subtle);
-              margin: 0;
-                font-family: 'Inter', sans-serif;
-                }
+  /* Radiant Light Gold Gradient */
+  background: radial-gradient(
+    circle at center, 
+    rgba(255, 223, 145, 0.15) 0%,   /* Soft gold center */
+    rgba(255, 248, 225, 0.4) 50%,   /* Very light cream transition */
+    rgba(248, 250, 252, 1) 100%     /* Slate-50 edge to match your layout */
+  );
+  background-attachment: fixed;     /* Keeps the gradient still while scrolling */
+  min-height: 100vh;
+}
 
                 /* The Main Wrapper */
                 .dashboard-layout {

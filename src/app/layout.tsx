@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased text-slate-900 bg-slate-50">
+        <body className="antialiased text-slate-900">
         <AppPrivyProvider>
           {/* --- NAVIGATION BAR --- */}
           <nav className="flex items-center justify-between p-6 bg-white shadow-sm border-b">
