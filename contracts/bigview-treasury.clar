@@ -7,6 +7,9 @@
 
 ;; Developer address (STX wallet for fees)
 (define-constant developer 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+(define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
+;; Replace this with a real pool address (e.g., FastPool or Xverse)
+(define-constant MAJOR-POOL-ADDRESS 'SP21YTSM60DQ67EPQDTF5G3S3F28VDVY7A9074V3H)
 
 ;; Error Codes
 (define-constant ERR-NOT-AUTHORIZED (err u100))
@@ -14,6 +17,10 @@
 (define-constant ERR-NO-REWARD (err u102))
 (define-constant ERR-INSUFFICIENT-STAKE (err u103)) ;; Added
 (define-constant ERR-TRANSFER-FAILED (err u104))   ;; Added
+(define-constant REWARD-CYCLE-INDEX u2100) ;; One cycle is 2100 blocks
+
+(define-constant ERR-NOT-UNLOCKED (err u105)) ;; NEW: Error for "Too early to withdraw"
+(define-constant ERR-NO-REQUEST (err u106))   ;; NEW: Error for "No unstake request found"
 
 ;; Tracking totals for the dashboard
 (define-data-var total-members-count uint u0)
@@ -30,6 +37,11 @@
 (define-map stakes { account: principal } { amount: uint }) ;; Tracks STX staked per user
 (define-map rewards { account: principal } { amount: uint })
 (define-map proposals { id: uint } { description: (string-ascii 64), votes-for: uint, votes-against: uint })
+;; This tracks "I want to take out X amount at Y block height"
+(define-map unstake-requests 
+  { account: principal } 
+  { amount: uint, unlock-at: uint }
+)
 
 ;; ---------------------------------------------------------
 ;; Read-Only Functions
@@ -86,44 +98,62 @@
 ;; New Staking Logic
 ;; ---------------------------------------------------------
 
-;; 1. User Staking STX
-(define-public (stake-tokens (amount uint))
+;; 1. Use PoX-4 for the Nakamoto era
+(define-public (stake-and-delegate (amount uint))
   (let (
     (user tx-sender)
-    (current-stake (get-user-stake user))
+    (current-total (var-get total-staked-amount))
+    (current-user-stake (get-user-stake user))
   )
-    ;; 1. Transfer STX from user to this contract
+    ;; STEP 1: Move STX from User to your Contract
     (try! (stx-transfer? amount user (as-contract tx-sender)))
-    
-    ;; 2. Update user's stake map
-    (map-set stakes { account: user } { amount: (+ current-stake amount) })
-    
-    ;; 3. Update total staked variable
-    (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
-    
-    (ok "Tokens staked successfully")
+
+    ;; STEP 2: Update your INTERNAL records (For your Dashboard)
+    (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
+    (var-set total-staked-amount (+ current-total amount))
+
+;; 3. Delegate to the Major Pool
+    ;; This doesn't lock it yet, it just says "MAJOR-POOL is allowed to lock this contract's funds"
+    (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none))
   )
 )
 
-;; 2. User Unstaking STX
-(define-public (unstake-tokens (amount uint))
+;; 3. THE NEW FUNCTIONS
+
+;; STEP 1: Tell the contract you want to leave
+(define-public (request-unstake (amount uint))
+  (let ((user tx-sender))
+    ;; Check if they actually have enough staked
+    (asserts! (>= (get-user-stake user) amount) ERR-INSUFFICIENT-STAKE)
+    
+    ;; Set the "Unlock Date" to current block + 2100 blocks (1 cycle)
+    (map-set unstake-requests { account: user } 
+      { 
+        amount: amount, 
+        unlock-at: (+ block-height REWARD-CYCLE-INDEX) 
+      }
+)
+    (ok true)
+  )
+)
+
+;; STEP 2: Actually withdraw the money (only works after the wait)
+(define-public (finalize-unstake)
   (let (
     (user tx-sender)
-    (current-stake (get-user-stake user))
+    (request (unwrap! (map-get? unstake-requests { account: user }) ERR-NO-REQUEST))
   )
-    ;; 1. Ensure user has enough stake
-    (asserts! (>= current-stake amount) ERR-INSUFFICIENT-STAKE)
+    ;; Check: Is the current block-height greater than the unlock-at height?
+    (asserts! (>= block-height (get unlock-at request)) ERR-NOT-UNLOCKED)
     
-    ;; 2. Transfer STX from contract back to user
-    (try! (as-contract (stx-transfer? amount tx-sender user)))
+    ;; If yes, transfer the STX back to the user
+    (try! (as-contract (stx-transfer? (get amount request) (as-contract tx-sender) user)))
+
+;; Update your internal maps
+    (map-delete unstake-requests { account: user })
+    (map-set stakes { account: user } { amount: (- (get-user-stake user) (get amount request)) })
     
-    ;; 3. Update user's stake map
-    (map-set stakes { account: user } { amount: (- current-stake amount) })
-    
-    ;; 4. Update total staked variable
-    (var-set total-staked-amount (- (var-get total-staked-amount) amount))
-    
-    (ok "Tokens unstaked successfully")
+    (ok true)
   )
 )
 
