@@ -5,8 +5,8 @@
 ;; Constants & Data Variables
 ;; ---------------------------------------------------------
 
-;; Developer address (STX wallet for fees)
-(define-constant developer 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM)
+;; 1. Add your developer wallet address as a constant
+(define-constant DEV-WALLET 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Replace with your actual wallet
 (define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
 ;; Replace this with a real pool address (e.g., FastPool or Xverse)
 (define-constant MAJOR-POOL-ADDRESS 'SP21YTSM60DQ67EPQDTF5G3S3F28VDVY7A9074V3H)
@@ -163,6 +163,39 @@
     (map-set rewards { account: user } { amount: amount })
     (var-set total-rewards-amount (+ (var-get total-rewards-amount) amount))
     (ok "Reward credited")
+  )
+)
+
+
+(define-public (claim-rewards)
+  (let (
+    (user tx-sender)
+    (user-stake (default-to u0 (get amount (map-get? stakes { account: user }))))
+    (total-pool-stake (var-get total-staked-amount))
+    ;; Get the sBTC balance currently held by the contract
+    (contract-sbtc-balance (unwrap! (as-contract (contract-call? SBTC-CONTRACT get-balance (as-contract tx-sender))) (err u500)))
+  )
+    ;; 1. Check if user has anything staked
+    (asserts! (> user-stake u0) (err u403))
+
+    (let (
+      ;; 2. Calculate total reward for this user
+      (total-user-reward (/ (* user-stake contract-sbtc-balance) total-pool-stake))
+      
+      ;; 3. Calculate 5% Fee: (Reward * 5) / 100
+      (dev-fee (/ (* total-user-reward u5) u100))
+      
+      ;; 4. Remaining reward for the user
+      (final-user-reward (- total-user-reward dev-fee))
+    )
+      ;; 5. Transfer 5% to Developer
+      (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
+      
+      ;; 6. Transfer 95% to the User
+      (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward (as-contract tx-sender) user none)))
+      
+      (ok {reward: final-user-reward, fee: dev-fee})
+    )
   )
 )
 
