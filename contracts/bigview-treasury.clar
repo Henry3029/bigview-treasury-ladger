@@ -6,10 +6,10 @@
 ;; ---------------------------------------------------------
 
 ;; 1. Add your developer wallet address as a constant
-(define-constant DEV-WALLET 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM) ;; Replace with your actual wallet
+(define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE) ;; Replace with your actual wallet
 (define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
 ;; Replace this with a real pool address (e.g., FastPool or Xverse)
-(define-constant MAJOR-POOL-ADDRESS 'SP21YTSM60DQ67EPQDTF5G3S3F28VDVY7A9074V3H)
+(define-constant MAJOR-POOL-ADDRESS 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
 
 ;; Error Codes
 (define-constant ERR-NOT-AUTHORIZED (err u100))
