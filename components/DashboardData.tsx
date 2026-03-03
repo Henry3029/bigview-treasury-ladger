@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { DashboardSummary } from '@/types/contract'
 import { callReadOnlyFunction, cvToJSON } from '@stacks/transactions';
-import { StacksTestnet } from '@stacks/network'; // or StacksMainnet()
+import { STACKS_TESTNET } from '@stacks/network'; // or StacksMainnet()
 import { usePrivy } from '@privy-io/react-auth';
 
 export default function DashboardData() {
@@ -14,7 +14,7 @@ export default function DashboardData() {
     async function fetchSummary() {
       if (!user) return;
 
-      const network = new StacksTestnet();
+      const network = STACKS_TESTNET;
       // Ensure these are in your .env.local
       const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
       const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;

@@ -4,12 +4,12 @@ import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
 // 1. Import necessary functions from Stacks.js
 import { fetchCallReadOnlyFunction, cvToJSON, principalCV } from '@stacks/transactions';
-import { StacksTestnet } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 
 // 2. Define constants
 const CONTRACT_ADDRESS = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
 const CONTRACT_NAME = 'bigview-treasury'; // <-- You must set this
-const NETWORK = new StacksTestnet();
+const NETWORK = STACKS_TESTNET;
 
 // 3. Updated function to fetch real-time data
 async function getDashboardData() {
@@ -28,7 +28,7 @@ async function getDashboardData() {
       network: NETWORK,
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
-      functionName: 'get-active-proposal', // <-- REPLACE WITH YOUR FUNCTION NAME
+      functionName: 'dashboard-summary',  // <-- REPLACE WITH YOUR FUNCTION NAME
       functionArgs: [],
       senderAddress: CONTRACT_ADDRESS,
     });

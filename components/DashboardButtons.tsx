@@ -8,7 +8,7 @@ import {
   stringAsciiCV, 
   PostConditionMode 
 } from '@stacks/transactions';
-import { StacksTestnet } from '@stacks/network';
+import { STACKS_TESTNET } from '@stacks/network';
 
 export default function DashboardButtons() {
   const { authenticated } = usePrivy();
@@ -22,7 +22,7 @@ export default function DashboardButtons() {
     if (!embeddedWallet) return alert("No embedded wallet found.");
 
     // 2. Define the Stacks Transaction
-    const network = new StacksTestnet(); 
+    const network = STACKS_TESTNET; 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
     const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
 
