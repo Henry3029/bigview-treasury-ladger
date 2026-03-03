@@ -105,6 +105,7 @@
     (current-total (var-get total-staked-amount))
     (current-user-stake (get-user-stake user))
   )
+  (begin 
     ;; STEP 1: Move STX from User to your Contract
     (try! (stx-transfer? amount user (as-contract tx-sender)))
 
@@ -114,7 +115,9 @@
 
 ;; 3. Delegate to the Major Pool
     ;; This doesn't lock it yet, it just says "MAJOR-POOL is allowed to lock this contract's funds"
-    (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none))
+   (try! (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)))
+    (ok true)
+  )
   )
 )
 
