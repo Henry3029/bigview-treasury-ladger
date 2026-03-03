@@ -158,15 +158,6 @@
 )
 
 ;; Rewards Logic
-(define-public (credit-reward (user principal) (amount uint))
-  (begin 
-    (map-set rewards { account: user } { amount: amount })
-    (var-set total-rewards-amount (+ (var-get total-rewards-amount) amount))
-    (ok "Reward credited")
-  )
-)
-
-
 (define-public (claim-rewards)
   (let (
     (user tx-sender)
