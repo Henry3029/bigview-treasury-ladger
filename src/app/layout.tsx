@@ -5,6 +5,7 @@ import AppPrivyProvider from '../components/privyProvider';
 import WalletButton from '../components/WalletButton';
 // 1. Import the Image component from next
 import Image from 'next/image';
+import { BottomNav } from '@/components/BottomNav';
 
 export default function RootLayout({
   children,
@@ -12,43 +13,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-        <body className="antialiased text-slate-900">
-        <AppPrivyProvider>
-          {/* --- NAVIGATION BAR --- */}
-          <nav className="flex items-center justify-between p-6 bg-white shadow-sm border-b">
-          <Link href="/" className="flex items-center gap-2">
-              <Image 
-                src="/images/logo.png" // Path starts from /public
-                alt="Bigview Treasury Logo"
-                width={40}  // Set desired width
-                height={40} // Set desired height
-                className="rounded-full" // Optional styling
-              />
- <span className='text-slate-900'>Treasury</span>
-            </div>
-            
-            <div className="space-x-6 font-medium text-slate-700">
-              <Link href="/homePage" className="hover:text-orange-500">Home page</Link>
-              <Link href="/history" className="hover:text-orange-500">Ledger</Link>
-              <Link href="/stake" className="hover:text-orange-500">Staking</Link>
-              <Link href="/governance" className="hover:text-orange-500">Governance</Link>
-                <Link href="/about" className="hover:text-orange-500">About Us</Link>
-            </div>
+  <html lang="en">
+    <body className="antialiased text-slate-900 bg-gray-50 flex flex-col min-h-screen">
+      <AppPrivyProvider>
+        {/* --- TOP HEADER (Simplified OPay Style) --- */}
+        <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white shadow-sm border-b">
+          <div className="flex items-center gap-2">
+            <Image src="/images/logo.png" alt="Logo" width={32} height={32} className="rounded-full" />
+            <span className='font-bold text-lg tracking-tight'>Treasury</span>
+          </div>
+          
+          {/* Only the Wallet Button stays at the top */}
+          <WalletButton />
+        </header>
 
-            {/* 2. Use the new Client Component here */}
-            <WalletButton />
-          </nav>
+        {/* --- MAIN CONTENT --- */}
+        {/* pb-20 ensures the BottomNav doesn't cover your content */}
+        <main className="flex-grow pb-20">
+          {children}
+        </main>
 
-          <main>
-            {children}
-          </main>
+        {/* --- THE OPay BOTTOM NAV --- */}
+        {/* We replace the horizontal links with this */}
+        <BottomNav /> 
 
-          <footer className="p-10 text-center text-gray-500 border-t mt-10">
-            © 2026 Bigview POX Community
-          </footer>
-        </AppPrivyProvider>
-      </body>
-    </html>
-  );
-}
+        {/* --- FOOTER --- */}
+        {/* In mobile apps, footers are usually hidden or very small */}
+        <footer className="p-6 text-center text-xs text-gray-400 border-t">
+          © 2026 Bigview POX
+        </footer>
+      </AppPrivyProvider>
+    </body>
+  </html>
+);
