@@ -1,21 +1,34 @@
-// src/components/DashboardData.tsx
 "use client";
 import { useEffect, useState } from 'react';
-import { DashboardSummary } from '@/types/contract'
+import { Loader2 } from 'lucide-react'; // Icon import
 import { callReadOnlyFunction, cvToJSON } from '@stacks/transactions';
-import { STACKS_TESTNET } from '@stacks/network'; // or StacksMainnet()
+import { STACKS_TESTNET } from '@stacks/network';
 import { usePrivy } from '@privy-io/react-auth';
 
 export default function DashboardData() {
   const [summary, setSummary] = useState<any>(null);
   const { user } = usePrivy();
+  
+  const [message, setMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Helper function for notifications
+  const notify = (text: string, type: 'success' | 'error' | 'info') => {
+    setMessage(text);
+    setStatus(type);
+    setTimeout(() => {
+      setMessage(null);
+      setStatus(null);
+    }, 4000);
+  };
 
   useEffect(() => {
     async function fetchSummary() {
-      if (!user) return;
+      if (!user?.wallet?.address) return;
 
+      setIsLoading(true);
       const network = STACKS_TESTNET;
-      // Ensure these are in your .env.local
       const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
       const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
 
@@ -25,28 +38,61 @@ export default function DashboardData() {
           contractAddress,
           contractName,
           functionName: 'dashboard-summary',
-          functionArgs: [], // No arguments needed
-          senderAddress: user.wallet?.address!,
+          functionArgs: [],
+          senderAddress: user.wallet.address,
         });
         
-        // Convert Clarity Value to JSON
         setSummary(cvToJSON(response));
-        console.log("Contract Data:", cvToJSON(response));
+        setIsLoading(false);
+        // notify('Updated', 'success'); // Optional: can be annoying if it pops up every time
       } catch (error) {
+        setIsLoading(false);
         console.error("Error fetching summary:", error);
+        notify('Could not load treasury data', 'error');
       }
     }
 
     fetchSummary();
   }, [user]);
 
-  if (!summary) return <div>Loading...</div>;
+  // --- THE SPINNER LOGIC ---
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-3xl border border-gray-100 shadow-sm">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <p className="mt-4 text-sm text-gray-500 font-medium">Fetching Treasury Data...</p>
+      </div>
+    );
+  }
+
+  // If no data and not loading
+  if (!summary) return null;
 
   return (
-    <div className="grid grid-cols-2 gap-4 p-6 bg-white rounded-xl shadow-sm border">
-      <div>Total Members: <span className="font-bold">{summary.value['total-members'].value}</span></div>
-      <div>Total Staked: <span className="font-bold">{summary.value['total-stakes'].value} STX</span></div>
-      {/* ... add more fields ... */}
+    <div className="flex flex-col gap-4">
+      {/* Message Area */}
+      {message && (
+        <div className={`p-4 rounded-2xl border transition-all ${
+          status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 
+          status === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
+          'bg-blue-50 border-blue-200 text-blue-800'
+        }`}>
+          <span className="text-sm font-medium">{message}</span>
+        </div>
+      )}
+
+      {/* The Data Card */}
+      <div className="grid grid-cols-2 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-gray-50">
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Members</span>
+          <span className="text-2xl font-bold text-slate-900">{summary.value['total-members'].value}</span>
+        </div>
+        
+        <div className="flex flex-col">
+          <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Staked</span>
+          <span className="text-2xl font-bold text-blue-600">{summary.value['total-stakes'].value} STX</span>
+        </div>
+      </div>
     </div>
   );
 }
