@@ -1,37 +1,88 @@
 'use client';
-import React from 'react';
-import { User, Shield, ExternalLink, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useConnect } from "@stacks/connect-react";
+import { User, Shield, ExternalLink, LogOut, Wallet } from 'lucide-react';
 
 export default function ProfilePage() {
+  const { userData, signout } = useConnect();
+  const [balance, setBalance] = useState<string>("Loading...");
+  const [userPhoto, setUserPhoto] = useState<string | null>(null);
+
+  // 1. Get the Testnet Address
+  const address = userData?.profile?.stxAddress?.testnet;
+  const truncatedAddress = address 
+    ? `${address.slice(0, 6)}...${address.slice(-4)}` 
+    : "Not Connected";
+
+  // 2. Fetch Real Testnet Balance from the Stacks API
+  useEffect(() => {
+    if (address) {
+      fetch(`https://api.testnet.hiro.so/extended/v1/address/${address}/balances`)
+        .then(res => res.json())
+        .then(data => {
+          // STX is stored in micro-STX (6 decimals), so we divide by 1,000,000
+          const stxBalance = parseInt(data.stx.balance) / 1000000;
+          setBalance(`${stxBalance.toLocaleString()} STX`);
+        })
+        .catch(() => setBalance("0 STX"));
+    }
+  }, [address]);
+
   return (
     <main className="min-h-screen bg-gray-50 p-4 pb-24 flex flex-col gap-6">
-      {/* 1. Identity Section */}
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-          <User size={32} />
-        </div>
+    {/* Identity Header */}
+    <div className="relative group cursor-pointer" onClick={() => {/* Trigger Upload Logic */}}>
+  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 border-2 border-white shadow-sm overflow-hidden">
+    {userPhoto ? (
+      <img src={userPhoto} alt="User" className="w-full h-full object-cover" />
+    ) : (
+      <User size={32} />
+    )}
+  </div>
+  {/* The "Plus" icon to tell the user they CAN add a photo */}
+  <div className="absolute bottom-0 right-0 bg-green-600 p-1 rounded-full border-2 border-white text-white">
+    <Plus size={12} />
+  </div>
+</div>
         <div>
           <h2 className="text-xl font-bold">My Account</h2>
-          <p className="text-sm text-gray-500 font-mono">SP2K...7X9W</p>
+          <p className="text-sm text-gray-500 font-mono tracking-tight">{truncatedAddress}</p>
         </div>
+
+      {/* Wallet Balance (Dynamic) */}
+      <div className="bg-slate-900 p-6 rounded-3xl text-white shadow-lg">
+        <div className="flex items-center gap-2 mb-2 opacity-80">
+          <Wallet size={16} />
+          <span className="text-xs uppercase tracking-wider">Available Balance</span>
+        </div>
+        <h3 className="text-3xl font-bold">{balance}</h3>
       </div>
 
-      {/* 2. Menu Options */}
+      {/* Settings & Activity */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+        {/* Testnet Explorer Link */}
+        <a 
+          href={`https://explorer.hiro.so/address/${address}?chain=testnet`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-4 flex items-center justify-between border-b border-gray-50 active:bg-gray-50"
+        >
           <div className="flex items-center gap-3">
-            <Shield className="text-blue-500" size={20} />
-            <span className="font-medium">Security & Privacy</span>
+            <ExternalLink className="text-blue-500" size={20} />
+            <span className="font-medium">View Testnet Explorer</span>
           </div>
-          <ExternalLink size={16} className="text-gray-400" />
-        </div>
-        
-        <div className="p-4 flex items-center justify-between active:bg-gray-50 text-red-500">
+        </a>
+
+        {/* Disconnect */}
+        <button 
+          onClick={() => signout()}
+          className="w-full p-4 flex items-center justify-between active:bg-gray-50 text-red-500"
+        >
           <div className="flex items-center gap-3">
             <LogOut size={20} />
             <span className="font-medium">Disconnect Wallet</span>
           </div>
-        </div>
+        </button>
       </div>
     </main>
   );
