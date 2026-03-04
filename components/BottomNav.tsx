@@ -26,6 +26,11 @@ export default function BottomNav() {
           <span className="text-xs">Rewards</span>
         </div>
       </Link>
+      {/* NEW: Me (Profile) Link */}
+      <Link href="/profile" className={`flex flex-col items-center gap-1 ${isActive('/profile') ? 'text-green-600' : 'text-gray-400'}`}>
+        <User size={24} />
+        <span className="text-[10px] font-medium">Me</span>
+      </Link>
     </nav>
   );
 }
