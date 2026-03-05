@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useConnect } from "@stacks/connect-react";
-import { User, Shield, ExternalLink, LogOut, Wallet } from 'lucide-react';
+import { User, Shield, ExternalLink, LogOut, Wallet, Plus } from 'lucide-react';
 
 export default function ProfilePage() {
   const { userData, signout } = useConnect();
@@ -20,10 +20,11 @@ export default function ProfilePage() {
       fetch(`https://api.testnet.hiro.so/extended/v1/address/${address}/balances`)
         .then(res => res.json())
         .then(data => {
-          // STX is stored in micro-STX (6 decimals), so we divide by 1,000,000
-          const stxBalance = parseInt(data.stx.balance) / 1000000;
-          setBalance(`${stxBalance.toLocaleString()} STX`);
-        })
+  // Use optional chaining (?.) and a fallback (|| 0) to stay safe
+  const rawBalance = data?.stx?.balance || 0;
+  const stxBalance = parseInt(rawBalance) / 1000000;
+  setBalance(`${stxBalance.toLocaleString()} STX`);
+})
         .catch(() => setBalance("0 STX"));
     }
   }, [address]);

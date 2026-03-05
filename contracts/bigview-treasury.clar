@@ -109,18 +109,20 @@
     ;; STEP 1: Move STX from User to your Contract
     (try! (stx-transfer? amount user (as-contract tx-sender)))
 
-    ;; STEP 2: Update your INTERNAL records (For your Dashboard)
+    ;; STEP 2: Update internal records
+    ;; We use 'asserts!' or just let them run, but the final result of 'begin' 
+    ;; must match the (ok true) at the end.
     (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
     (var-set total-staked-amount (+ current-total amount))
 
-;; 3. Delegate to the Major Pool
-    ;; This doesn't lock it yet, it just says "MAJOR-POOL is allowed to lock this contract's funds"
-   (try! (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)))
+    ;; STEP 3: Delegate to the Major Pool
+    (try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)))
+    
+    ;; FINAL STEP: This is the response that the function returns
     (ok true)
   )
   )
 )
-
 ;; 3. THE NEW FUNCTIONS
 
 ;; STEP 1: Tell the contract you want to leave

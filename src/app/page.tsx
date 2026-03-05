@@ -20,7 +20,7 @@ async function getDashboardData() {
       { cache: 'no-store' }
     );
     const balanceData = await balanceRes.json();
-    const stxBalance = balanceData.stx.balance / 1_000_000;
+    const stxBalance = (balanceData?.stx?.balance || 0) / 1_000_000;
 
     // --- PART B: Read Proposal Data (Contract Call) ---
     // Example: Reading the active proposal title
@@ -55,7 +55,7 @@ async function getDashboardData() {
 }
 
 export default async function Dashboard() {
-  const data = await getDashboardData();
+  const stats = await getDashboardData();
 
   return (
     <main className="max-w-7xl mx-auto p-8 space-y-10">

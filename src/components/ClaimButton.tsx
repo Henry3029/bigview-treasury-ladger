@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { useConnect } from '@stacks/connect-react';
 import { STACKS_TESTNET } from '@stacks/network';
@@ -19,11 +20,10 @@ const notify = (text: string, type: 'success' | 'error' | 'info') => {
                   setStatus(null);
                     }, 4000);
                     };
-}
 
   const handleClaim = async () => {
     await doContractCall({
-      network: STACKS_TESTNET;
+      network: STACKS_TESTNET,
       anchorMode: AnchorMode.Any,
       contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
       contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
@@ -39,7 +39,7 @@ const notify = (text: string, type: 'success' | 'error' | 'info') => {
       },
       onCancel: () => {
         console.log('User cancelled the claim.');
-        setMessage('Claim cancelled.');
+        notify('Claim cancelled.');
   setTimeout(() => setMessage(null), 3000);
       },
     });
@@ -60,3 +60,5 @@ const notify = (text: string, type: 'success' | 'error' | 'info') => {
       Claim Now
     </button>
   </>
+  );
+  };
