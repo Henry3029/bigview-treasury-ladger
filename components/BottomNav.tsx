@@ -2,9 +2,15 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { usePrivy } from '@privy-io/react-auth'; // REQUIRED for user
+import { LayoutDashboard, Receipt, Wallet, User } from 'lucide-react';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { user } = usePrivy();    // This fixes the "cannot find name user" error
+
+    // This fixes the "cannot find name isActive" error
+      const isActive = (path: string) => pathname === path;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around p-3 pb-6">
