@@ -33,23 +33,24 @@ const notify = (text: string, type: 'success' | 'error' | 'info') => {
       onFinish: (data) => {
         console.log('Transaction sent:', data.txId);
         notify('Claim Request Sent! Check your wallet history', 'success');
-  
-  // Optional: Hide the message automatically after 5 seconds
-  setTimeout(() => setMessage(null), 5000);
-      },
-      onCancel: () => {
-        console.log('User cancelled the claim.');
-        notify('Claim cancelled.');
-  setTimeout(() => setMessage(null), 3000);
-      },
-    });
-  };
+        },
+        onCancel: () => {
+  notify('Claim cancelled.', 'error'); // notify handles the timer!
+},
 
   return (
     <>
   {message && (
-  <div className="mx-4 mb-4 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
-    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+  <div className={`mx-4 mb-4 p-4 border rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
+    status === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 
+    status === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 
+    'bg-blue-50 border-blue-200 text-blue-700'
+  }`}>
+    <div className={`w-2 h-2 rounded-full animate-pulse ${
+      status === 'success' ? 'bg-green-500' : 
+      status === 'error' ? 'bg-red-500' : 
+      'bg-blue-500'
+    }`}></div>
     <span className="text-sm font-medium">{message}</span>
   </div>
 )}

@@ -102,27 +102,25 @@
 (define-public (stake-and-delegate (amount uint))
   (let (
     (user tx-sender)
-    (current-total (var-get total-staked-amount))
-    (current-user-stake (get-user-stake user))
+    (current-user-stake (default-to u0 (get amount (map-get? stakes { account: user }))))
   )
-  (begin 
-    ;; STEP 1: Move STX from User to your Contract
-    (try! (stx-transfer? amount user (as-contract tx-sender)))
+    (begin 
+      ;; 1. The Transfer (The first "Gate")
+      (try! (stx-transfer? amount user (as-contract tx-sender)))
 
-    ;; STEP 2: Update internal records
-    ;; We use 'asserts!' or just let them run, but the final result of 'begin' 
-    ;; must match the (ok true) at the end.
-    (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
-    (var-set total-staked-amount (+ current-total amount))
+      ;; 2. The Delegation (The second "Gate")
+      (try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)))
 
-    ;; STEP 3: Delegate to the Major Pool
-    (try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)))
-    
-    ;; FINAL STEP: This is the response that the function returns
-    (ok true)
-  )
+      ;; 3. The Record Keeping (Only happens if 1 and 2 pass)
+      (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
+      (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
+
+      (ok true)
+    )
   )
 )
+
+
 ;; 3. THE NEW FUNCTIONS
 
 ;; STEP 1: Tell the contract you want to leave
