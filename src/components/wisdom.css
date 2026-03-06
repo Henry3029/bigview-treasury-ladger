@@ -1,0 +1,84 @@
+/* --- Flickity Core Rules (Keep These) --- */
+.flickity-enabled {
+  position: relative;
+}
+.flickity-enabled:focus { outline: none; }
+.flickity-viewport {
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+.flickity-slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.flickity-enabled.is-draggable {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.flickity-enabled.is-draggable .flickity-viewport {
+  cursor: move;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+.flickity-enabled.is-draggable .flickity-viewport.is-pointer-down {
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
+
+/* --- The Carousel Design --- */
+.carousel {
+  margin-bottom: 20px;
+}
+.carousel-cell {
+  width: 100%; /* Each slide is 100% width */
+  height: 250px; /* Fixed height for the quote card */
+  margin-right: 10px;
+}
+
+/* --- The Quote Card & Gradients --- */
+.quote-card {
+  height: 100%;
+}
+
+/* Three beautiful, modern gradients */
+.gradient-1 {
+  background: linear-gradient(135deg, #676FFF 0%, #39CCCC 100%); /* Blue to Teal */
+}
+.gradient-2 {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); /* Orange to Amber */
+}
+.gradient-3 {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Emerald to Green */
+}
+
+/* --- Navigation Dots Styling --- */
+.flickity-page-dots {
+  position: absolute;
+  width: 100%;
+  bottom: -10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  text-align: center;
+  line-height: 1;
+}
+.flickity-page-dots .dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 8px;
+  background: #cbd5e1; /* Gray dot */
+  border-radius: 50%;
+  opacity: 0.25;
+  cursor: pointer;
+}
+.flickity-page-dots .dot.is-selected {
+  background: #676FFF; /* Accent colored selected dot */
+  opacity: 1;
+}

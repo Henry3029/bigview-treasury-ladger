@@ -1,4 +1,5 @@
 import React from 'react';
+import WisdomCarousel from '@/components/WisdomCarousel';
 import DashboardData from '@/components/DashboardData';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
@@ -59,6 +60,8 @@ export default async function Dashboard() {
 
   return (
     <main className="max-w-7xl mx-auto p-8 space-y-10">
+    {/* 2. Place the component wherever you want! I recommend before "Quick Actions" */}
+      <WisdomCarousel />
       {/* Header Section */}
       <div className="flex justify-between items-center border-b pb-6">
         <div>
