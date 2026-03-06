@@ -5,6 +5,8 @@ import './wisdom.css'; // We will create this CSS file next!
 
 // --- The 10 Famous Wise Men & Their Quotes ---
 const quotes = [
+ { test: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
+  { test: "The only way to predict your future is to create It", sage: "Abraham Lincoln" },
   { text: "The only true wisdom is in knowing you know nothing.", sage: "Socrates" },
   { text: "Your time is limited, don't waste it living someone else's life.", sage: "Steve Jobs" },
   { text: "Life is what happens when you're busy making other plans.", sage: "John Lennon" },
