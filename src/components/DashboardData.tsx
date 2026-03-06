@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react'; // Icon import
-import { callReadOnlyFunction, cvToJSON } from '@stacks/transactions';
+import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 import { usePrivy } from '@privy-io/react-auth';
 
@@ -33,7 +33,7 @@ export default function DashboardData() {
       const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
 
       try {
-        const response = await callReadOnlyFunction({
+        const response = await fetchCallReadOnlyFunction({
           network,
           contractAddress,
           contractName,
