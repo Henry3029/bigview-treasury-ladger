@@ -5,7 +5,16 @@ import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 import { usePrivy } from '@privy-io/react-auth';
 
-export default function DashboardData() {
+interface DashboardDataProps {
+  stake: string;
+  reward: string;
+  proposal: string;
+  votesFor: number;
+  votesAgainst: number;
+}
+
+export default function DashboardData({ stake, reward, proposal, votesFor, votesAgainst }: DashboardDataProps) {
+  // your component code...
   const [summary, setSummary] = useState<any>(null);
   const { user } = usePrivy();
   
@@ -70,14 +79,10 @@ export default function DashboardData() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Message Area */}
+      {/* Notifications */}
       {message && (
-        <div className={`p-4 rounded-2xl border transition-all ${
-          status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 
-          status === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
-          'bg-blue-50 border-blue-200 text-blue-800'
-        }`}>
-          <span className="text-sm font-medium">{message}</span>
+        <div className={`p-4 rounded-2xl border ${status === 'error' ? 'bg-red-50' : 'bg-green-50'}`}>
+           {message}
         </div>
       )}
 
@@ -85,14 +90,19 @@ export default function DashboardData() {
       <div className="grid grid-cols-2 gap-4 p-6 bg-white rounded-3xl shadow-sm border border-gray-50">
         <div className="flex flex-col">
           <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Members</span>
-          <span className="text-2xl font-bold text-slate-900">{summary.value['total-members'].value}</span>
+          {/* If summary exists, use it. Otherwise, use a default 0 */}
+          <span className="text-2xl font-bold text-slate-900">
+            {summary?.value['total-members']?.value || "0"}
+          </span>
         </div>
         
         <div className="flex flex-col">
           <span className="text-xs text-gray-400 uppercase font-bold tracking-wider">Total Staked</span>
-          <span className="text-2xl font-bold text-blue-600">{summary.value['total-stakes'].value} STX</span>
+          {/* If summary exists, use it. Otherwise, use the 'stake' prop from the parent! */}
+          <span className="text-2xl font-bold text-blue-600">
+            {summary?.value['total-stakes']?.value ? `${summary.value['total-stakes'].value} STX` : stake}
+          </span>
         </div>
       </div>
     </div>
   );
-}

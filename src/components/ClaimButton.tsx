@@ -1,65 +1,68 @@
 "use client";
-import React from 'react';
+import React, { useState } from 'react'; // Added useState to React import
 import { useConnect } from '@stacks/connect-react';
 import { STACKS_TESTNET } from '@stacks/network';
 import { AnchorMode, PostConditionMode } from '@stacks/transactions';
-import { useState } from 'react';
 
 export const ClaimButton = () => {
   const { doContractCall } = useConnect();
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
 
-const notify = (text: string, type: 'success' | 'error' | 'info') => {
+  const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
-      setStatus(type);
-
-        // Automatically hide the message after 4 seconds
-          setTimeout(() => {
-              setMessage(null);
-                  setStatus(null);
-                    }, 4000);
-                    };
+    setStatus(type);
+    setTimeout(() => {
+      setMessage(null);
+      setStatus(null);
+    }, 4000);
+  };
 
   const handleClaim = async () => {
+    // Hardcoding these for now to ensure the "white page" doesn't return
+    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
+    const contractName = 'bigview-treasury';
+
     await doContractCall({
       network: STACKS_TESTNET,
       anchorMode: AnchorMode.Any,
-      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
-      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
-      functionName: 'claim-rewards', // Must match your .clar file!
-      functionArgs: [], // Rewards usually don't need arguments
+      contractAddress: contractAddress,
+      contractName: contractName,
+      functionName: 'claim-rewards', 
+      functionArgs: [], 
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data) => {
         console.log('Transaction sent:', data.txId);
         notify('Claim Request Sent! Check your wallet history', 'success');
-        },
-        onCancel: () => {
-  notify('Claim cancelled.', 'error'); // notify handles the timer!
-},
+      },
+      onCancel: () => {
+        notify('Claim cancelled.', 'error'); 
+      },
+    });
+  }; // <--- FIXED: Added missing closing bracket for handleClaim
 
   return (
     <>
-  {message && (
-  <div className={`mx-4 mb-4 p-4 border rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
-    status === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 
-    status === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 
-    'bg-blue-50 border-blue-200 text-blue-700'
-  }`}>
-    <div className={`w-2 h-2 rounded-full animate-pulse ${
-      status === 'success' ? 'bg-green-500' : 
-      status === 'error' ? 'bg-red-500' : 
-      'bg-blue-500'
-    }`}></div>
-    <span className="text-sm font-medium">{message}</span>
-  </div>
-)}
-    <button 
-      onClick={handleClaim}
-      className="w-full bg-white text-green-700 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 active:scale-95 transition-all"
-    >
-      Claim Now
-    </button>
-  </>
+      {message && (
+        <div className={`mx-4 mb-4 p-4 border rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
+          status === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 
+          status === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 
+          'bg-blue-50 border-blue-200 text-blue-700'
+        }`}>
+          <div className={`w-2 h-2 rounded-full animate-pulse ${
+            status === 'success' ? 'bg-green-500' : 
+            status === 'error' ? 'bg-red-500' : 
+            'bg-blue-500'
+          }`}></div>
+          <span className="text-sm font-medium">{message}</span>
+        </div>
+      )}
+      <button 
+        onClick={handleClaim}
+        className="w-full bg-white text-green-700 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 active:scale-95 transition-all"
+      >
+        Claim Now
+      </button>
+    </>
   );
-  };
+};

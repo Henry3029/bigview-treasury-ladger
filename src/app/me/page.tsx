@@ -1,11 +1,24 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useConnect } from "@stacks/connect-react";
+// 1. Update this import to include useUserSession
+import { useConnect, useUserSession } from "@stacks/connect-react"; 
 import { User, Shield, ExternalLink, LogOut, Wallet, Plus } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { userData, signout } = useConnect();
+  // 2. Use useUserSession to get the data and the auth object
+  const { userSession } = useUserSession(); 
+  
+  // 3. Get the data from the session
+  const userData = userSession.isUserSignedIn() ? userSession.loadUserData() : null;
+
+  // 4. Create a custom signout function
+  const handleSignOut = () => {
+    userSession.signUserOut();
+    window.location.reload(); // Refresh to clear the state
+  };
+
   const [balance, setBalance] = useState<string>("Loading...");
+  // ... rest of your code
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
 
   // 1. Get the Testnet Address
@@ -30,6 +43,9 @@ export default function ProfilePage() {
   }, [address]);
 
   return (
+  if (!userData) {
+  return <div className="p-10 text-center">Please connect your wallet to view your profile.</div>;
+}
     <main className="min-h-screen bg-gray-50 p-4 pb-24 flex flex-col gap-6">
     {/* Identity Header */}
     <div className="relative group cursor-pointer" onClick={() => {/* Trigger Upload Logic */}}>
@@ -76,7 +92,7 @@ export default function ProfilePage() {
 
         {/* Disconnect */}
         <button 
-          onClick={() => signout()}
+          <button onClick={handleSignOut}
           className="w-full p-4 flex items-center justify-between active:bg-gray-50 text-red-500"
         >
           <div className="flex items-center gap-3">
