@@ -1,49 +1,51 @@
 @import "tailwindcss";
 
 :root { 
-      --sidebar-width: 260px;
-        --bank-blue: #002D72;
-          --bg-subtle: #f4f7fa;
-          }
+  --sidebar-width: 260px;
+  --bank-blue: #002D72;
+  --bg-subtle: #f4f7fa;
+}
 
-          body {
+body {
   /* Radiant Light Gold Gradient */
   background: radial-gradient(
     circle at center, 
-    rgba(255, 223, 145, 0.15) 0%,   /* Soft gold center */
-    rgba(255, 248, 225, 0.4) 50%,   /* Very light cream transition */
-    rgba(248, 250, 252, 1) 100%     /* Slate-50 edge to match your layout */
+    rgba(255, 223, 145, 0.15) 0%,   
+    rgba(255, 248, 225, 0.4) 50%,   
+    rgba(248, 250, 252, 1) 100%     
   );
-  background-attachment: fixed;     /* Keeps the gradient still while scrolling */
+  background-attachment: fixed;
+  min-height: 100vh;
+  margin: 0; /* Important: Removes default browser padding */
+}
+
+/* The Main Wrapper */
+.dashboard-layout {
+  display: grid;
+  grid-template-areas: 
+    "header"
+    "main"
+    "footer";
   min-height: 100vh;
 }
 
-                /* The Main Wrapper */
-                .dashboard-layout {
-                  display: grid;
-                    grid-template-areas: 
-                        "header"
-                            "main"
-                                "footer";
-                                  min-height: 100vh;
-                                  }
+/* Tablet & Desktop Layout */
+@media (min-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: 70px 1fr 50px;
+    grid-template-areas: 
+      "sidebar header"
+      "sidebar main"
+      "sidebar footer";
+  }
+}
 
-                                  /* Tablet & Desktop Layout */
-                                  @media (min-width: 1024px) {
-                                    .dashboard-layout {
-                                        grid-template-columns: var(--sidebar-width) 1fr;
-                                            grid-template-rows: 70px 1fr 50px;
-                                                grid-template-areas: 
-                                                      "sidebar header"
-                                                            "sidebar main"
-                                                                  "sidebar footer";
-                                                                    }
-                                                                    }
-
-                                                                    .main-content {
-                                                                      grid-area: main;
-                                                                        padding: 2rem;
-                                                                          max-width: 1200px; /* Prevents stretching on big screens */
-                                                                            margin: 0 auto;    /* Centers the dashboard */
-                                                                              width: 100%;
-                                                                              }
+.main-content {
+  grid-area: main;
+  padding: 2rem;
+  width: 100%;
+  /* Fix: Use max-width with justify-self for grid centering */
+  max-width: 1200px; 
+  justify-self: center; 
+}

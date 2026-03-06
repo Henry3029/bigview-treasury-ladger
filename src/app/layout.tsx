@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import '../styles/globals.css';
-import AppPrivyProvider from '../components/privyProvider';
+import '../../styles/globals.css';
+import AppPrivyProvider from '@/components/privyProvider';
 // 1. Import your new Client Component
-import WalletButton from '../components/WalletButton';
+import WalletButton from '@/components/WalletButton';
 // 1. Import the Image component from next
 import Image from 'next/image';
 import { BottomNav } from '@/components/BottomNav';
+import Sidebar from '@/components/Sidebar';
 
 export default function RootLayout({
   children,
@@ -14,34 +15,44 @@ export default function RootLayout({
 }) {
   return (
   <html lang="en">
-    <body className="antialiased text-slate-900 bg-gray-50 flex flex-col min-h-screen">
+    {/* 1. Add 'dashboard-layout' to the body or a wrapper div */}
+    <body className="antialiased text-slate-900 bg-gray-50 dashboard-layout">
       <AppPrivyProvider>
-        {/* --- TOP HEADER (Simplified OPay Style) --- */}
-        <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white shadow-sm border-b">
+      {/* 🖥️ Desktop Sidebar (Hidden on Mobile) */}
+          <Sidebar />
+        
+        {/* --- TOP HEADER --- */}
+        {/* Added 'header' grid-area via className if using CSS modules, 
+            or just ensure it's the first child in the grid */}
+        <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white shadow-sm border-b [grid-area:header]">
           <div className="flex items-center gap-2">
-            <Image src="/images/logo.png" alt="Logo" width={32} height={32} className="rounded-full" />
-            <span className='font-bold text-lg tracking-tight'>Treasury</span>
+            <Image 
+              src="/images/bigview-image.png" 
+              alt="Logo" 
+              width={40} 
+              height={40} 
+              priority 
+              className="rounded-full shadow-sm" 
+            />
+            <span className='font-bold text-lg tracking-tight text-blue-900'>Treasury</span>
           </div>
-          
-          {/* Only the Wallet Button stays at the top */}
           <WalletButton />
         </header>
 
         {/* --- MAIN CONTENT --- */}
-        {/* pb-20 ensures the BottomNav doesn't cover your content */}
-        <main className="flex-grow pb-20">
+        {/* We use 'main-content' class here to trigger the 1200px centering we built */}
+        <main className="main-content flex-grow pb-24">
           {children}
         </main>
 
-        {/* --- THE OPay BOTTOM NAV --- */}
-        {/* We replace the horizontal links with this */}
+        {/* --- THE BOTTOM NAV --- */}
         <BottomNav /> 
 
         {/* --- FOOTER --- */}
-        {/* In mobile apps, footers are usually hidden or very small */}
-        <footer className="p-6 text-center text-xs text-gray-400 border-t">
-          © 2026 Bigview POX
+        <footer className="p-6 text-center text-xs text-gray-400 border-t [grid-area:footer]">
+          © 2026 Bigview Treasury-Ladger
         </footer>
+        
       </AppPrivyProvider>
     </body>
   </html>
