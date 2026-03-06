@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import '../../styles/globals.css';
-import AppPrivyProvider from '@/components/privyProvider';
+import AppPrivyProvider from '@/components/PrivyProvider';
 // 1. Import your new Client Component
 import WalletButton from '@/components/WalletButton';
 // 1. Import the Image component from next
 import Image from 'next/image';
-import { BottomNav } from '@/components/BottomNav';
+import BottomNav from '@/components/BottomNav';
 import Sidebar from '@/components/Sidebar';
 
 export default function RootLayout({
@@ -57,3 +57,4 @@ export default function RootLayout({
     </body>
   </html>
 );
+}
