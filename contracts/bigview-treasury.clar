@@ -109,7 +109,7 @@
       (try! (stx-transfer? amount user (as-contract tx-sender)))
 
       ;; 2. The Delegation (The second "Gate")
-(try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx (to-uint amount) MAJOR-POOL-ADDRESS none none)))
+(try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx (i-to-u amount) MAJOR-POOL-ADDRESS none none)))
       ;; 3. The Record Keeping (Only happens if 1 and 2 pass)
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
       (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
