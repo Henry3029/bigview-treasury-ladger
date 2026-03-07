@@ -1,8 +1,18 @@
 "use client";
 import { usePrivy } from '@privy-io/react-auth';
+import React from 'react';
 
-export default function StatusBadge() {
-  // 1. Get authentication state from Privy
+// 1. Define the rules (Interface) for the props
+interface StatusBadgeProps {
+  status: 'online' | 'offline' | 'maintenance' | string;
+  label: string;
+}
+
+
+// 2. Apply the interface to the component
+export default function StatusBadge({ status, label }: StatusBadgeProps) {
+  // Determine dot color based on status
+  const dotColor = status === 'online' ? 'bg-green-500' : 'bg-red-500';
   const { authenticated, user } = usePrivy();
   
   // 2. Identify the connected Stacks address

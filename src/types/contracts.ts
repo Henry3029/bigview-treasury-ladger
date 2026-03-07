@@ -12,8 +12,3 @@ export interface Proposal {
   "votes-for": number;  // Match 'votes-for' exactly (requires quotes because of the dash)
   "votes-against": number; 
 }
-
-export interface StatusBadgeProps {
-  status: 'online' | 'offline' | 'maintenance' | string; // Adding 'string' makes it flexible
-  label: string;
-}

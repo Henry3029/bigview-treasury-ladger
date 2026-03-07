@@ -46,8 +46,11 @@ export default function StakePage() {
       const userData = userSession.loadUserData();
       const userAddress = userData.profile.stxAddress.testnet; 
 
+if (!userAddress) {
+  return notify("Could not find your Stacks address. Try reconnecting.", "error");
+}
       // 4. Create the Post-Condition (Security Guard)
-      const postCondition = Pc.principalSTX(userAddress).willSendEq(microStacks); 
+const postCondition = Pc.principal(userAddress).willSendEq(microStacks);
 
       await doContractCall({
         network: STACKS_TESTNET,

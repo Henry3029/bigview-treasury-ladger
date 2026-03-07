@@ -3,7 +3,6 @@ import WisdomCarousel from '@/components/WisdomCarousel';
 import DashboardData from '@/components/DashboardData';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
-import { StatusBadgeProps } from '@/types/contracts'
 import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 
