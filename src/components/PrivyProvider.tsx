@@ -13,10 +13,17 @@ export default function AppPrivyProvider({children}: {children: React.ReactNode}
           accentColor: '#676FFF',
           logo: 'https://your-logo-url.com/logo.png', // Optional: adds professional touch
         },
-        // ✅ UPDATED: Modern Privy Configuration
+        // ✅ FIXED: Using the standard configuration for modern Privy
         embeddedWallets: {
-          createOnLogin: 'users-without-wallets',
+          createOnLogin: 'users-without-wallets', 
+          requireUserPasswordOnCreate: false, // Makes it smoother for users
         },
+        // If 'createOnLogin' still shows a red line, 
+        // it means your version uses 'onCreateWallet':
+        /* embeddedWallets: {
+          onCreateWallet: 'users-without-wallets',
+        }, 
+        */
       }}
     >
       {children}

@@ -106,3 +106,4 @@ export default function DashboardData({ stake, reward, proposal, votesFor, votes
       </div>
     </div>
   );
+  }

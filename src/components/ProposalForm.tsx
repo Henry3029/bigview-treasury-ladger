@@ -1,32 +1,51 @@
 "use client";
-import { usePrivy, useSolanaWallets } from '@privy-io/react-auth'; // Privy core
-import { useConnect } from '@stacks/connect-react'; // You need this for Stacks logic
+import React from 'react';
+// 1. Removed unused Solana/Privy imports that were causing the "Unused" or "Module" errors
+import { useConnect } from '@stacks/connect-react'; 
 import { stringAsciiCV } from '@stacks/transactions';
 
 export default function ProposalForm() {
-  // 1. We use the 'doContractCall' from Stacks Connect instead of Privy's sendTransaction
+  // 2. We only need Stacks Connect for the actual blockchain interaction
   const { doContractCall } = useConnect(); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const description = formData.get('description') as string;
+    const description = (formData.get('description') as string) || "";
 
-    // 2. This structure is what the Stacks library "knows"
+    if (!description) {
+        alert("Please enter a description");
+        return;
+    }
+
+    // 3. Ensure your .env variables match exactly what's in your Vercel/Local settings
     await doContractCall({
-      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
-      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || 'bigview-treasury',
       functionName: 'create-proposal',
       functionArgs: [stringAsciiCV(description)],
-      onFinish: (data) => console.log("Proposal Created!", data),
-      onCancel: () => console.log("User denied the proposal"),
+      onFinish: (data) => {
+        console.log("Proposal Created!", data);
+        alert("Proposal submitted to the Stacks Testnet!");
+      },
+      onCancel: () => {
+        console.log("User denied the proposal");
+      },
     });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded-xl bg-white shadow-sm">
-      <input name="description" placeholder="Proposal Title" className="border p-3 w-full rounded-lg outline-none focus:ring-2 focus:ring-orange-500" />
-      <button type="submit" className="bg-orange-600 text-white font-bold p-3 mt-4 w-full rounded-lg hover:bg-orange-700 transition-colors">
+    <form onSubmit={handleSubmit} className="p-6 border rounded-3xl bg-white shadow-sm flex flex-col gap-4">
+      <h3 className="font-bold text-lg text-slate-800">Create New Proposal</h3>
+      <input 
+        name="description" 
+        placeholder="e.g., Fund the Community Marketing Pool" 
+        className="border border-slate-200 p-4 w-full rounded-2xl outline-none focus:ring-2 focus:ring-orange-500 transition-all" 
+      />
+      <button 
+        type="submit" 
+        className="bg-orange-600 text-white font-bold p-4 w-full rounded-2xl hover:bg-orange-700 active:scale-95 transition-all shadow-lg shadow-orange-100"
+      >
         Submit Proposal
       </button>
     </form>

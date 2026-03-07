@@ -1,12 +1,12 @@
 "use client";
 import React from 'react';
 import Flickity from 'react-flickity-component';
-import './wisdom.css'; // We will create this CSS file next!
+import './wisdom.css'; 
 
-// --- The 10 Famous Wise Men & Their Quotes ---
+// --- The Famous Wise Men & Their Quotes ---
 const quotes = [
- { test: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
-  { test: "The only way to predict your future is to create It", sage: "Abraham Lincoln" },
+  { text: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
+  { text: "The only way to predict your future is to create It", sage: "Abraham Lincoln" },
   { text: "The only true wisdom is in knowing you know nothing.", sage: "Socrates" },
   { text: "Your time is limited, don't waste it living someone else's life.", sage: "Steve Jobs" },
   { text: "Life is what happens when you're busy making other plans.", sage: "John Lennon" },
@@ -22,11 +22,11 @@ const quotes = [
 // --- Carousel Configuration ---
 const flickityOptions = {
   initialIndex: 0,
-  autoPlay: 3000, // Slides automatically every 3 seconds
-  wrapAround: true, // Seamless loop
-  prevNextButtons: false, // Hide arrows for cleaner look
-  pageDots: true, // Keep the navigation dots
-  pauseAutoPlayOnHover: true, // Pause if mouse is over it
+  autoPlay: 3000, 
+  wrapAround: true, 
+  prevNextButtons: false, 
+  pageDots: true, 
+  pauseAutoPlayOnHover: true, 
 };
 
 export default function WisdomCarousel() {
@@ -34,27 +34,26 @@ export default function WisdomCarousel() {
     <section className="wisdom-section p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10">
       <h2 className="text-xl font-semibold mb-6">Voices of Wisdom</h2>
       <Flickity
-        className={'carousel'} // The main CSS class
-        elementType={'div'} // The container is a <div>
-        options={flickityOptions} // Use our config from above
-        disableImagesLoaded={false} // Safe to keep false
-        reloadOnUpdate // Reloads if quotes list changes
-        static // Boosts performance
+        className={'carousel'} 
+        elementType={'div'} 
+        options={flickityOptions} 
+        disableImagesLoaded={false} 
+        reloadOnUpdate 
+        static 
       >
         {quotes.map((quote, index) => (
-          <div key={index} className="carousel-cell">
-            {/* The individual slide with a beautiful gradient */}
-            <div className={`quote-card gradient-${(index % 3) + 1} p-8 rounded-3xl text-white shadow-xl flex flex-col justify-center`}>
+          <div key={index} className="carousel-cell px-2">
+            <div className={`quote-card gradient-${(index % 3) + 1} p-8 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[200px]`}>
               <blockquote className="text-xl md:text-2xl font-serif italic font-medium leading-normal mb-4">
                 "{quote.text}"
               </blockquote>
               <cite className="text-sm font-sans uppercase tracking-wider font-bold opacity-80 not-italic">
                 — {quote.sage}
-              cite>
-            div>
-          div>
+              </cite>
+            </div>
+          </div>
         ))}
-      Flickity>
-    section>
+      </Flickity>
+    </section>
   );
 }
