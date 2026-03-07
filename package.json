@@ -23,6 +23,7 @@
     "@types/node": "^24.4.0",
     "chokidar-cli": "^3.0.0",
     "crypto-js": "^4.2.0",
+    "flickity": "^3.0.0",
     "next": "^15.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
