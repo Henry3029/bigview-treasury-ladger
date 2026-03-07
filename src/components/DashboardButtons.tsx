@@ -78,7 +78,6 @@ const [lastTxId, setLastTxId] = useState<string | null>(null);
     <div className="flex flex-col gap-8 p-4">
       
       {/* 1. Global Message Area */}
-// Inside your return block, replace the old message area with this:
 {message && (
   <div className={`p-4 rounded-2xl flex items-center justify-between border animate-in fade-in slide-in-from-top-2 ${
     status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 
