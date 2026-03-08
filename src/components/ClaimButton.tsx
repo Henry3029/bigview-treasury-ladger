@@ -59,7 +59,7 @@ export const ClaimButton = () => {
       )}
       <button 
         onClick={handleClaim}
-        className="w-full bg-white text-green-700 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 active:scale-95 transition-all"
+        className="btn-grain py-2 px-6"
       >
         Claim Now
       </button>

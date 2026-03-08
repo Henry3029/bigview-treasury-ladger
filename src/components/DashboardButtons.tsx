@@ -108,17 +108,21 @@ const [lastTxId, setLastTxId] = useState<string | null>(null);
         <h3 className="text-gray-500 text-xs uppercase tracking-widest font-bold mb-3 ml-1">Governance - Proposal #1</h3>
         <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
           <button 
-            disabled={isLoading}
-            onClick={() => handleContractCall('vote', [uintCV(1), boolCV(true)])}
-            className="flex flex-col items-center justify-center bg-green-50 text-green-700 p-4 rounded-2xl border border-green-100 hover:bg-green-100 transition disabled:opacity-50"
-          >
-            {isLoading ? <Loader2 className="animate-spin" /> : <span className="font-bold">Vote Yes</span>}
-          </button>
+  disabled={isLoading}
+  onClick={() => handleContractCall('vote', [uintCV(1), boolCV(true)])}
+  className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
+>
+  {isLoading ? (
+    <Loader2 className="animate-spin" />
+  ) : (
+    <span className="font-bold uppercase tracking-wide text-sm">Vote Yes</span>
+  )}
+</button>
           
           <button 
             disabled={isLoading}
             onClick={() => handleContractCall('vote', [uintCV(1), boolCV(false)])}
-            className="flex flex-col items-center justify-center bg-red-50 text-red-700 p-4 rounded-2xl border border-red-100 hover:bg-red-100 transition disabled:opacity-50"
+            className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
           >
             {isLoading ? <Loader2 className="animate-spin" /> : <span className="font-bold">Vote No</span>}
           </button>
@@ -132,7 +136,7 @@ const [lastTxId, setLastTxId] = useState<string | null>(null);
           <button 
             disabled={isLoading}
             onClick={() => handleContractCall('add-member', [])}
-            className="w-full flex items-center justify-between bg-purple-600 text-white p-4 rounded-2xl shadow-md active:scale-95 transition disabled:bg-purple-400"
+            className="btn-grain-outline flex flex-col items-center justify-center disabled:opacity-50"
           >
             <span className="font-bold">
                {isLoading ? "Processing..." : "Become a Member"}

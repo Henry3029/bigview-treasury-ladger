@@ -44,7 +44,7 @@ export default function ProposalForm() {
       />
       <button 
         type="submit" 
-        className="bg-orange-600 text-white font-bold p-4 w-full rounded-2xl hover:bg-orange-700 active:scale-95 transition-all shadow-lg shadow-orange-100"
+        className="btn-grain-outline py-2 px-6"
       >
         Submit Proposal
       </button>

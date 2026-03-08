@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import '../../styles/globals.css';
+import '@/styles/globals.css';
 import AppPrivyProvider from '@/components/PrivyProvider';
 // 1. Import your new Client Component
 import WalletButton from '@/components/WalletButton';
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
   <html lang="en">
     {/* 1. Add 'dashboard-layout' to the body or a wrapper div */}
-    <body className="antialiased text-slate-900 bg-gray-50 dashboard-layout">
+<body className="antialiased text-slate-900 dashboard-layout">
       <AppPrivyProvider>
       {/* 🖥️ Desktop Sidebar (Hidden on Mobile) */}
           <Sidebar />

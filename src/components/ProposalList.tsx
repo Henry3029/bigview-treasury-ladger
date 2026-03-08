@@ -25,8 +25,8 @@ export default function ProposalList() {
             <p className="text-sm text-gray-500">For: {p.votesFor} | Against: {p.votesAgainst}</p>
           </div>
           <div className="space-x-2">
-            <button className="bg-green-100 text-green-700 px-3 py-1 rounded">Vote For</button>
-            <button className="bg-red-100 text-red-700 px-3 py-1 rounded">Vote Against</button>
+            <button className="btn-grain py-2 px-6">Vote For</button>
+            <button className="btn-grain py-2 px-6">Vote Against</button>
           </div>
         </div>
       ))}

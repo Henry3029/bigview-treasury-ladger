@@ -1,28 +1,28 @@
-'use client'; // This is essential for Privy hooks
+'use client';
 
 import { usePrivy } from '@privy-io/react-auth';
 
 export default function WalletButton() {
   const { authenticated, login, logout, user } = usePrivy();
 
-  if (authenticated) {
-    // If logged in, show a "Logout" or "Connected" button
+  // Condition 1: User is Logged In
+  if (authenticated && user?.wallet?.address) {
+    const addr = user.wallet.address;
     return (
       <button 
         onClick={() => logout()}
-        className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition"
+        className="btn-grain-outline py-2 px-6" // Using your new CSS class!
       >
-        {/* Shows a shortened address if available */}
-        {user?.wallet?.address.slice(0, 6)}...{user?.wallet?.address.slice(-4)}
+        {addr.slice(0, 4)}...{addr.slice(-4)}
       </button>
     );
   }
 
-  // If not logged in, show "Connect Wallet"
+  // Condition 2: User is NOT Logged In
   return (
     <button 
       onClick={() => login()}
-      className="px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-700 transition"
+      className="btn-grain py-2 px-6" // Using the Grainlify Gold Pill!
     >
       Connect Wallet
     </button>

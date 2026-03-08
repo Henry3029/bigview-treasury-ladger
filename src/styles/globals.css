@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --grain-bg: #F2EFE9;
+  --grain-gold: #EAB308;
+}
+
+body {
+  background: radial-gradient(
+    circle at 50% 40%, 
+    rgba(255, 249, 229, 1) 0%, 
+    rgba(242, 239, 233, 1) 70%
+  );
+  background-color: var(--grain-bg);
+  color: #1A1A1A;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+@layer components {
+  /* Combined all buttons here for organization */
+  .btn-grain {
+    @apply bg-[#EAB308] text-[#1A1A1A] px-8 py-3 rounded-full font-semibold 
+           transition-all duration-300 shadow-md border border-[#D4A017]
+           hover:bg-[#F2EFE9] hover:text-[#EAB308] hover:scale-105
+           active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  .btn-grain-outline {
+    @apply bg-transparent text-[#1A1A1A] px-8 py-3 rounded-full font-semibold 
+           transition-all duration-300 border-2 border-[#E5E2DA]
+           hover:border-[#EAB308] hover:bg-[#FFF9E5]
+           active:scale-95 flex items-center justify-center gap-2;
+  }
+
+  /* Your secondary style using the warm cream tones */
+  .btn-secondary {
+    @apply bg-[#E5E2DA] hover:bg-[#DEDAD0] text-[#1A1A1A] px-8 py-3 rounded-full font-medium transition-all border border-[#D6D3CB];
+  }
+
+  /* Glassy Card look for your dashboard containers */
+  .glass-card {
+    @apply bg-white/30 backdrop-blur-md border border-white/40 rounded-3xl p-8;
+  }
+}
