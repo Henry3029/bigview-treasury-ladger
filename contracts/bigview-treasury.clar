@@ -4,6 +4,11 @@
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
 ;; ---------------------------------------------------------
+;; 0. Define the SIP-010 Trait (Standard for sBTC/Tokens)
+(use-trait sip010-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT-010-trait-ft-standard.sip-010-trait)
+
+;; Then define your sBTC constant using that trait type
+(define-constant SBTC-CONTRACT 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4)
 
 ;; 1. Add your developer wallet address as a constant
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE) ;; Replace with your actual wallet
@@ -101,29 +106,25 @@
 ;; 1. Use PoX-4 for the Nakamoto era
 (define-public (stake-and-delegate (amount uint))
   (let (
-      (user tx-sender)
-          (current-user-stake (default-to u0 (get amount (map-get? stakes { account: user }))))
-            )
-                (begin 
-                      ;; 1. The Transfer - Wrap in try! to stop if user has no funds
-                            (try! (stx-transfer? amount user (as-contract tx-sender)))
+    (user tx-sender)
+    (current-user-stake (get-user-stake user))
+  )
+    (begin 
+      ;; Path 1: STX Transfer (Returns a response)
+      (try! (stx-transfer? amount user (as-contract tx-sender)))
 
-                                  ;; 2. The Delegation - We use 'unwrap-panic' or 'asserts!' to keep the type consistent
-                                        (asserts! (is-ok (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none))) (err u101))
+      ;; Path 2: PoX Delegation
+      ;; We use 'unwrap!' to force the response into a format Clarity likes
+      (unwrap! (as-contract (contract-call? 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) ERR-TRANSFER-FAILED)
 
-                                              ;; 3. The Record Keeping (Only runs if 1 & 2 succeeded)
-                                                    (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
-                                                          (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
+      ;; Path 3: Record Keeping
+      (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
+      (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
 
-                                                                (ok true)
-                                                                    )
-                                                                      )
-                                                                                                                          
-                                                                                            
-
-
-
-
+      (ok true)
+    )
+  )
+)
 
 ;; 3. THE NEW FUNCTIONS
 
