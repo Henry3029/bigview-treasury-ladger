@@ -10,7 +10,6 @@ cache_dir = "./.cache"
 
 [contracts.bigview-treasury]
 path = "contracts/bigview-treasury.clar"
-depends_on = ["sbtc-token"]
 clarity_version = 2
 epoch = "2.5"
 

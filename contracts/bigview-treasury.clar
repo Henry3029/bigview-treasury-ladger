@@ -5,8 +5,9 @@
 ;; Constants & Data Variables
 ;; ---------------------------------------------------------
 
-;; Update these at the top of your .clar file
-(define-constant SBTC-CONTRACT 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sbtc-token)
+;; Use the Mainnet constant - Clarinet will swap this for you on Testnet
+(define-constant SBTC-CONTRACT 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token)
+
 
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
 ;; FIXED: Official PoX-4 address for Testnet
