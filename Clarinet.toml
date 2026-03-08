@@ -3,6 +3,9 @@ name = "bigview-treasury"
 description = ""
 authors = []
 telemetry = true
+requirements = [
+    { contract_id = "SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token" }
+    ]
 cache_dir = "./.cache"
 
 [contracts.bigview-treasury]
