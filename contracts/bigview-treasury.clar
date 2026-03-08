@@ -1,0 +1,141 @@
+;; SPDX-License-Identifier: MIT
+;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
+
+;; ---------------------------------------------------------
+;; Constants & Data Variables
+;; ---------------------------------------------------------
+
+;; 0. Define the SIP-010 Trait (Standard for sBTC/Tokens)
+;; FIXED: Corrected the address and naming for the SIP-010 trait
+(use-trait sip010-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
+
+;; Then define your sBTC constant
+(define-constant SBTC-CONTRACT 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4)
+
+(define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
+;; FIXED: Official PoX-4 address for Testnet
+(define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
+(define-constant MAJOR-POOL-ADDRESS 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
+
+;; Error Codes (Unified as uint)
+(define-constant ERR-NOT-AUTHORIZED (err u100))
+(define-constant ERR-NO-STAKE (err u101))
+(define-constant ERR-NO-REWARD (err u102))
+(define-constant ERR-INSUFFICIENT-STAKE (err u103))
+(define-constant ERR-TRANSFER-FAILED (err u104))
+(define-constant ERR-NOT-UNLOCKED (err u105))
+(define-constant ERR-NO-REQUEST (err u106))
+(define-constant REWARD-CYCLE-INDEX u2100)
+
+(define-data-var total-members-count uint u0)
+(define-data-var total-staked-amount uint u0)
+(define-data-var total-rewards-amount uint u0)
+(define-data-var proposal-counter uint u0)
+
+;; ---------------------------------------------------------
+;; Data Maps
+;; ---------------------------------------------------------
+(define-map user-wallets { user: principal } { wallet: principal })
+(define-map members { account: principal } { is-member: bool })
+(define-map stakes { account: principal } { amount: uint })
+(define-map rewards { account: principal } { amount: uint })
+(define-map proposals { id: uint } { description: (string-ascii 64), votes-for: uint, votes-against: uint })
+(define-map unstake-requests { account: principal } { amount: uint, unlock-at: uint })
+
+;; ---------------------------------------------------------
+;; Read-Only Functions
+;; ---------------------------------------------------------
+(define-read-only (dashboard-summary)
+  {
+    total-members: (var-get total-members-count),
+    total-stakes: (var-get total-staked-amount),
+    total-rewards: (var-get total-rewards-amount),
+    proposals-count: (var-get proposal-counter)
+  }
+)
+
+(define-read-only (get-user-stake (user principal))
+  (default-to u0 (get amount (map-get? stakes { account: user })))
+)
+
+;; ---------------------------------------------------------
+;; Public Functions
+;; ---------------------------------------------------------
+
+(define-public (stake-and-delegate (amount uint))
+  (let (
+    (user tx-sender)
+    (current-user-stake (get-user-stake user))
+  )
+    (begin 
+      ;; Step 1: Transfer STX to contract
+      (try! (stx-transfer? amount user (as-contract tx-sender)))
+
+      ;; Step 2: Delegate to Pool
+      ;; FIXED: Using unwrap! with a uint error code (u104) to match the stx-transfer? error type
+      (unwrap! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
+
+      ;; Step 3: Updates
+      (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
+      (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
+      (ok true)
+    )
+  )
+)
+
+(define-public (claim-rewards)
+  (let (
+    (user tx-sender)
+    (user-stake (get-user-stake user))
+    (total-pool-stake (var-get total-staked-amount))
+    ;; FIXED: Corrected trait usage for get-balance
+    (contract-sbtc-balance (unwrap! (as-contract (contract-call? .sbtc-token get-balance (as-contract tx-sender))) (err u500)))
+  )
+    (asserts! (> user-stake u0) ERR-NO-STAKE)
+    (let (
+      (total-user-reward (/ (* user-stake contract-sbtc-balance) total-pool-stake))
+      (dev-fee (/ (* total-user-reward u5) u100))
+      (final-user-reward (- total-user-reward dev-fee))
+    )
+      ;; Step 5 & 6: Token Transfers
+      (try! (as-contract (contract-call? .sbtc-token transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
+      (try! (as-contract (contract-call? .sbtc-token transfer final-user-reward (as-contract tx-sender) user none)))
+      (ok {reward: final-user-reward, fee: dev-fee})
+    )
+  )
+)
+
+;; (Rest of your Governance functions are fine and can remain as they were)
+
+;; Governance Logic
+;; ---------------------------------------------------------
+
+(define-public (create-proposal (desc (string-ascii 64)))
+  (let ((id (+ (var-get proposal-counter) u1)))
+    (begin
+      (map-insert proposals { id: id }
+        { description: desc, votes-for: u0, votes-against: u0 })
+      (var-set proposal-counter id)
+      (ok id)
+    )
+  )
+)
+
+(define-public (vote (id uint) (support bool))
+  (let ((proposal (unwrap! (map-get? proposals { id: id }) (err "Proposal not found"))))
+    (begin
+      (map-set proposals { id: id }
+        { 
+          description: (get description proposal),
+          votes-for: (if support 
+                       (+ (get votes-for proposal) u1) 
+                       (get votes-for proposal)),
+          votes-against: (if support 
+                          (get votes-against proposal) 
+                          (+ (get votes-against proposal) u1))
+        }
+      )
+      (ok "Vote recorded")
+    )
+  )
+) 
