@@ -5,12 +5,8 @@
 ;; Constants & Data Variables
 ;; ---------------------------------------------------------
 
-;; 0. Define the SIP-010 Trait (Standard for sBTC/Tokens)
-;; FIXED: Corrected the address and naming for the SIP-010 trait
-(use-trait sip010-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
-
-;; Then define your sBTC constant
-(define-constant SBTC-CONTRACT 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4)
+;; Update these at the top of your .clar file
+(define-constant SBTC-CONTRACT 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sbtc-token)
 
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
 ;; FIXED: Official PoX-4 address for Testnet
@@ -88,19 +84,20 @@
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; FIXED: Corrected trait usage for get-balance
-    (contract-sbtc-balance (unwrap! (as-contract (contract-call? .sbtc-token get-balance (as-contract tx-sender))) (err u500)))
+    ;; Use the constant we defined earlier instead of the dot-notation
+    (contract-sbtc-balance (unwrap! (as-contract (contract-call? SBTC-CONTRACT get-balance (as-contract tx-sender))) (err u500)))
   )
-    (asserts! (> user-stake u0) ERR-NO-STAKE)
-    (let (
-      (total-user-reward (/ (* user-stake contract-sbtc-balance) total-pool-stake))
-      (dev-fee (/ (* total-user-reward u5) u100))
-      (final-user-reward (- total-user-reward dev-fee))
-    )
-      ;; Step 5 & 6: Token Transfers
-      (try! (as-contract (contract-call? .sbtc-token transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
-      (try! (as-contract (contract-call? .sbtc-token transfer final-user-reward (as-contract tx-sender) user none)))
-      (ok {reward: final-user-reward, fee: dev-fee})
+    (begin
+      (asserts! (> user-stake u0) ERR-NO-STAKE)
+      (let (
+        (total-user-reward (/ (* user-stake contract-sbtc-balance) total-pool-stake))
+        (dev-fee (/ (* total-user-reward u5) u100))
+        (final-user-reward (- total-user-reward dev-fee))
+      )
+        (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
+        (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward (as-contract tx-sender) user none)))
+        (ok {reward: final-user-reward, fee: dev-fee})
+      )
     )
   )
 )

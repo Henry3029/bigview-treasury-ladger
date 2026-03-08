@@ -7,8 +7,13 @@ cache_dir = "./.cache"
 
 [contracts.bigview-treasury]
 path = "contracts/bigview-treasury.clar"
+depends_on = ["sbtc-token"]
 clarity_version = 2
 epoch = "2.5"
+
+# Add this section for Testnet
+[networks.testnet.contracts.sbtc-token]
+address = "ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT" # This is the official sBTC Testnet Address
 
 [repl.analysis]
 passes = ["check_checker"]
@@ -16,6 +21,7 @@ check_checker = { trusted_sender = false, trusted_caller = false, callee_filter 
 
 [networks.testnet]
 cost_strategy = "low"
+
 
 # Check-checker settings:
 # trusted_sender: if true, inputs are trusted after tx_sender has been checked.
