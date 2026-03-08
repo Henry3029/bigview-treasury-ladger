@@ -101,22 +101,27 @@
 ;; 1. Use PoX-4 for the Nakamoto era
 (define-public (stake-and-delegate (amount uint))
   (let (
-    (user tx-sender)
-    (current-user-stake (default-to u0 (get amount (map-get? stakes { account: user }))))
-  )
-    (begin 
-      ;; 1. The Transfer (The first "Gate")
-      (try! (stx-transfer? amount user (as-contract tx-sender)))
+      (user tx-sender)
+          ;; Use get-amount-or-zero helper to keep the let block clean
+              (current-user-stake (default-to u0 (get amount (map-get? stakes { account: user }))))
+                )
+                    (begin 
+                          ;; Step 1 & 2: The "Heavy Lifting"
+                                ;; We use try! to ensure if these fail, the whole function stops and returns an error
+                                      (try! (stx-transfer? amount user (as-contract tx-sender)))
+                                            (try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)))
 
-    (try! (as-contract (contract-call? 'SP000000000000000000002Q6VF78.pox-4 delegate-stx (int-to-uint amount) MAJOR-POOL-ADDRESS none none)))
-      ;; 3. The Record Keeping (Only happens if 1 and 2 pass)
-      (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
-      (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
+                                                  ;; Step 3: The Record Keeping
+                                                        ;; These are simple actions that return 'true', so we just let them run
+                                                              (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
+                                                                    (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
 
-      (ok true)
-    )
-  )
-)
+                                                                          ;; Step 4: The Final Word
+                                                                                ;; This ensures the entire function returns (response bool uint)
+                                                                                      (ok true)
+                                                                                          )
+                                                                                            )
+                                                                                            )
 
 
 ;; 3. THE NEW FUNCTIONS
