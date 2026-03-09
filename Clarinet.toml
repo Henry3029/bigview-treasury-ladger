@@ -3,6 +3,8 @@ name = "bigview-project"
 authors = []
 description = ""
 telemetry = true
+cost_strategy = "low-cost"
+cache_dir = "./.clarinet"
 
 [contracts.bigview-treasury]
 path = 'contracts/bigview-treasury.clar'
