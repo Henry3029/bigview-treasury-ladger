@@ -6,11 +6,14 @@
   )
 )
 
-(define-token sbtc)
+(define-fungible-token sbtc)
 
 (define-public (transfer (amount uint) (sender principal) (recipient principal) (memo (optional (buff 34))))
-  (ok true)
-)
+  (if (> amount u0)
+      (ok true)
+          (err u1) ;; This gives the treasury an 'err' type it can understand
+            )
+            )
 
 (define-read-only (get-balance (who principal))
   (ok u1000000) ;; Give the mock some fake balance for testing

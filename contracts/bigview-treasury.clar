@@ -6,7 +6,7 @@
 ;; ---------------------------------------------------------
 
 ;; Use the Mainnet constant - Clarinet will swap this for you on Testnet
-(define-constant SBTC-CONTRACT 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token)
+(define-constant SBTC-CONTRACT .sbtc-token)
 
 
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
