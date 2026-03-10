@@ -1,4 +1,3 @@
-;; @version 2
 ;; SPDX-License-Identifier: MIT
 ;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
 
@@ -68,11 +67,11 @@
   )
     (begin 
       ;; Step 1: Transfer STX to contract
-      (try! (stx-transfer? amount user (as-contract tx-sender)))
+      (try! (stx-transfer? amount user (as-contract? tx-sender)))
 
       ;; Step 2: Delegate to Pool
       ;; FIXED: Using unwrap! with a uint error code (u104) to match the stx-transfer? error type
-      (unwrap! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
+      (unwrap! (as-contract? (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
 
       ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
@@ -88,7 +87,7 @@
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
     ;; Use the constant we defined earlier instead of the dot-notation
-    (contract-sbtc-balance (unwrap! (as-contract (contract-call? SBTC-CONTRACT get-balance (as-contract tx-sender))) (err u500)))
+    (contract-sbtc-balance (unwrap! (as-contract? (contract-call? SBTC-CONTRACT get-balance (as-contract? tx-sender))) (err u500)))
   )
     (begin
       (asserts! (> user-stake u0) ERR-NO-STAKE)
@@ -97,8 +96,8 @@
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
-        (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
-        (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward (as-contract tx-sender) user none)))
+        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer dev-fee (as-contract tx-sender) DEV-WALLET none)))
+        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer final-user-reward (as-contract? tx-sender) user none)))
         (ok {reward: final-user-reward, fee: dev-fee})
       )
     )
