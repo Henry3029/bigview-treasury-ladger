@@ -10,15 +10,15 @@ plan:
       transactions:
         - contract-publish:
             contract-name: sbtc-token
-            expected-sender: ST18VP9P1WMPA7FXNPGTA1BF1TVTA6STQ892MH286
-            cost: 6080
+            expected-sender: ST3XNK10MAN5V6FPX3EKJG771Y2NTMR476M0SWDHZ
+            cost: 3580838
             path: contracts/sbtc-token.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: bigview-treasury-v2
-            expected-sender: ST18VP9P1WMPA7FXNPGTA1BF1TVTA6STQ892MH286
-            cost: 52050
+            expected-sender: ST3XNK10MAN5V6FPX3EKJG771Y2NTMR476M0SWDHZ
+            cost: 3593733
             path: contracts/bigview-treasury-v2.clar
             anchor-block-only: true
             clarity-version: 2
