@@ -1,12 +1,14 @@
+;; @version 2
 ;; SPDX-License-Identifier: MIT
 ;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
 
+(use-trait sbtc-token-trait 'ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token.sip-010-trait)
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
 ;; ---------------------------------------------------------
 
-;; Use the Mainnet constant - Clarinet will swap this for you on Testnet
-(define-constant SBTC-CONTRACT .sbtc-token)
+;; Use the actual Nakamoto Testnet sBTC address
+(define-constant SBTC-CONTRACT 'ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token)
 
 
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
