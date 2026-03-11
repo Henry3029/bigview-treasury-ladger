@@ -3,7 +3,7 @@
 
 (use-trait sbtc-token-trait 'ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token.sip-010-trait)
 ;; ---------------------------------------------------------
-;; Constants & Data Variables
+;; Constants & Data Variables set
 ;; ---------------------------------------------------------
 
 ;; Use the actual Nakamoto Testnet sBTC address
