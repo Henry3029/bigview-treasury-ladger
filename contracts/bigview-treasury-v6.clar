@@ -1,22 +1,23 @@
 ;; @version 2
 ;; SPDX-License-Identifier: MIT
-;; BigView Dashboard Contract in Clarity (Updated 
+;; BigView Dashboard Contract in Clarity (Updated 2026)
 
+;; ---------------------------------------------------------
+;; Traits
+;; ---------------------------------------------------------
 (use-trait sbtc-token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait )
+
 ;; ---------------------------------------------------------
-;; Constants & Data Variables set
+;; Constants & Data Variables
 ;; ---------------------------------------------------------
 
-;; Use the actual Nakamoto Testnet sBTC address
-at
-
-
-(define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
-;; FIXED: Official PoX-4 address for Testnet
+;; FIXED: Re-added the missing SBTC-CONTRACT definition
+(define-constant SBTC-CONTRACT 'ST3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token )
+(define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
 (define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
-(define-constant MAJOR-POOL-ADDRESS 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
+(define-constant MAJOR-POOL-ADDRESS 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
 
-;; Error Codes (Unified as uint)
+;; Error Codes
 (define-constant ERR-NOT-AUTHORIZED (err u100))
 (define-constant ERR-NO-STAKE (err u101))
 (define-constant ERR-NO-REWARD (err u102))
@@ -24,7 +25,6 @@ at
 (define-constant ERR-TRANSFER-FAILED (err u104))
 (define-constant ERR-NOT-UNLOCKED (err u105))
 (define-constant ERR-NO-REQUEST (err u106))
-(define-constant REWARD-CYCLE-INDEX u2100)
 
 (define-data-var total-members-count uint u0)
 (define-data-var total-staked-amount uint u0)
@@ -34,12 +34,9 @@ at
 ;; ---------------------------------------------------------
 ;; Data Maps
 ;; ---------------------------------------------------------
-(define-map user-wallets { user: principal } { wallet: principal })
 (define-map members { account: principal } { is-member: bool })
 (define-map stakes { account: principal } { amount: uint })
-(define-map rewards { account: principal } { amount: uint })
 (define-map proposals { id: uint } { description: (string-ascii 64), votes-for: uint, votes-against: uint })
-(define-map unstake-requests { account: principal } { amount: uint, unlock-at: uint })
 
 ;; ---------------------------------------------------------
 ;; Read-Only Functions
@@ -67,9 +64,12 @@ at
     (current-user-stake (get-user-stake user))
   )
     (begin 
+      ;; Step 1: Transfer FROM user TO contract
       (try! (stx-transfer? amount user (as-contract tx-sender)))
-      ;; Wrap in try! to handle the delegation response
+      
+      ;; Step 2: Delegate to Pool (Clarity 2 style - no question mark)
       (try! (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)))
+      
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
       (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
       (ok true)
@@ -82,7 +82,7 @@ at
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; Added unwrap! so contract-sbtc-balance is a uint, not a response
+    ;; Clarity 2 style check-balance
     (contract-sbtc-balance (unwrap! (as-contract (contract-call? SBTC-CONTRACT get-balance tx-sender)) (err u500)))
   )
     (begin
@@ -92,6 +92,7 @@ at
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
+        ;; Transfers using Clarity 2 as-contract
         (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee tx-sender DEV-WALLET none)))
         (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward tx-sender user none)))
         (ok {reward: final-user-reward, fee: dev-fee})
@@ -100,8 +101,7 @@ at
   )
 )
 
-;; (Rest of your Governance functions are fine and can remain as they were)
-
+;; ---------------------------------------------------------
 ;; Governance Logic
 ;; ---------------------------------------------------------
 
@@ -133,4 +133,4 @@ at
       (ok "Vote recorded")
     )
   )
-) 
+)
