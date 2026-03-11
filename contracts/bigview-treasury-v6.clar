@@ -1,14 +1,14 @@
 ;; @version 2
 ;; SPDX-License-Identifier: MIT
-;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
+;; BigView Dashboard Contract in Clarity (Updated 
 
-(use-trait sbtc-token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sbtc-token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait )
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables set
 ;; ---------------------------------------------------------
 
 ;; Use the actual Nakamoto Testnet sBTC address
-(define-constant SBTC-CONTRACT 'ST3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token)
+at
 
 
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBPSHJSYWY87ZZE9TE)
