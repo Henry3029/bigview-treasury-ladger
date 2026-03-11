@@ -66,12 +66,10 @@
     (current-user-stake (get-user-stake user))
   )
     (begin 
-      ;; Step 1: Transfer STX FROM user TO contract
-      ;; We don't need as-contract? here because the USER is the one sending.
-      (try! (stx-transfer? amount user (as-contract tx-sender)))
+      ;; FIX: Change 'as-contract' to 'as-contract?'
+      (try! (stx-transfer? amount user (as-contract? tx-sender)))
 
       ;; Step 2: Delegate to Pool
-      ;; We wrap the WHOLE call in as-contract? so the POX contract thinks the CONTRACT is the one delegating.
       (unwrap! (as-contract? (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
 
       ;; Step 3: Updates
