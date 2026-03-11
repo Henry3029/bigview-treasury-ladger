@@ -66,12 +66,14 @@
     (current-user-stake (get-user-stake user))
   )
     (begin 
-      ;; Step 1: Transfer STX FROM user TO contract
-      ;; We use as-contract (no ?) here because it's just an address, not an action.
+      ;; Step 1: Transfer FROM user TO the contract
+      ;; Here, (as-contract tx-sender) is just an ADDRESS (the recipient).
+      ;; We don't use the '?' here because we aren't switching authority yet.
       (try! (stx-transfer? amount user (as-contract tx-sender)))
 
       ;; Step 2: Delegate to Pool
-      ;; FIXED: Added the '?' to as-contract? so Clarity 4 recognizes it
+      ;; HERE we are "Doing" an action as the contract.
+      ;; We MUST use as-contract? and we MUST unwrap! the response it gives back.
       (unwrap! (as-contract? (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
 
       ;; Step 3: Updates
