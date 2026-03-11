@@ -2,24 +2,17 @@
 id: 0
 name: Testnet deployment
 network: testnet
-stacks-node: "https://api.testnet.hiro.so"
+stacks-node: "https://stacks-node-api.testnet.stacks.co"
 bitcoin-node: "http://blockstack:blockstacksystem@bitcoind.testnet.stacks.co:18332"
 plan:
   batches:
     - id: 0
       transactions:
         - contract-publish:
-            contract-name: sbtc-token
-            expected-sender: ST3XNK10MAN5V6FPX3EKJG771Y2NTMR476M0SWDHZ
-            cost: 3580838
-            path: contracts/sbtc-token.clar
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
-            contract-name: bigview-treasury-v2
-            expected-sender: ST3XNK10MAN5V6FPX3EKJG771Y2NTMR476M0SWDHZ
-            cost: 3593733
-            path: contracts/bigview-treasury-v2.clar
+            contract-name: bigview-treasury-v6
+            expected-sender: STEDCBKARWTQAX43B34X86RJ5R8VTPF6A4BKYCRR
+            cost: 53550
+            path: contracts/bigview-treasury-v6.clar
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.5"
