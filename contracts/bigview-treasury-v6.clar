@@ -12,7 +12,7 @@
 ;; ---------------------------------------------------------
 
 ;; FIXED: Re-added the missing SBTC-CONTRACT definition
-(define-constant SBTC-CONTRACT 'ST3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token )
+(define-constant SBTC-CONTRACT 'ST3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4.sbtc-token)
 (define-constant DEV-WALLET 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
 (define-constant POX-CONTRACT 'ST000000000000000000002AMW42H.pox-4)
 (define-constant MAJOR-POOL-ADDRESS 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
@@ -62,14 +62,17 @@
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
+    ;; We "capture" the contract's address here
+    (contract-address (as-contract tx-sender))
   )
     (begin 
-      ;; Step 1: Transfer FROM user TO contract
-      (try! (stx-transfer? amount user (as-contract tx-sender)))
+      ;; Step 1: Transfer FROM user TO contract using the variable
+      (try! (stx-transfer? amount user contract-address))
       
-      ;; Step 2: Delegate to Pool (Clarity 2 style - no question mark)
-      (try! (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)))
+      ;; Step 2: Delegate to Pool (Clarity 2 style - simple wrapper)
+      (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)))
       
+      ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
       (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
       (ok true)
