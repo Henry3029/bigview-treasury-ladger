@@ -66,8 +66,8 @@
     (current-user-stake (get-user-stake user))
   )
     (begin 
-      ;; FIX: Change 'as-contract' to 'as-contract?'
-      (try! (stx-transfer? amount user (as-contract? tx-sender)))
+      ;; FIXED: Wrap the entire transfer in as-contract?
+      (try! (as-contract? (stx-transfer? amount user tx-sender)))
 
       ;; Step 2: Delegate to Pool
       (unwrap! (as-contract? (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
@@ -80,13 +80,15 @@
   )
 )
 
+
 (define-public (claim-rewards)
   (let (
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; WRAP the balance check: "Hey contract, check YOUR sBTC balance"
-    (contract-sbtc-balance (unwrap! (as-contract? (contract-call? .sbtc-token get-balance tx-sender)) (err u500)))
+    
+    ;; FIXED: Use SBTC-CONTRACT constant instead of .sbtc-token
+    (contract-sbtc-balance (unwrap! (as-contract? (contract-call? SBTC-CONTRACT get-balance tx-sender)) (err u500)))
   )
     (begin
       (asserts! (> user-stake u0) ERR-NO-STAKE)
@@ -95,9 +97,12 @@
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
-        ;; WRAP the transfers: "Hey contract, transfer from YOURSELF to Dev/User"
-        (try! (as-contract? (contract-call? .sbtc-token transfer dev-fee tx-sender DEV-WALLET none)))
-        (try! (as-contract? (contract-call? .sbtc-token transfer final-user-reward tx-sender user none)))
+        ;; FIXED: Changed .sbtc-token to SBTC-CONTRACT and added '?' to as-contract
+        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer dev-fee tx-sender DEV-WALLET none)))
+        
+        ;; FIXED: Changed .sbtc-token to SBTC-CONTRACT
+        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer final-user-reward tx-sender user none)))
+        
         (ok {reward: final-user-reward, fee: dev-fee})
       )
     )

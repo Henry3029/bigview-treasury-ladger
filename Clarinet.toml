@@ -6,8 +6,8 @@ telemetry = true
 cost_strategy = "low-cost"
 cache_dir = "./.clarinet"
 
-[contracts.bigview-treasury-v5]
-path = 'contracts/bigview-treasury-v5.clar'
+[contracts.bigview-treasury-v6]
+path = 'contracts/bigview-treasury-v6.clar'
 clarity_version = 4
 epoch = 3.3
 [repl.analysis]
