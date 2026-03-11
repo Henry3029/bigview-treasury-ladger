@@ -67,17 +67,9 @@
     (current-user-stake (get-user-stake user))
   )
     (begin 
-      ;; Step 1: Transfer FROM user TO contract
-      ;; In Clarity 2, (as-contract tx-sender) is how you get the contract's address
       (try! (stx-transfer? amount user (as-contract tx-sender)))
-
-      ;; Step 2: Delegate to Pool
-      ;; We use the old 'as-contract' (no question mark)
-      (as-contract 
-        (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)
-      )
-
-      ;; Step 3: Updates
+      ;; Wrap in try! to handle the delegation response
+      (try! (as-contract (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)))
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
       (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
       (ok true)
@@ -85,14 +77,13 @@
   )
 )
 
-
 (define-public (claim-rewards)
   (let (
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; Using as-contract (no ?) to check balance
-    (contract-sbtc-balance (as-contract (contract-call? SBTC-CONTRACT get-balance tx-sender)))
+    ;; Added unwrap! so contract-sbtc-balance is a uint, not a response
+    (contract-sbtc-balance (unwrap! (as-contract (contract-call? SBTC-CONTRACT get-balance tx-sender)) (err u500)))
   )
     (begin
       (asserts! (> user-stake u0) ERR-NO-STAKE)
@@ -101,7 +92,6 @@
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
-        ;; Simple as-contract wrappers for the transfers
         (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee tx-sender DEV-WALLET none)))
         (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward tx-sender user none)))
         (ok {reward: final-user-reward, fee: dev-fee})
