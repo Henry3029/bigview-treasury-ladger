@@ -64,19 +64,20 @@
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
+    ;; We define the contract's address here as a simple variable
+    (contract-address (as-contract tx-sender))
   )
     (begin 
-      ;; Step 1: Transfer FROM user TO the contract
-      ;; Here, (as-contract tx-sender) is just an ADDRESS (the recipient).
-      ;; We don't use the '?' here because we aren't switching authority yet.
-      (try! (stx-transfer? amount user (as-contract tx-sender)))
+      ;; Step 1: Transfer STX FROM user TO this contract
+      ;; This is a standard transfer. No '?' or complex wrappers needed.
+      (try! (stx-transfer? amount user contract-address))
 
       ;; Step 2: Delegate to Pool
-      ;; HERE we are "Doing" an action as the contract.
-      ;; We MUST use as-contract? and we MUST unwrap! the response it gives back.
+      ;; Because the contract is the one delegating, we use the '?' version
+      ;; to give the contract "permission" to speak to the PoX contract.
       (unwrap! (as-contract? (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)) (err u104))
 
-      ;; Step 3: Updates
+      ;; Step 3: Update your internal maps
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
       (var-set total-staked-amount (+ (var-get total-staked-amount) amount))
       (ok true)
