@@ -1,3 +1,4 @@
+;; @version 2
 ;; SPDX-License-Identifier: MIT
 ;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
 
@@ -64,19 +65,16 @@
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
-    ;; We "fetch" the contract's address into a variable.
-    ;; In Clarity 4, even getting the address is a checked action.
-    (contract-address (unwrap! (as-contract? (ok tx-sender)) (err u999)))
   )
     (begin 
-      ;; Step 1: Transfer FROM user TO the contract-address variable
-      (try! (stx-transfer? amount user contract-address))
+      ;; Step 1: Transfer FROM user TO contract
+      ;; In Clarity 2, (as-contract tx-sender) is how you get the contract's address
+      (try! (stx-transfer? amount user (as-contract tx-sender)))
 
       ;; Step 2: Delegate to Pool
-      ;; We unwrap the whole action to satisfy the "2 argument" VM rule.
-      (unwrap! 
-        (as-contract? (contract-call? POX-CONTRACT delegate-stx amount MAJOR-POOL-ADDRESS none none)) 
-        (err u104)
+      ;; We use the old 'as-contract' (no question mark)
+      (as-contract 
+        (contract-call? 'ST000000000000000000002AMW42H.pox-4 delegate-stx amount MAJOR-POOL-ADDRESS none none)
       )
 
       ;; Step 3: Updates
@@ -93,9 +91,8 @@
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    
-    ;; FIXED: Use SBTC-CONTRACT constant instead of .sbtc-token
-    (contract-sbtc-balance (unwrap! (as-contract? (contract-call? SBTC-CONTRACT get-balance tx-sender)) (err u500)))
+    ;; Using as-contract (no ?) to check balance
+    (contract-sbtc-balance (as-contract (contract-call? SBTC-CONTRACT get-balance tx-sender)))
   )
     (begin
       (asserts! (> user-stake u0) ERR-NO-STAKE)
@@ -104,12 +101,9 @@
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
-        ;; FIXED: Changed .sbtc-token to SBTC-CONTRACT and added '?' to as-contract
-        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer dev-fee tx-sender DEV-WALLET none)))
-        
-        ;; FIXED: Changed .sbtc-token to SBTC-CONTRACT
-        (try! (as-contract? (contract-call? SBTC-CONTRACT transfer final-user-reward tx-sender user none)))
-        
+        ;; Simple as-contract wrappers for the transfers
+        (try! (as-contract (contract-call? SBTC-CONTRACT transfer dev-fee tx-sender DEV-WALLET none)))
+        (try! (as-contract (contract-call? SBTC-CONTRACT transfer final-user-reward tx-sender user none)))
         (ok {reward: final-user-reward, fee: dev-fee})
       )
     )
