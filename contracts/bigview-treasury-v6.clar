@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: MIT
 ;; BigView Dashboard Contract in Clarity (Updated for Nakamoto/Clarity 2+)
 
-(use-trait sbtc-token-trait 'ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token.sip-010-trait)
+(use-trait sbtc-token-trait 'ST1F7QA2MDF17S807EPA36TSS8AMEFY4KA9TVGWXT.sbtc-token.ft-trait)
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables set
 ;; ---------------------------------------------------------
