@@ -67,21 +67,19 @@
 ;; Public Functions
 ;; ---------------------------------------------------------
 
-(define-public (stake-and-delegate (amount uint) (pox-contract <pox-trait>)))
+(define-public (stake-and-delegate (amount uint) (pox-contract <pox-trait>))
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
     (contract-address (as-contract tx-sender))
-    ;; Fetch the current addresses from your data-vars
     (target-pool (var-get major-pool-address))
   )
     (begin 
       ;; Step 1: Transfer FROM user TO contract
       (try! (stx-transfer? amount user contract-address))
       
-      ;; Step 2: Delegate to Pool using our new variables
-      ;; Note: We replaced the hardcoded 'ST00...pox-4 and MAJOR-POOL-ADDRESS
-     (try! (as-contract (contract-call? pox-contract delegate-stx amount (var-get major-pool-address) none none)))
+      ;; Step 2: Delegate to Pool
+      (try! (as-contract (contract-call? pox-contract delegate-stx amount target-pool none none)))
       
       ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
@@ -89,15 +87,13 @@
       (ok true)
     )
   )
+)
 
-
-;; Added 'sbtc-token' as an argument so we don't need the constant anymore
 (define-public (claim-rewards (sbtc-token <sbtc-token-trait>))
   (let (
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; We replaced SBTC-CONTRACT with the variable name 'sbtc-token'
     (contract-sbtc-balance (unwrap! (as-contract (contract-call? sbtc-token get-balance tx-sender)) (err u500)))
   )
     (begin
@@ -107,7 +103,6 @@
         (dev-fee (/ (* total-user-reward u5) u100))
         (final-user-reward (- total-user-reward dev-fee))
       )
-        ;; Again, replacing the old constant with 'sbtc-token'
         (try! (as-contract (contract-call? sbtc-token transfer dev-fee tx-sender (var-get dev-wallet) none)))
         (try! (as-contract (contract-call? sbtc-token transfer final-user-reward tx-sender user none)))
         (ok {reward: final-user-reward, fee: dev-fee})
@@ -164,7 +159,7 @@
     (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
     (var-set major-pool-address new-pool)
     ;; Use the direct address here to avoid the "missing contract name" error
-    (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+      (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
     (ok true)
   )
 )
