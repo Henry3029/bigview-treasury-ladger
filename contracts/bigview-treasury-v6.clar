@@ -155,12 +155,20 @@
   )
 )
 
+
 (define-public (set-major-pool (new-pool principal))
   (begin
+    ;; 1. Check permissions (Returns a response type)
     (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
+    
+    ;; 2. Update the address
     (var-set major-pool-address new-pool)
-    ;; Use the direct address here to avoid the "missing contract name" error
-      (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+    
+    ;; 3. THE FIX: Wrap the contract call in an asserts! 
+    ;; 'is-ok' turns the response into a simple true/false boolean
+    (asserts! (is-ok (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none))) (err u500))
+    
+    ;; 4. Final return (matches the response type of the asserts above)
     (ok true)
   )
 )
