@@ -161,21 +161,12 @@
 )
 
 (define-public (set-major-pool (new-pool principal))
-  (let ((pox-contract-addr (var-get pox-contract)))
-    (begin
-      ;; 1. Security Check
-      (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
-      
-      ;; 2. Update the variable
-      (var-set major-pool-address new-pool)
-      
-      ;; 3. Grant the permission to the new pool 
-      ;; We use try! here to make sure the contract-call succeeds
-      (try! (as-contract (contract-call? pox-contract-addr allow-contract-caller new-pool none)))
-      
-      ;; 4. Return the final OK at the very end
-      (ok true)
-    )
+  (begin
+    (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
+    (var-set major-pool-address new-pool)
+    ;; Use the direct address here to avoid the "missing contract name" error
+    (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+    (ok true)
   )
 )
 
