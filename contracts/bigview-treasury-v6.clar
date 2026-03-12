@@ -26,10 +26,10 @@
 (define-data-var pox-contract principal 'ST000000000000000000002AMW42H.pox-4 )
 
 ;; Use your actual wallet address here
-(define-data-var dev-wallet principal ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
+(define-data-var dev-wallet principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE )
 
 ;; Initial Xverse pool address (replace with the current one from Xverse)
-(define-data-var major-pool-address principal ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
+(define-data-var major-pool-address principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE )
 
 (define-data-var total-members-count uint u0)
 (define-data-var total-staked-amount uint u0)
