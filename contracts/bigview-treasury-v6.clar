@@ -7,7 +7,7 @@
 ;; ---------------------------------------------------------
 ;; Pointing to your own local file now!
 (use-trait sbtc-token-trait .sip-010-trait.sip-010-trait)
-(use-trait pox-trait 'ST000000000000000000002AMW42H.pox-4-trait.pox-4-trait)
+(use-trait pox-trait .pox-trait.pox-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
@@ -79,7 +79,7 @@
       (try! (stx-transfer? amount user contract-address))
       
       ;; Step 2: Delegate to Pool
-      (try! (as-contract (contract-call? pox-contract delegate-stx amount target-pool none none)))
+      (try! (as-contract (contract-call? pox-contract delegate-stx amount (var-get major-pool-address) none none)))
       
       ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
