@@ -67,7 +67,7 @@
 ;; Public Functions
 ;; ---------------------------------------------------------
 
-(define-public (stake-and-delegate (amount uint) (pox-contract <pox-trait>))
+(define-public (stake-and-delegate (amount uint) (pox-trait-arg <pox-trait>)))
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
@@ -79,7 +79,7 @@
       (try! (stx-transfer? amount user contract-address))
       
       ;; Step 2: Delegate to Pool
-      (try! (as-contract (contract-call? pox-contract delegate-stx amount (var-get major-pool-address) none none)))
+     (try! (as-contract (contract-call? pox-trait-arg delegate-stx amount (var-get major-pool-address) none none)))
       
       ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
@@ -87,7 +87,7 @@
       (ok true)
     )
   )
-)
+
 
 (define-public (claim-rewards (sbtc-token <sbtc-token-trait>))
   (let (
