@@ -7,6 +7,7 @@
 ;; ---------------------------------------------------------
 ;; Pointing to your own local file now!
 (use-trait sbtc-token-trait .sip-010-trait.sip-010-trait)
+(use-trait pox-trait 'ST000000000000000000002AMW42H.pox-4-trait.pox-4-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
@@ -26,10 +27,8 @@
 (define-data-var pox-contract principal 'ST000000000000000000002AMW42H.pox-4 )
 
 ;; Use your actual wallet address here
-(define-data-var dev-wallet principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE )
-
-;; Initial Xverse pool address (replace with the current one from Xverse)
-(define-data-var major-pool-address principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE )
+(define-data-var dev-wallet principal tx-sender)
+(define-data-var major-pool-address principal tx-sender)
 
 (define-data-var total-members-count uint u0)
 (define-data-var total-staked-amount uint u0)
@@ -68,13 +67,12 @@
 ;; Public Functions
 ;; ---------------------------------------------------------
 
-(define-public (stake-and-delegate (amount uint))
+(define-public (stake-and-delegate (amount uint) (pox-contract <pox-trait>)))
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
     (contract-address (as-contract tx-sender))
     ;; Fetch the current addresses from your data-vars
-    (target-pox (var-get pox-contract))
     (target-pool (var-get major-pool-address))
   )
     (begin 
@@ -83,7 +81,7 @@
       
       ;; Step 2: Delegate to Pool using our new variables
       ;; Note: We replaced the hardcoded 'ST00...pox-4 and MAJOR-POOL-ADDRESS
-      (try! (as-contract (contract-call? target-pox delegate-stx amount target-pool none none)))
+     (try! (as-contract (contract-call? pox-contract delegate-stx amount (var-get major-pool-address) none none)))
       
       ;; Step 3: Updates
       (map-set stakes { account: user } { amount: (+ current-user-stake amount) })
@@ -91,7 +89,7 @@
       (ok true)
     )
   )
-)
+
 
 ;; Added 'sbtc-token' as an argument so we don't need the constant anymore
 (define-public (claim-rewards (sbtc-token <sbtc-token-trait>))
@@ -156,7 +154,7 @@
 (define-public (set-dev-wallet (new-address principal))
   (begin
     ;; Only the person who deployed the contract (tx-sender) can change this
-    (asserts! (is-eq tx-sender 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
+    (asserts! (is-eq tx-sender ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
     (ok (var-set dev-wallet new-address))
   )
 )
