@@ -21,6 +21,11 @@ path = "contracts/sip-010-trait.clar"
 clarity_version = 2
 epoch = 2.5
 
+[contracts.pox-trait]
+path = "contracts/pox-trait.clar"
+clarity_version = 2
+epoch = 2.5
+
 [repl.analysis.lint_groups]
 
 [repl.analysis.lints]
