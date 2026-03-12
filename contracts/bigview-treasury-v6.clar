@@ -160,7 +160,6 @@
   (begin
     ;; 1. Check permissions (Returns a response type)
     (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
-    
     ;; 2. Update the address
     (var-set major-pool-address new-pool)
     
