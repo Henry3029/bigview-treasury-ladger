@@ -5,7 +5,7 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait -token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait )
+(use-trait sbtc-token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
@@ -22,13 +22,13 @@
 
 ;; Use 'SP000000000000000000002Q6VF78.pox-4 for Mainnet 
 ;; or 'ST000000000000000000002AMW42H.pox-4 for Testnet
-(define-data-var pox-contract principal 'ST000000000000000000002AMW42H.pox-4)
+(define-data-var pox-contract principal 'ST000000000000000000002AMW42H.pox-4 )
 
 ;; Use your actual wallet address here
-(define-data-var dev-wallet principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
+(define-data-var dev-wallet principal ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
 
 ;; Initial Xverse pool address (replace with the current one from Xverse)
-(define-data-var major-pool-address principal 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
+(define-data-var major-pool-address principal ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE)
 
 (define-data-var total-members-count uint u0)
 (define-data-var total-staked-amount uint u0)
@@ -60,7 +60,7 @@
 
 ;; To use it in a contract-call?, you now wrap it in a var-get
 (define-read-only (get-current-cycle)
-  (contract-call? (var-get pox-contract) current-pox-reward-cycle)
+  (contract-call? 'ST000000000000000000002AMW42H.pox-4 current-pox-reward-cycle)
 )
 
 ;; ---------------------------------------------------------
@@ -155,25 +155,27 @@
 (define-public (set-dev-wallet (new-address principal))
   (begin
     ;; Only the person who deployed the contract (tx-sender) can change this
-    (asserts! (is-eq tx-sender 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
+    (asserts! (is-eq tx-sender ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
     (ok (var-set dev-wallet new-address))
   )
 )
 
 (define-public (set-major-pool (new-pool principal))
-  (begin
-    ;; 1. Security Check
-    (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
-    
-    ;; 2. Update the variable
-    (var-set major-pool-address new-pool)
-    
-    ;; 3. Grant the permission to the new pool 
-    ;; We use try! here to make sure the contract-call succeeds
-    (try! (as-contract (contract-call? (var-get pox-contract) allow-contract-caller new-pool none)))
-    
-    ;; 4. Return the final OK at the very end
-    (ok true)
+  (let ((pox-contract-addr (var-get pox-contract)))
+    (begin
+      ;; 1. Security Check
+      (asserts! (is-eq tx-sender (var-get dev-wallet)) (err u403))
+      
+      ;; 2. Update the variable
+      (var-set major-pool-address new-pool)
+      
+      ;; 3. Grant the permission to the new pool 
+      ;; We use try! here to make sure the contract-call succeeds
+      (try! (as-contract (contract-call? pox-contract-addr allow-contract-caller new-pool none)))
+      
+      ;; 4. Return the final OK at the very end
+      (ok true)
+    )
   )
 )
 
