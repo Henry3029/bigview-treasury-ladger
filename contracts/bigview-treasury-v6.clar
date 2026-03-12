@@ -156,7 +156,7 @@
 (define-public (set-dev-wallet (new-address principal))
   (begin
     ;; Only the person who deployed the contract (tx-sender) can change this
-    (asserts! (is-eq tx-sender ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
+    (asserts! (is-eq tx-sender 'ST35D3Y0P9RR8DC750D0X3BWBP5HJSYWY87ZZE9TE) (err u403))
     (ok (var-set dev-wallet new-address))
   )
 )
