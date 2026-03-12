@@ -67,7 +67,7 @@
 ;; Public Functions
 ;; ---------------------------------------------------------
 
-(define-public (stake-and-delegate (amount uint) (pox-trait-arg <pox-trait>)))
+(define-public (stake-and-delegate (amount uint) (pox-trait-arg <pox-trait>))
   (let (
     (user tx-sender)
     (current-user-stake (get-user-stake user))
