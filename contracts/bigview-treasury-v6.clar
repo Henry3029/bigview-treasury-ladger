@@ -5,7 +5,8 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait sbtc-token-trait 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT.sip-010-trait-ft-standard.sip-010-trait)
+;; Pointing to your own local file now!
+(use-trait sbtc-token-trait .sip-010-trait.sip-010-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
