@@ -9,17 +9,24 @@ plan:
     - id: 0
       transactions:
         - contract-publish:
-            contract-name: sbtc-token
+            contract-name: pox-trait
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 6080
-            path: contracts/sbtc-token.clar
+            cost: 1270
+            path: contracts/pox-trait.clar
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
-            contract-name: bigview-treasury-v2
+            contract-name: sip-010-trait
             expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            cost: 52050
-            path: contracts/bigview-treasury-v2.clar
+            cost: 4360
+            path: contracts/sip-010-trait.clar
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: bigview-treasury-v6
+            expected-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            cost: 63170
+            path: contracts/bigview-treasury-v6.clar
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.5"
