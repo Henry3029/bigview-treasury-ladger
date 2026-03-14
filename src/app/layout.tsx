@@ -1,14 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Providers } from './providers'; // This now holds the ConnectProvider
 import '@/styles/globals.css';
 import AppPrivyProvider from '@/components/PrivyProvider';
 import WalletButton from '@/components/WalletButton';
 import Image from 'next/image';
 import BottomNav from '@/components/BottomNav';
 import Sidebar from '@/components/Sidebar';
-
-// 1. IMPORT the ConnectProvider
-import { ConnectProvider } from '@stacks/connect-react';
 
 export const metadata: Metadata = {
   title: 'Bigview Treasury Ledger',
@@ -24,15 +21,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased text-slate-900 dashboard-layout">
         <AppPrivyProvider>
-          {/* 2. WRAP everything inside ConnectProvider */}
-          <ConnectProvider
-            authOptions={{
-              appDetails: {
-                name: 'Bigview Treasury',
-                icon: 'https://your-domain.com/images/bigview-image.png',
-              },
-            }}
-          >
+          {/* Use the Providers component here to wrap everything */}
+          <Providers>
             <Sidebar />
             
             <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white shadow-sm border-b [grid-area:header]">
@@ -59,7 +49,7 @@ export default function RootLayout({
             <footer className="p-6 text-center text-xs text-gray-400 border-t [grid-area:footer]">
               © 2026 Bigview Treasury-Ledger
             </footer>
-          </ConnectProvider>
+          </Providers>
         </AppPrivyProvider>
       </body>
     </html>
