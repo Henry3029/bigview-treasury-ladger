@@ -2,7 +2,7 @@
 
 import React from 'react';
 // 1. Try a more direct import if the named one is failing
-import { ConnectProvider } from '@stacks/connect-react';
+import * as StacksConnect from '@stacks/connect-react';
 import { PrivyProvider } from '@privy-io/react-auth';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -21,9 +21,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         appearance: { theme: 'light' },
       }}
     >
-      <ConnectProvider authOptions={stxOptions}>
-        {children}
-      </ConnectProvider>
+<StacksConnect.ConnectProvider authOptions={stxOptions}>
+  {children}
+</StacksConnect.ConnectProvider>
     </PrivyProvider>
   );
 }
