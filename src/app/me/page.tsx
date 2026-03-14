@@ -11,7 +11,15 @@ const userSession = new UserSession({ appConfig });
 export default function ProfilePage() {
   const [balance, setBalance] = useState<string>("Loading...");
   const [userPhoto] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
+// 1. Wait for the browser to be ready
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
+  // 2. If not ready, show a simple loading state (prevents the crash)
+  if (!mounted) return <div className="p-10 text-center">Loading dashboard...</div>;
   // 3. Safety Check: If not signed in, show the "Please Connect" screen
   if (!userSession.isUserSignedIn()) {
     return (
