@@ -6,9 +6,9 @@ import StatusBadge from '@/components/StatusBadge';
 import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 
-const CONTRACT_ADDRESS = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-const CONTRACT_NAME = 'bigview-treasury'; 
-const NETWORK = STACKS_TESTNET;
+const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '';
+const CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME || '';
+const NETWORK = process.env.NEXT_PUBLIC_NETWORK;
 
 async function getDashboardData() {
   try {
@@ -25,29 +25,35 @@ async function getDashboardData() {
       network: NETWORK,
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
-      functionName: 'get-active-proposal', // Updated to a standard name
+      functionName: 'dashboard-summary', 
       functionArgs: [],
       senderAddress: CONTRACT_ADDRESS,
     });
 
     // Use a safer way to parse the JSON
     const parsedData = cvToJSON(proposalResponse);
-    // If the contract returns a { value: "Title" } or just "Title"
-    const proposalTitle = parsedData?.value?.value || parsedData?.value || "No active proposal";
+    
+       // Clarity returns nested 'value' objects for each field in the tuple
+    const data = parsedData.value;
+
+    // Convert microStacks to STX for the UI
+    const totalStakedSTX = Number(data['total-stakes'].value) / 1000000;
+    const totalRewardsSTX = Number(data['total-rewards'].value) / 1000000;
 
     return {
-      stake: `${stxBalance.toLocaleString()} STX`,
-      reward: "0.005", 
-      proposal: proposalTitle, 
-      votesFor: 540, 
-      votesAgainst: 120,
+      stake: `${totalStakedSTX.toLocaleString()} STX`,
+      reward: `${totalRewardsSTX.toFixed(3)} STX`, // Dynamic from contract!
+      proposal: `Total Proposals: ${data['proposals-count'].value}`, // Dynamic!
+      votesFor: Number(data['total-members'].value), // Using member count as a placeholder
+      votesAgainst: 0, 
+      treasuryBalance: `${treasuryBalance.toLocaleString()} STX`,
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
+    console.error("Dashboard Fetch Error:", error);
     return {
       stake: "0 STX",
       reward: "0.000",
-      proposal: "Connect Wallet to Load",
+      proposal: "Connection Error",
       votesFor: 0,
       votesAgainst: 0,
     };
@@ -61,6 +67,9 @@ export default async function Dashboard() {
   return (
     <main className="max-w-7xl mx-auto p-8 space-y-10">
       <WisdomCarousel />
+      
+      {/* The Hybrid Part: User Stats appear only when logged in */}
+  <UserStats />
       
       {/* Header Section */}
       <div className="flex justify-between items-center border-b pb-6">

@@ -1,25 +1,22 @@
-// src/app/history/page.tsx
-import TreasuryTable from "@/components/TreasuryTable"; // Adjust path if needed
+"use client";
 
-async function getTreasuryData() {
-  const TREASURY_ADDR = "ST1PQ..."; // Your contract address
-  const res = await fetch(
-    `https://api.testnet.hiro.so/extended/v1/address/${TREASURY_ADDR}/transactions`,
-    { cache: 'no-store' }
-  );
-  return res.json();
-}
+import { useConnect } from "@stacks/connect-react";
+import TreasuryTable from "@/components/TreasuryTable";
 
-export default async function HistoryPage() {
-  const data = await getTreasuryData();
+export default function HistoryPage() {
+  const { userSession } = useConnect();
+  
+  // Get the signed-in user's address
+  const userAddress = userSession.isUserSignedIn() 
+    ? userSession.loadUserData().profile.stxAddress.testnet 
+    : null;
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Treasury Ledger</h1>
+      <h1 className="text-2xl font-bold mb-6">Transaction History</h1>
       
-      {/* 🚀 This is where your component goes! */}
-      <TreasuryTable transactions={data.results} />
-      
+      {/* We "pass" the address to the table as a prop named 'address' */}
+      <TreasuryTable address={userAddress} />
     </div>
   );
 }

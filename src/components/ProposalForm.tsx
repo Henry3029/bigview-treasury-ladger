@@ -1,12 +1,21 @@
 "use client";
-import React from 'react';
-// 1. Removed unused Solana/Privy imports that were causing the "Unused" or "Module" errors
-import { useConnect } from '@stacks/connect-react'; 
+import React, { useState } from 'react'; // 1. Added useState to imports
+import { openContractCall } from '@stacks/connect';
 import { stringAsciiCV } from '@stacks/transactions';
 
 export default function ProposalForm() {
-  // 2. We only need Stacks Connect for the actual blockchain interaction
-  const { doContractCall } = useConnect(); 
+  // 2. MOVED HOOKS TO THE TOP LEVEL (Required)
+  const [message, setMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
+
+  const notify = (text: string, type: 'success' | 'error' | 'info') => {
+    setMessage(text);
+    setStatus(type);
+    setTimeout(() => {
+      setMessage(null);
+      setStatus(null);
+    }, 4000);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,22 +23,22 @@ export default function ProposalForm() {
     const description = (formData.get('description') as string) || "";
 
     if (!description) {
-        alert("Please enter a description");
-        return;
+      notify("Please enter a description", "info");
+      return;
     }
 
-    // 3. Ensure your .env variables match exactly what's in your Vercel/Local settings
-    await doContractCall({
-      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || 'bigview-treasury',
+    // 3. Added fallbacks ('') to prevent undefined errors
+    await openContractCall({
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
+      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
       functionName: 'create-proposal',
       functionArgs: [stringAsciiCV(description)],
       onFinish: (data) => {
         console.log("Proposal Created!", data);
-        alert("Proposal submitted to the Stacks Testnet!");
+        notify("Proposal submitted to the Stacks Testnet!", "success");
       },
       onCancel: () => {
-        console.log("User denied the proposal");
+        notify("User denied the proposal", "error");
       },
     });
   };
@@ -37,6 +46,17 @@ export default function ProposalForm() {
   return (
     <form onSubmit={handleSubmit} className="p-6 border rounded-3xl bg-white shadow-sm flex flex-col gap-4">
       <h3 className="font-bold text-lg text-slate-800">Create New Proposal</h3>
+      
+      {/* 4. Dynamic feedback message */}
+      {message && (
+        <p className={`p-3 rounded-lg text-sm ${
+          status === 'success' ? 'bg-green-100 text-green-700' : 
+          status === 'error' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+        }`}>
+          {message}
+        </p>
+      )}
+
       <input 
         name="description" 
         placeholder="e.g., Fund the Community Marketing Pool" 
@@ -44,7 +64,7 @@ export default function ProposalForm() {
       />
       <button 
         type="submit" 
-        className="btn-grain-outline py-2 px-6"
+        className="bg-orange-600 text-white font-bold py-3 px-6 rounded-2xl hover:bg-orange-700 transition-colors"
       >
         Submit Proposal
       </button>

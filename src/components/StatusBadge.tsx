@@ -2,27 +2,40 @@
 import { usePrivy } from '@privy-io/react-auth';
 import React from 'react';
 
-// 1. Define the rules (Interface) for the props
 interface StatusBadgeProps {
   status: 'online' | 'offline' | 'maintenance' | string;
   label: string;
 }
 
-
-// 2. Apply the interface to the component
 export default function StatusBadge({ status, label }: StatusBadgeProps) {
-  // Determine dot color based on status
-  const dotColor = status === 'online' ? 'bg-green-500' : 'bg-red-500';
   const { authenticated, user } = usePrivy();
   
-  // 2. Identify the connected Stacks address
-  const stacksAddress = user?.wallet?.address; // This depends on how Privy maps it
+  // 1. Correct way to find the Stacks address in Privy
+  // We look through linked accounts for one that looks like a Stacks address
+  const stacksAddress = user?.linkedAccounts?.find(
+    (acc: any) => acc.type === 'wallet' && acc.connectorType === 'stacks'
+  )?.address || user?.wallet?.address;
+
+  // 2. Logic for the visual indicator
+  // If authenticated, we show "Success" colors, otherwise we show the passed-in "status"
+  const isConnected = authenticated && stacksAddress;
+  const activeColor = isConnected ? 'bg-green-500' : 'bg-red-500';
+  const bgColor = isConnected ? 'bg-green-50' : 'bg-red-50';
+  const textColor = isConnected ? 'text-green-700' : 'text-red-700';
 
   return (
-    <div className={`flex items-center gap-2 p-2 rounded-full text-sm font-medium
-      ${authenticated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-      <span className={`h-2 w-2 rounded-full ${authenticated ? 'bg-green-500' : 'bg-red-500'}`}></span>
-      {authenticated ? `Connected: ${stacksAddress?.slice(0,6)}...` : "Disconnected"}
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border transition-all
+      ${bgColor} ${textColor} ${isConnected ? 'border-green-100' : 'border-red-100'}`}>
+      
+      {/* The Status Dot */}
+      <span className={`h-2 w-2 rounded-full animate-pulse ${activeColor}`}></span>
+      
+      {/* The Label */}
+      <span>
+        {isConnected 
+          ? `STX: ${stacksAddress.slice(0, 5)}...${stacksAddress.slice(-4)}` 
+          : label || "Disconnected"}
+      </span>
     </div>
   );
 }

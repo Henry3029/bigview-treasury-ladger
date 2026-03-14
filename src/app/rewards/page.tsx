@@ -10,6 +10,8 @@ export default function RewardsPage() {
   // --- 1. Storage Containers (State) ---
   const [liveApy, setLiveApy] = useState("0.0");
   const [liveStaked, setLiveStaked] = useState("0");
+  const [message, setMessage] = useState<string | null>("Fetching live data...");
+  const [status, setStatus] = useState<'info' | 'error' | 'success'>('info');
   
   // ADD THESE TWO: These fix the "cannot find name" errors
   const [totalEarned, setTotalEarned] = useState("0.00");
@@ -19,12 +21,12 @@ export default function RewardsPage() {
 async function getBlockchainData() {
   try {
     const response = await fetchCallReadOnlyFunction({
-      network: STACKS_TESTNET,
-      contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-      contractName: 'bigview-treasury',
-      functionName: 'dashboard-summary', // Updated name
-      functionArgs: [],
-      senderAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+      network: process.env.NEXT_PUBLIC_NETWORK || 'devnet',
+  contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
+  contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
+  functionName: 'dashboard-summary',
+  functionArgs: [],
+  senderAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
     });
 
     const result = cvToJSON(response).value;
@@ -40,6 +42,8 @@ async function getBlockchainData() {
     
   } catch (error) {
     console.error("Error fetching Dashboard Summary:", error);
+    setMessage("Failed to sync with blockchain. Check your connection.");
+      setStatus('error');
   }
 }
   // Run the brain function on load
@@ -49,6 +53,13 @@ async function getBlockchainData() {
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 pb-24 flex flex-col gap-6">
+    {message && (
+        <div className={`p-3 rounded-xl text-sm font-medium ${
+          status === 'error' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+        }`}>
+          {message}
+        </div>
+      )}
       {/* 1. Header (Fixed: totalEarned and pending are now defined) */}
       <RewardHeader 
         totalEarned={totalEarned} 

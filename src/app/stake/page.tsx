@@ -8,6 +8,7 @@ import {
   PostConditionMode, 
   Pc 
 } from '@stacks/transactions';
+import { openContractCall } from '@stacks/connect'; // Use openContractCall for cleaner async handling
 import { STACKS_TESTNET } from '@stacks/network';
 
 // 1. Initialize the Session outside the component
@@ -15,7 +16,6 @@ const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
 
 export default function StakePage() {
-  const { doContractCall } = useConnect();
   const [amount, setAmount] = useState('');
   
   // 2. Added missing state variables for messages
@@ -34,7 +34,7 @@ export default function StakePage() {
   const handleStake = async () => {
     // 3. Check if user is even signed in before doing logic
     if (!userSession.isUserSignedIn()) {
-      return notify("Please connect your wallet first", "error");
+      return authenticate();
     }
 
     if (!amount || isNaN(Number(amount))) {
@@ -42,7 +42,8 @@ export default function StakePage() {
     }
 
     try {
-      const microStacks = Number(amount) * 1000000;
+      // 1. Convert to microStacks (1 STX = 1,000,000 microStacks)
+    const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       const userData = userSession.loadUserData();
       const userAddress = userData.profile.stxAddress.testnet; 
 
@@ -50,14 +51,16 @@ if (!userAddress) {
   return notify("Could not find your Stacks address. Try reconnecting.", "error");
 }
       // 4. Create the Post-Condition (Security Guard)
-const postCondition = Pc.principal(userAddress).willSendEq(microStacks);
+const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
 
-      await doContractCall({
-        network: STACKS_TESTNET,
-        contractAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-        contractName: 'bigview-treasury',
-        functionName: 'stake-and-delegate',
-        functionArgs: [uintCV(microStacks)],
+     // 4. Execute the Contract Call
+    await openContractCall({
+      // Use your .env variables here!
+      network: process.env.NEXT_PUBLIC_NETWORK,
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!, 
+      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
+      functionName: 'stake-and-delegate',
+      functionArgs: [uintCV(microStacks), principalCV(poxContractPrincipal)],
         
         postConditionMode: PostConditionMode.Deny, 
         postConditions: [postCondition],

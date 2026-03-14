@@ -1,4 +1,4 @@
-// 1. REMOVED "use client" - This is now a fast Server Component
+import type { Metadata } from 'next'; // Added for SEO
 import Link from 'next/link';
 import '@/styles/globals.css';
 import AppPrivyProvider from '@/components/PrivyProvider';
@@ -6,6 +6,12 @@ import WalletButton from '@/components/WalletButton';
 import Image from 'next/image';
 import BottomNav from '@/components/BottomNav';
 import Sidebar from '@/components/Sidebar';
+
+// 1. Added Metadata (Only works in Server Components!)
+export const metadata: Metadata = {
+  title: 'Bigview Treasury Ladger'
+  description: 'Stake STX & Earn BTC Rewards'
+};
 
 export default function RootLayout({
   children,
@@ -15,8 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased text-slate-900 dashboard-layout">
-        {/* The Provider stays here, but since the layout is a Server Component, 
-            Next.js can pre-render the HTML for the Sidebar/Header instantly! */}
+        {/* AppPrivyProvider handles the Stacks/Privy Auth state */}
         <AppPrivyProvider>
           <Sidebar />
           
@@ -27,7 +32,7 @@ export default function RootLayout({
                 alt="Logo" 
                 width={40} 
                 height={40} 
-                priority // Good! This tells Next.js to load this logo first
+                priority 
                 className="rounded-full shadow-sm" 
               />
               <span className='font-bold text-lg tracking-tight text-blue-900'>Treasury</span>
@@ -42,7 +47,7 @@ export default function RootLayout({
           <BottomNav /> 
 
           <footer className="p-6 text-center text-xs text-gray-400 border-t [grid-area:footer]">
-             2026 Bigview Treasury-Ledger
+            © 2026 Bigview Treasury-Ledger
           </footer>
         </AppPrivyProvider>
       </body>

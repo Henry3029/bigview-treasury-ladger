@@ -54,6 +54,10 @@
   }
 )
 
+(define-read-only (get-proposal-by-id (id uint))
+  (map-get? proposals id)
+)
+
 (define-read-only (get-user-stake (user principal))
   (default-to u0 (get amount (map-get? stakes { account: user })))
 )
