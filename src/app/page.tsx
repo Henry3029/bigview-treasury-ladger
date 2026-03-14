@@ -1,6 +1,7 @@
 import React from 'react';
 import WisdomCarousel from '@/components/WisdomCarousel';
 import DashboardData from '@/components/DashboardData';
+import UserStats from '@/components/UserStats';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
 import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
@@ -46,7 +47,7 @@ async function getDashboardData() {
       proposal: `Total Proposals: ${data['proposals-count'].value}`, // Dynamic!
       votesFor: Number(data['total-members'].value), // Using member count as a placeholder
       votesAgainst: 0, 
-      treasuryBalance: `${treasuryBalance.toLocaleString()} STX`,
+      treasuryBalance: `${stxBalance.toLocaleString()} STX`,
     };
   } catch (error) {
     console.error("Dashboard Fetch Error:", error);
