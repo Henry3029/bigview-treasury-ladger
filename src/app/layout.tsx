@@ -9,7 +9,7 @@ import Sidebar from '@/components/Sidebar';
 
 // 1. Added Metadata (Only works in Server Components!)
 export const metadata: Metadata = {
-  title: 'Bigview Treasury Ladger'
+  title: 'Bigview Treasury Ladger',
   description: 'Stake STX & Earn BTC Rewards'
 };
 
