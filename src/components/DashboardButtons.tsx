@@ -34,6 +34,11 @@ export default function DashboardButtons() {
 
     setIsLoading(true);
 
+    // --- THE FIX IS HERE ---
+    // We get the "stxAddress" and the "userSession" directly from the Privy wallet
+    const stxAddress = embeddedWallet.address; 
+    const userSession = (embeddedWallet as any).getCoreSession?.(); 
+
     const options = {
       contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
       contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
@@ -41,6 +46,11 @@ export default function DashboardButtons() {
       functionArgs: args,
       network: STACKS_TESTNET,
       postConditionMode: PostConditionMode.Allow,
+      
+      // --- AND HERE ---
+      // This tells Stacks: "Don't look for an extension, use this Privy session!"
+      userSession, 
+      
       onFinish: (data: any) => {
         setIsLoading(false);
         setLastTxId(data.txId);
@@ -56,6 +66,7 @@ export default function DashboardButtons() {
       await openContractCall(options);
     } catch (e) {
       setIsLoading(false);
+      console.error(e); // Added for better debugging
       notify("Request failed", "error");
     }
   };
