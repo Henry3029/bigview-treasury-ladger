@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Providers } from './providers'; // This now holds the ConnectProvider
+import { Providers } from './providers'; 
 import '@/styles/globals.css';
 import WalletButton from '@/components/WalletButton';
 import Image from 'next/image';

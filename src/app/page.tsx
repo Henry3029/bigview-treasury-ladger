@@ -1,7 +1,6 @@
 import React from 'react';
 import WisdomCarousel from '@/components/WisdomCarousel';
 import DashboardData from '@/components/DashboardData';
-import UserStats from '@/components/UserStats';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
 import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
@@ -68,9 +67,6 @@ export default async function Dashboard() {
   return (
     <main className="max-w-7xl mx-auto p-8 space-y-10">
       <WisdomCarousel />
-      
-      {/* The Hybrid Part: User Stats appear only when logged in */}
-  <UserStats />
       
       {/* Header Section */}
       <div className="flex justify-between items-center border-b pb-6">
