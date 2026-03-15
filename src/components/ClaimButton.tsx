@@ -1,13 +1,16 @@
 "use client";
-import React, { useState } from 'react'; // Added useState to React import
-import { useConnect } from '@stacks/connect-react';
+import React, { useState } from 'react';
+// We use openContractCall directly from @stacks/connect
+import { openContractCall } from '@stacks/connect';
 import { STACKS_TESTNET } from '@stacks/network';
 import { AnchorMode, PostConditionMode } from '@stacks/transactions';
 
 export const ClaimButton = () => {
-  const { doContractCall } = useConnect();
+  // REMOVED: const { doContractCall } = useConnect(); <--- This was the crasher!
+  
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
@@ -19,27 +22,51 @@ export const ClaimButton = () => {
   };
 
   const handleClaim = async () => {
-    // Hardcoding these for now to ensure the "white page" doesn't return
-    const contractAddress = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM';
-    const contractName = 'bigview-treasury';
+    // 1. Fetching Real Values from .env
+    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+    const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME;
 
-    await doContractCall({
-      network: STACKS_TESTNET,
-      anchorMode: AnchorMode.Any,
-      contractAddress: contractAddress,
-      contractName: contractName,
-      functionName: 'claim-rewards', 
-      functionArgs: [], 
-      postConditionMode: PostConditionMode.Allow,
-      onFinish: (data) => {
-        console.log('Transaction sent:', data.txId);
-        notify('Claim Request Sent! Check your wallet history', 'success');
-      },
-      onCancel: () => {
-        notify('Claim cancelled.', 'error'); 
-      },
-    });
-  }; // <--- FIXED: Added missing closing bracket for handleClaim
+    // Safety check: Ensure the real values exist before trying to call
+    if (!contractAddress || !contractName) {
+      notify("Configuration Error: Contract details missing.", "error");
+      console.error("Check your .env file for NEXT_PUBLIC_CONTRACT_ADDRESS and NAME");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await openContractCall({
+        network: STACKS_TESTNET,
+        anchorMode: AnchorMode.Any,
+        contractAddress: contractAddress,
+        contractName: contractName,
+        functionName: 'claim-rewards', 
+        functionArgs: [], 
+        postConditionMode: PostConditionMode.Allow,
+        
+        // App details are required when using the direct function
+        appDetails: {
+          name: 'Bigview Treasury',
+          icon: window.location.origin + '/images/bigview-image.png',
+        },
+
+        onFinish: (data) => {
+          setIsLoading(false);
+          console.log('Transaction sent:', data.txId);
+          notify('Claim Request Sent! Check your wallet history', 'success');
+        },
+        onCancel: () => {
+          setIsLoading(false);
+          notify('Claim cancelled.', 'error'); 
+        },
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Contract call failed:", error);
+      notify("Failed to open wallet popup.", "error");
+    }
+  };
 
   return (
     <>
@@ -57,11 +84,13 @@ export const ClaimButton = () => {
           <span className="text-sm font-medium">{message}</span>
         </div>
       )}
+      
       <button 
         onClick={handleClaim}
-        className="btn-grain py-2 px-6"
+        disabled={isLoading}
+        className={`btn-grain py-2 px-6 transition-all ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
       >
-        Claim Now
+        {isLoading ? 'Connecting...' : 'Claim Now'}
       </button>
     </>
   );
