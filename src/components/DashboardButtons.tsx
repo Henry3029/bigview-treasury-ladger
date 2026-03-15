@@ -2,13 +2,8 @@
 import React, { useState } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { openContractCall } from '@stacks/connect';
-import { Loader2, ArrowRight } from 'lucide-react'; // Added Loader2 for the spinner
-import { ExternalLink, CheckCircle } from 'lucide-react';
-import { 
-  uintCV, 
-  boolCV, 
-  PostConditionMode 
-} from '@stacks/transactions';
+import { Loader2, Wallet, ArrowRight, ExternalLink, CheckCircle } from 'lucide-react';
+import { PostConditionMode } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 
 export default function DashboardButtons() {
@@ -17,13 +12,10 @@ export default function DashboardButtons() {
   
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
-  const [isLoading, setIsLoading] = useState(false); // New Loading State
-  
-  const getExplorerUrl = (txId: string) => {
-  return `https://explorer.hiro.so/txid/${txId}?chain=testnet`;
-};
-const [lastTxId, setLastTxId] = useState<string | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastTxId, setLastTxId] = useState<string | null>(null);
+
+  const getExplorerUrl = (txId: string) => `https://explorer.hiro.so/txid/${txId}?chain=testnet`;
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
@@ -40,111 +32,88 @@ const [lastTxId, setLastTxId] = useState<string | null>(null);
     const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
     if (!embeddedWallet) return notify("No embedded wallet found.", "error");
 
-    setIsLoading(true); // START SPINNER
-
-    const network = STACKS_TESTNET; 
-    const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!;
-    const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME!;
+    setIsLoading(true);
 
     const options = {
-      contractAddress,
-      contractName,
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
+      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
       functionName,
       functionArgs: args,
-      network,
+      network: STACKS_TESTNET,
       postConditionMode: PostConditionMode.Allow,
       onFinish: (data: any) => {
-  setIsLoading(false);
-  // Pass the ID so we can build the link in the UI
-  notify(`Sent! View on Explorer`, "success");
-  // Save the txId in a temporary state if you want the link to work
-  setLastTxId(data.txId); 
-},
+        setIsLoading(false);
+        setLastTxId(data.txId);
+        notify(`Transaction Sent!`, "success");
+      },
       onCancel: () => {
-        setIsLoading(false); // STOP SPINNER
-        notify("Transaction cancelled", "error");
+        setIsLoading(false);
+        notify("Cancelled", "error");
       }
     };
 
     try {
-        await openContractCall(options);
+      await openContractCall(options);
     } catch (e) {
-        setIsLoading(false);
-        notify("Request failed", "error");
+      setIsLoading(false);
+      notify("Request failed", "error");
     }
   };
 
   return (
-    <div className="flex flex-col gap-8 p-4">
+    <div className="flex flex-col gap-6 p-4">
       
-      {/* 1. Global Message Area */}
-{message && (
-  <div className={`p-4 rounded-2xl flex items-center justify-between border animate-in fade-in slide-in-from-top-2 ${
-    status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 
-    status === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
-    'bg-blue-50 border-blue-200 text-blue-800'
-  }`}>
-    <div className="flex items-center gap-3">
-      {status === 'success' ? <CheckCircle size={18} /> : <div className="w-2 h-2 rounded-full bg-current animate-pulse" />}
-      <span className="text-sm font-medium">{message}</span>
-    </div>
+      {/* Notifications Area */}
+      {message && (
+        <div className={`p-4 rounded-2xl flex items-center justify-between border animate-in fade-in slide-in-from-top-2 ${
+          status === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 
+          status === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 
+          'bg-blue-50 border-blue-200 text-blue-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            {status === 'success' ? <CheckCircle size={18} /> : <div className="w-2 h-2 rounded-full bg-current animate-pulse" />}
+            <span className="text-sm font-medium">{message}</span>
+          </div>
+          {status === 'success' && lastTxId && (
+            <a href={getExplorerUrl(lastTxId)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs font-bold underline">
+              Track <ExternalLink size={14} />
+            </a>
+          )}
+        </div>
+      )}
 
-    {/* Show the link ONLY if it's a success and we have a TxId */}
-    {status === 'success' && lastTxId && (
-      <a 
-        href={getExplorerUrl(lastTxId)} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="flex items-center gap-1 text-xs font-bold underline decoration-2 underline-offset-4 hover:text-green-600 transition"
-      >
-        Track <ExternalLink size={14} />
-      </a>
-    )}
-  </div>
-)}
-
-      {/* 2. GOVERNANCE SECTION */}
+      {/* CORE ACTIONS SECTION */}
       <section>
-        <h3 className="text-gray-500 text-xs uppercase tracking-widest font-bold mb-3 ml-1">Governance - Proposal #1</h3>
-        <div className="grid grid-cols-2 gap-4 bg-white p-4 rounded-3xl border border-gray-100 shadow-sm">
-          <button 
-  disabled={isLoading}
-  onClick={() => handleContractCall('vote', [uintCV(1), boolCV(true)])}
-  className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
->
-  {isLoading ? (
-    <Loader2 className="animate-spin" />
-  ) : (
-    <span className="font-bold uppercase tracking-wide text-sm">Vote Yes</span>
-  )}
-</button>
-          
+        <h3 className="text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black mb-4 ml-1">Treasury Actions</h3>
+        
+        <div className="flex flex-col gap-4">
+          {/* Main Stake Button - This is your money maker */}
           <button 
             disabled={isLoading}
-            onClick={() => handleContractCall('vote', [uintCV(1), boolCV(false)])}
-            className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
+            onClick={() => window.location.href = '/stake'} // Redirect to the dedicated stake page
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-3xl flex items-center justify-between transition-all active:scale-95 shadow-md disabled:opacity-50"
           >
-            {isLoading ? <Loader2 className="animate-spin" /> : <span className="font-bold">Vote No</span>}
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-2 rounded-xl">
+                <Wallet size={20} />
+              </div>
+              <span className="font-bold text-lg">Stake STX</span>
+            </div>
+            <ArrowRight size={20} />
+          </button>
+
+          {/* Secondary Claim Button */}
+          <button 
+            disabled={isLoading}
+            onClick={() => handleContractCall('claim-rewards', [])}
+            className="w-full bg-white border border-gray-100 p-5 rounded-3xl flex items-center justify-between hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-50"
+          >
+            <span className="font-bold text-gray-700 uppercase tracking-tight">Claim sBTC Rewards</span>
+            {isLoading ? <Loader2 className="animate-spin text-blue-600" size={20} /> : <div className="w-2 h-2 rounded-full bg-blue-600" />}
           </button>
         </div>
       </section>
 
-      {/* 3. MEMBERSHIP SECTION */}
-      <section>
-        <h3 className="text-gray-500 text-xs uppercase tracking-widest font-bold mb-3 ml-1">Membership & Setup</h3>
-        <div className="flex flex-col gap-3">
-          <button 
-            disabled={isLoading}
-            onClick={() => handleContractCall('add-member', [])}
-            className="btn-grain-outline flex flex-col items-center justify-center disabled:opacity-50"
-          >
-            <span className="font-bold">
-               {isLoading ? "Processing..." : "Become a Member"}
-            </span>
-            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <ArrowRight size={18} />}
-          </button>
-        </div>
-      </section>
     </div>
   );
 }

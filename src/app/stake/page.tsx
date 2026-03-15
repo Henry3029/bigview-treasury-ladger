@@ -54,9 +54,7 @@ export default function StakePage() {
       // 2. Convert to microStacks
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
-      // 3. PoX Contract Address (Usually hardcoded for Stacks Staking)
-      // For Testnet PoX-3: 'ST000000000000000000002AMW42H.pox-3'
-      const poxContract = 'ST000000000000000000002AMW42H.pox-3';
+      const poxContract = 'ST000000000000000000002AMW42H.pox-4';
 
       // 4. Create the Post-Condition (Ensures you don't send more than intended)
       const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
