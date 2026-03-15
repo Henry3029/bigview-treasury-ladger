@@ -33,7 +33,15 @@ export default function ProfilePage() {
     }
   }, [address]);
 
-  if (!ready || !mounted) return <div className="p-10 text-center text-gray-400 animate-pulse">Loading profile...</div>;
+  // Replace the plain text div with your professional spinner
+if (!ready || !mounted) {
+  return (
+    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+      <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+      <p className="text-blue-600 font-bold animate-pulse">Syncing Treasury Data...</p>
+    </div>
+  );
+}
 
   if (!authenticated) {
     return (
