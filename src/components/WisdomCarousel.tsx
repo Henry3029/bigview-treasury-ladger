@@ -7,7 +7,7 @@ const quotes = [
   { text: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
   { text: "The only way to predict your future is to create It", sage: "Abraham Lincoln" },
   { text: "The only true wisdom is in knowing you know nothing.", sage: "Socrates" },
-    { text: "Your time is limited, don't waste it living someone else's life.", sage: "Steve Jobs" },
+  { text: "Your time is limited, don't waste it living someone else's life.", sage: "Steve Jobs" },
   { text: "Life is what happens when you're busy making other plans.", sage: "John Lennon" },
   { text: "The journey of a thousand miles begins with one step.", sage: "Lao Tzu" },
   { text: "Be the change that you wish to see in the world.", sage: "Mahatma Gandhi" },
@@ -24,43 +24,58 @@ const flickityOptions = {
   wrapAround: true, 
   prevNextButtons: false, 
   pageDots: true, 
-  pauseAutoPlayOnHover: true, 
+  pauseAutoPlayOnHover: true,
+  adaptiveHeight: true,
 };
 
 export default function WisdomCarousel() {
-  // --- ADDED: Client-side guard ---
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  if (!isClient) return null; // Or a simple skeleton loader
+  // --- FIX 1: Vertical Flash Guard ---
+  // We show a placeholder card that looks like a slide so the page doesn't jump.
+  if (!isClient) {
+    return (
+      <section className="p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10">
+        <h2 className="text-xl font-semibold mb-6">Voices of Wisdom</h2>
+        <div className="w-full h-[250px] bg-gray-50 rounded-3xl animate-pulse flex items-center justify-center text-gray-300">
+          Loading wisdom...
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="wisdom-section p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10">
+    <section className="wisdom-section p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10 overflow-hidden">
       <h2 className="text-xl font-semibold mb-6">Voices of Wisdom</h2>
-      <Flickity
-        className={'carousel'} 
-        elementType={'div'} 
-        options={flickityOptions} 
-        disableImagesLoaded={false} 
-        reloadOnUpdate 
-        static 
-      >
-        {quotes.map((quote, index) => (
-          <div key={index} className="carousel-cell px-2">
-            <div className={`quote-card gradient-${(index % 3) + 1} p-8 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[250px]`}>
-              <blockquote className="text-xl md:text-2xl font-serif italic font-medium leading-normal mb-4">
-                "{quote.text}"
-              </blockquote>
-              <cite className="text-sm font-sans uppercase tracking-wider font-bold opacity-80 not-italic">
-                — {quote.sage}
-              </cite>
+      
+      {/* --- FIX 2: Wrapper for Blank Slide Issue --- */}
+      <div className="flickity-viewport-wrapper">
+        <Flickity
+          className={'carousel'} 
+          elementType={'div'} 
+          options={flickityOptions} 
+          disableImagesLoaded={false} 
+          reloadOnUpdate 
+          static 
+        >
+          {quotes.map((quote, index) => (
+            <div key={index} className="carousel-cell w-full px-2">
+              <div className={`quote-card gradient-${(index % 3) + 1} p-8 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[250px]`}>
+                <blockquote className="text-xl md:text-2xl font-serif italic font-medium leading-normal mb-4">
+                  "{quote.text}"
+                </blockquote>
+                <cite className="text-sm font-sans uppercase tracking-wider font-bold opacity-80 not-italic">
+                  — {quote.sage}
+                </cite>
+              </div>
             </div>
-          </div>
-        ))}
-      </Flickity>
+          ))}
+        </Flickity>
+      </div>
     </section>
   );
 }

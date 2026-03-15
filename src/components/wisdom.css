@@ -1,10 +1,22 @@
+/* --- FIX: Prevent vertical stacking on load --- */
+.carousel:not(.flickity-enabled) {
+  display: flex;
+  overflow: hidden;
+  gap: 10px;
+}
+
+.carousel:not(.flickity-enabled) .carousel-cell {
+  min-width: 100%;
+  flex-shrink: 0;
+}
+
 /* --- Flickity Core Rules (Keep These) --- */
 .flickity-enabled { position: relative; }
 .flickity-enabled:focus { outline: none; }
 .flickity-viewport {
   overflow: hidden;
   position: relative;
-  height: 100%;
+  min-height: 250px;
 }
 .flickity-slider {
   position: absolute;
@@ -29,8 +41,10 @@
 }
 .carousel-cell {
   width: 100%; 
-  height: 250px; 
+  height: 100%;      /* Let it fill the viewport */
+  min-height: 250px; /* Match the viewport */
   margin-right: 10px;
+  flex-shrink: 0;    /* Prevent slides from squishing */
 }
 
 /* --- The Quote Card & Gradients --- */
@@ -66,15 +80,17 @@
 
 .flickity-page-dots .dot {
   display: inline-block;
-  width: 10px;        /* Back to your original size */
-  height: 10px;       /* Back to your original size */
-  margin: 0 8px;      /* Back to your original margin */
-  background: #cbd5e1;/* Back to your original gray */
+  width: 10px;
+  height: 10px;
+  margin: 0 8px;
+  background: #cbd5e1;
   border-radius: 50%;
-  opacity: 0.25;      /* Back to your original opacity */
+  opacity: 0.25;
   cursor: pointer;
   
-  /* --- THE FIX: This kills the "view1, view2" text --- */
+  /* --- REFINED FIX: Kills "view1" text for good --- */
+  font-size: 0;        /* Add this! */
+  line-height: 0;     /* Add this! */
   color: transparent;
   text-indent: -9999px;
   overflow: hidden;
