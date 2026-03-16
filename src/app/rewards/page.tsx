@@ -19,31 +19,39 @@ export default function RewardsPage() {
 
 // 2. The Real "Brain" Function
 async function getBlockchainData() {
+  // Use the network object you already imported at the top
+  const network = STACKS_TESTNET; 
+
   try {
     const response = await fetchCallReadOnlyFunction({
-      network: process.env.NEXT_PUBLIC_NETWORK || 'devnet',
-  contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
-  contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
-  functionName: 'dashboard-summary',
-  functionArgs: [],
-  senderAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
+      network, 
+      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '',
+      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
+      functionName: 'dashboard-summary',
+      functionArgs: [],
+      senderAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '', 
     });
 
-    const result = cvToJSON(response).value;
+    // 1. Convert Clarity to JSON
+    const jsonResponse = cvToJSON(response);
 
-    // The names here MUST match your .clar file exactly
-    // We divide by 1_000_000 to convert micro-STX to real STX
-    const rewards = result['total-rewards'].value / 1_000_000;
-    const stakes = result['total-stakes'].value / 1_000_000;
+    // 2. Check if the contract returned an (ok ...) or an (err ...)
+    // Read-only functions often wrap results in a Response type
+    if (jsonResponse.success) {
+      const data = jsonResponse.value.value; // Drill down into the 'ok' value
 
-    // Update your screen
-    setTotalEarned(rewards.toLocaleString());
-    setLiveStaked(stakes.toLocaleString());
-    
+      // 3. Divide by 1,000,000 for decimal STX
+      const rewards = Number(data['total-rewards'].value) / 1000000;
+      const stakes = Number(data['total-stakes'].value) / 1000000;
+
+      setTotalEarned(rewards.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+      setLiveStaked(stakes.toLocaleString());
+      setMessage(null); // Clear the "Fetching..." message
+    }
   } catch (error) {
-    console.error("Error fetching Dashboard Summary:", error);
-    setMessage("Failed to sync with blockchain. Check your connection.");
-      setStatus('error');
+    console.error("Sync Error:", error);
+    setMessage("Sync failed. Are you on the right network?");
+    setStatus('error');
   }
 }
   // Run the brain function on load

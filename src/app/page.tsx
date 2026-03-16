@@ -12,13 +12,13 @@ const CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME || '';
 
 async function getDashboardData() {
   try {
-    // --- PART A: Fetch STX Balance (Direct from API) ---
+    // --- PART A: Fetch STX Balance ---
     const balanceRes = await fetch(
       `https://api.testnet.hiro.so/extended/v1/address/${CONTRACT_ADDRESS}/balances`,
-      { cache: 'no-store' }
+      { next: { revalidate: 60 } } // Better than 'no-store' for performance
     );
     const balanceData = await balanceRes.json();
-    const stxBalance = (balanceData?.stx?.balance || 0) / 1_000_000;
+    const stxBalance = (Number(balanceData?.stx?.balance) || 0) / 1_000_000;
 
     // --- PART B: Read Treasury Data from Contract ---
     const response = await fetchCallReadOnlyFunction({
@@ -31,19 +31,25 @@ async function getDashboardData() {
     });
 
     const parsedData = cvToJSON(response);
-    const data = parsedData.value;
+    
+    //  THE FIX: Check if the response was "ok" (success)
+    if (parsedData.success) {
+      const data = parsedData.value.value; // Drill down into the 'ok' contents
 
-    // Convert microStacks to STX for the UI
-    const totalStakedSTX = Number(data['total-stakes'].value) / 1_000_000;
+      const totalStakedSTX = Number(data['total-stakes'].value) / 1_000_000;
 
-    return {
-      stake: `${totalStakedSTX.toLocaleString()} STX`,
-      treasuryBalance: `${stxBalance.toLocaleString()} STX`,
-    };
+      return {
+        stake: `${totalStakedSTX.toLocaleString()} STX`,
+        treasuryBalance: `${stxBalance.toLocaleString()} STX`,
+      };
+    }
+    
+    throw new Error("Contract returned an error");
+    
   } catch (error) {
     console.error("Dashboard Fetch Error:", error);
     return {
-      stake: "0 STX",
+      stake: "N/A",
       treasuryBalance: "0 STX",
     };
   }

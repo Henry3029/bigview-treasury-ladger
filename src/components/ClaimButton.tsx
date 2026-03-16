@@ -1,12 +1,15 @@
 "use client";
 import React, { useState } from 'react';
-// We use openContractCall directly from @stacks/connect
 import { openContractCall } from '@stacks/connect';
 import { STACKS_TESTNET } from '@stacks/network';
 import { AnchorMode, PostConditionMode } from '@stacks/transactions';
+// 1. IMPORT PRIVY HOOKS
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 
 export const ClaimButton = () => {
-  // REMOVED: const { doContractCall } = useConnect(); <--- This was the crasher!
+  // 2. INITIALIZE PRIVY
+  const { authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
   
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
@@ -22,21 +25,30 @@ export const ClaimButton = () => {
   };
 
   const handleClaim = async () => {
-    // 1. Fetching Real Values from .env
+    // 3. AUTH CHECK
+    if (!authenticated) {
+      return login();
+    }
+
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME;
 
-    // Safety check: Ensure the real values exist before trying to call
     if (!contractAddress || !contractName) {
-      notify("Configuration Error: Contract details missing.", "error");
-      console.error("Check your .env file for NEXT_PUBLIC_CONTRACT_ADDRESS and NAME");
+      notify("Configuration Error", "error");
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // 4. FIND THE PRIVY WALLET & GET SESSION
+      const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
+      
+      // This is the magic line that kills the "Origin" error:
+      const userSession = embeddedWallet ? await (embeddedWallet as any).getCoreSession?.() : undefined;
+
       await openContractCall({
+        userSession, // <--- PASS THE SESSION HERE
         network: STACKS_TESTNET,
         anchorMode: AnchorMode.Any,
         contractAddress: contractAddress,
@@ -45,7 +57,6 @@ export const ClaimButton = () => {
         functionArgs: [], 
         postConditionMode: PostConditionMode.Allow,
         
-        // App details are required when using the direct function
         appDetails: {
           name: 'Bigview Treasury',
           icon: window.location.origin + '/images/bigview-image.png',
@@ -53,18 +64,17 @@ export const ClaimButton = () => {
 
         onFinish: (data) => {
           setIsLoading(false);
-          console.log('Transaction sent:', data.txId);
-          notify('Claim Request Sent! Check your wallet history', 'success');
+          notify('Claim Request Sent!', 'success');
         },
         onCancel: () => {
           setIsLoading(false);
-          notify('Claim cancelled.', 'error'); 
+          notify('Claim cancelled.', 'info'); 
         },
       });
     } catch (error) {
       setIsLoading(false);
       console.error("Contract call failed:", error);
-      notify("Failed to open wallet popup.", "error");
+      notify("Transaction failed.", "error");
     }
   };
 

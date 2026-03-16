@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth'; // 1. Added useWallets
 // Use direct imports from @stacks/connect and @stacks/transactions
 import { openContractCall } from '@stacks/connect';
 import { 
@@ -14,6 +15,7 @@ import { STACKS_TESTNET } from '@stacks/network';
 
 export default function StakePage() {
   const { user, authenticated, login, ready } = usePrivy();
+  const { wallets } = useWallets(); // 2. Initialize wallets hook
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
@@ -58,9 +60,14 @@ export default function StakePage() {
 
       // 4. Create the Post-Condition (Ensures you don't send more than intended)
       const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
+      
+         // 🚀 THE FIX: Find the Privy wallet and get the session
+      const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
+      const userSession = embeddedWallet ? await (embeddedWallet as any).getCoreSession?.() : undefined;
 
       // 5. Execute using the stable openContractCall
       await openContractCall({
+      	userSession,
         network: STACKS_TESTNET,
         contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!, 
         contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
@@ -89,10 +96,11 @@ export default function StakePage() {
           notify("Transaction cancelled", "info");
         },
       });
-    } catch (error) {
-      setIsLoading(false);
+       } catch (error) {
+      setIsLoading(true); // Keep loading if showing error
       console.error(error);
-      notify("Staking failed. Check console for details.", "error");
+      notify("Staking failed.", "error");
+      setIsLoading(false);
     }
   };
 
@@ -137,7 +145,7 @@ export default function StakePage() {
           <button 
             onClick={handleStake}
             disabled={isLoading}
-            className={`w-full bg-blue-600 text-white py-5 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2 ${
+            className={`btn-grain flex flex-col items-center justify-center disabled:opacity-50 ${
               isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 active:scale-95'
             }`}
           >

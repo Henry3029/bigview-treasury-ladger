@@ -33,32 +33,45 @@ export default function DashboardButtons() {
     if (!embeddedWallet) return notify("No embedded wallet found.", "error");
 
     setIsLoading(true);
-
-    const options = {
-      contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
-      contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
-      functionName,
-      functionArgs: args,
-      network: STACKS_TESTNET,
-      postConditionMode: PostConditionMode.Allow,
-      onFinish: (data: any) => {
-        setIsLoading(false);
-        setLastTxId(data.txId);
-        notify(`Transaction Sent!`, "success");
-      },
-      onCancel: () => {
-        setIsLoading(false);
-        notify("Cancelled", "error");
-      }
-    };
-
+    
     try {
+      // 🚀 THE FIX: Get the Privy session before the call
+      const userSession = await (embeddedWallet as any).getCoreSession?.();
+
+      const options = {
+        userSession, // <--- ADD THIS LINE
+        contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
+        contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
+        functionName,
+        functionArgs: args,
+        network: STACKS_TESTNET,
+        postConditionMode: PostConditionMode.Allow,
+        
+        // Highly recommended to add appDetails here too for the Privy popup
+        appDetails: {
+          name: 'Bigview Treasury',
+          icon: window.location.origin + '/images/bigview-image.png',
+        },
+
+        onFinish: (data: any) => {
+          setIsLoading(false);
+          setLastTxId(data.txId);
+          notify(`Transaction Sent!`, "success");
+        },
+        onCancel: () => {
+          setIsLoading(false);
+          notify("Cancelled", "error");
+        }
+      };
+
       await openContractCall(options);
     } catch (e) {
       setIsLoading(false);
+      console.error("Contract call error:", e);
       notify("Request failed", "error");
     }
   };
+
 
   return (
     <div className="flex flex-col gap-6 p-4">
