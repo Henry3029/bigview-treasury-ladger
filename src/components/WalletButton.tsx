@@ -26,10 +26,13 @@ export default function WalletButton() {
   // Condition 2: User is NOT Logged In
   return (
     <button 
-      onClick={() => login()}
-      className="btn-grain py-2 px-8 font-bold tracking-tight shadow-lg"
-    >
-      Login or Sign Up
-    </button>
+  onClick={() => {
+    console.log("Login button was clicked!"); // This will show in your browser console
+    login();
+  }}
+  className="btn-grain py-2 px-8 font-bold tracking-tight shadow-lg"
+>
+  Login or Sign Up
+</button>
   );
 }
