@@ -104,7 +104,7 @@ export default function DashboardButtons() {
           <button 
             disabled={isLoading}
             onClick={() => window.location.href = '/stake'} // Redirect to the dedicated stake page
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-3xl flex items-center justify-between transition-all active:scale-95 shadow-md disabled:opacity-50"
+            className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-xl">

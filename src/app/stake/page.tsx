@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 import { usePrivy, useWallets } from '@privy-io/react-auth'; // 1. Added useWallets
 // Use direct imports from @stacks/connect and @stacks/transactions
 import { openContractCall } from '@stacks/connect';
