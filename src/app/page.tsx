@@ -1,5 +1,6 @@
 import React from 'react';
 import WisdomCarousel from '@/components/WisdomCarousel';
+import WelcomeBanner from '@/components/WelcomeBanner';
 import DashboardData from '@/components/DashboardData';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
@@ -53,6 +54,9 @@ export default async function Dashboard() {
 
   return (
     <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+    {/* 🚀 THE WELCOME BANNER GOES HERE */}
+      <WelcomeBanner />
+    
       <WisdomCarousel />
       
       {/* Header Section */}

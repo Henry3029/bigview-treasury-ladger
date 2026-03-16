@@ -8,6 +8,7 @@ export default function ProfilePage() {
   const { user, authenticated, logout, ready } = usePrivy();
   const [balance, setBalance] = useState<string>("Loading...");
   const [mounted, setMounted] = useState(false);
+  const { linkWallet } = usePrivy();
 
   // Get the Stacks address from Privy's linked accounts
   const stxAccount = user?.linkedAccounts.find(
@@ -102,6 +103,13 @@ if (!ready || !mounted) {
             <span className="font-semibold text-gray-700">View Testnet Explorer</span>
           </div>
         </a>
+        
+        <button 
+  onClick={() => linkWallet()}
+  className="btn-grain-outline mt-4"
+>
+  Link my Leather Wallet
+</button>
 
         <button 
           onClick={() => logout()}

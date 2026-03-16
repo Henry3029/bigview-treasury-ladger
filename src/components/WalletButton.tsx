@@ -5,10 +5,9 @@ import { usePrivy } from '@privy-io/react-auth';
 export default function WalletButton() {
   const { authenticated, login, logout, user } = usePrivy();
 
-  // --- ADD IT HERE ---
-  // This looks through all linked accounts to find the Stacks one
+  // Finds the Stacks address in the Privy user object
   const stacksAddress = user?.linkedAccounts?.find(
-    (acc: any) => acc.type === 'wallet' && acc.connectorType === 'stacks'
+    (acc: any) => acc.type === 'wallet' && acc.chainType === 'stacks'
   )?.address || user?.wallet?.address;
 
   // Condition 1: User is Logged In
@@ -16,9 +15,9 @@ export default function WalletButton() {
     return (
       <button 
         onClick={() => logout()}
-        className="btn-grain-outline py-2 px-6"
+        className="btn-grain-outline py-2 px-6 flex items-center gap-2"
       >
-        {/* We use stacksAddress now instead of user.wallet.address */}
+        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
         {stacksAddress.slice(0, 4)}...{stacksAddress.slice(-4)}
       </button>
     );
@@ -28,9 +27,9 @@ export default function WalletButton() {
   return (
     <button 
       onClick={() => login()}
-      className="btn-grain py-2 px-6" // using the Grainlify Gold pill
+      className="btn-grain py-2 px-8 font-bold tracking-tight shadow-lg"
     >
-      Connect Wallet
+      Login or Sign Up
     </button>
   );
 }
