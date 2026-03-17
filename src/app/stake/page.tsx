@@ -36,37 +36,29 @@ export default function StakePage() {
   };
 
   const handleStake = async () => {
-    // 1. Check Auth via Privy
-    if (!authenticated) {
-      return login();
-    }
-
-    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      return notify("Enter a valid amount", "error");
-    }
-
-    if (!userAddress) {
-      return notify("Stacks wallet not found. Please reconnect.", "error");
-    }
+    if (!authenticated) return login();
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) return notify("Enter a valid amount", "error");
+    if (!userAddress) return notify("Stacks wallet not found.", "error");
 
     setIsLoading(true);
 
     try {
-      // 2. Convert to microStacks
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
-      
       const poxContract = 'ST000000000000000000002AMW42H.pox-4';
-
-      // 4. Create the Post-Condition (Ensures you don't send more than intended)
       const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
       
-         // 🚀 THE FIX: Find the Privy wallet and get the session
+      //  THE MAGIC: Find the Privy wallet
       const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
-      const userSession = embeddedWallet ? await (embeddedWallet as any).getCoreSession?.() : undefined;
+      
+      // We need to check if the user is using the Privy embedded wallet 
+      // or an external wallet they linked (like Leather)
+      const stxProvider = embeddedWallet 
+        ? (embeddedWallet as any).getProvider?.() 
+        : (window as any).StacksProvider;
 
-      // 5. Execute using the stable openContractCall
       await openContractCall({
-      	userSession,
+        //  Pass the provider directly so it knows which wallet to use!
+        userSession: stxProvider, 
         network: STACKS_TESTNET,
         contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!, 
         contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
@@ -75,28 +67,22 @@ export default function StakePage() {
           uintCV(microStacks), 
           principalCV(poxContract)
         ],
-        
         postConditionMode: PostConditionMode.Deny, 
         postConditions: [postCondition],
-
         appDetails: {
           name: 'Bigview Treasury',
           icon: window.location.origin + '/images/bigview-image.png',
         },
-
         onFinish: (data) => {
           setIsLoading(false);
-          console.log("TX Data:", data);
-          notify("Stake request submitted! Check your wallet.", "success");
-          setAmount('');
+          notify("Stake submitted!", "success");
         },
         onCancel: () => {
           setIsLoading(false);
-          notify("Transaction cancelled", "info");
+          notify("Cancelled", "info");
         },
       });
-       } catch (error) {
-      setIsLoading(true); // Keep loading if showing error
+    } catch (error) {
       console.error(error);
       notify("Staking failed.", "error");
       setIsLoading(false);

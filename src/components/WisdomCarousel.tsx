@@ -25,7 +25,10 @@ const flickityOptions = {
   prevNextButtons: false, 
   pageDots: true, 
   pauseAutoPlayOnHover: true,
-  adaptiveHeight: true,
+  // ❌ REMOVE adaptiveHeight: true (It causes the white space jumps)
+  // ✅ ADD contain: true (Keeps slides from drifting)
+  contain: true,
+  draggable: true,
 };
 
 export default function WisdomCarousel() {
@@ -49,26 +52,27 @@ export default function WisdomCarousel() {
   }
 
   return (
-    <section className="wisdom-section p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10 overflow-hidden">
-      <h2 className="text-xl font-semibold mb-6">Voices of Wisdom</h2>
+    <section className="wisdom-section p-4 md:p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10 overflow-hidden">
+      <h2 className="text-xl font-bold mb-6 text-slate-800">Voices of Wisdom</h2>
       
-      {/* --- FIX 2: Wrapper for Blank Slide Issue --- */}
       <div className="flickity-viewport-wrapper">
         <Flickity
           className={'carousel'} 
-          elementType={'div'} 
           options={flickityOptions} 
-          disableImagesLoaded={false} 
-          reloadOnUpdate 
-          static 
+          // 🚀 FIX: Ensure we don't use 'static' if we want it to refresh properly
         >
           {quotes.map((quote, index) => (
-            <div key={index} className="carousel-cell w-full px-2">
-              <div className={`quote-card gradient-${(index % 3) + 1} p-8 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[250px]`}>
-                <blockquote className="text-xl md:text-2xl font-serif italic font-medium leading-normal mb-4">
+            /* 📱 MOBILE FIX: Set width to 100% and remove unnecessary padding */
+            <div key={index} className="carousel-cell w-full px-1">
+              {/* 🎨 SHAPE FIX: Use aspect-square or a fixed ratio for that "rounded triangle/diamond" look on mobile */}
+              <div className={`quote-card gradient-${(index % 3) + 1} p-6 md:p-10 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-center items-center text-center min-h-[320px] md:min-h-[400px]`}>
+                
+                {/* 🖋️ TEXT SIZE FIX: text-lg for mobile, text-3xl for laptop */}
+                <blockquote className="text-lg md:text-3xl font-serif italic font-medium leading-tight mb-6">
                   "{quote.text}"
                 </blockquote>
-                <cite className="text-sm font-sans uppercase tracking-wider font-bold opacity-80 not-italic">
+                
+                <cite className="text-[10px] md:text-sm font-sans uppercase tracking-widest font-black opacity-90 not-italic border-t border-white/20 pt-4">
                   — {quote.sage}
                 </cite>
               </div>
