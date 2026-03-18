@@ -1,7 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import Flickity from 'react-flickity-component';
-import './wisdom.css'; 
+import React, { useEffect, useState, useRef } from 'react';
 
 const quotes = [
   { text: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
@@ -18,67 +16,85 @@ const quotes = [
   { text: "Live as if you were to die tomorrow. Learn as if you were to live forever.", sage: "Mahatma Gandhi" },
 ];
 
-const flickityOptions = {
-  initialIndex: 0,
-  autoPlay: 3000, 
-  wrapAround: true, 
-  prevNextButtons: false, 
-  pageDots: true, 
-  pauseAutoPlayOnHover: true,
-  // ❌ REMOVE adaptiveHeight: true (It causes the white space jumps)
-  // ✅ ADD contain: true (Keeps slides from drifting)
-  contain: true,
-  draggable: true,
-};
-
 export default function WisdomCarousel() {
-  const [isClient, setIsClient] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
+  // --- AUTO-PLAY LOGIC ---
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const nextIndex = (activeIndex + 1) % quotes.length;
+        const scrollAmount = scrollRef.current.offsetWidth * nextIndex;
+        
+        scrollRef.current.scrollTo({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+        setActiveIndex(nextIndex);
+      }
+    }, 4000); // 4 seconds
 
-  // --- FIX 1: Vertical Flash Guard ---
-  // We show a placeholder card that looks like a slide so the page doesn't jump.
-  if (!isClient) {
-    return (
-      <section className="p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10">
-        <h2 className="text-xl font-semibold mb-6">Voices of Wisdom</h2>
-        <div className="w-full h-[250px] bg-gray-50 rounded-3xl animate-pulse flex items-center justify-center text-gray-300">
-          Loading wisdom...
-        </div>
-      </section>
-    );
-  }
+    return () => clearInterval(interval);
+  }, [activeIndex]);
+
+  // Update index when user swipes manually
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const index = Math.round(scrollRef.current.scrollLeft / scrollRef.current.offsetWidth);
+      setActiveIndex(index);
+    }
+  };
+
+  const gradients = [
+    "from-blue-600 to-cyan-400",
+    "from-amber-500 to-orange-600",
+    "from-emerald-500 to-teal-600"
+  ];
 
   return (
-    <section className="wisdom-section p-4 md:p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10 overflow-hidden">
+    <section className="p-4 md:p-8 bg-white rounded-3xl shadow-sm border border-gray-100 my-10 overflow-hidden">
       <h2 className="text-xl font-bold mb-6 text-slate-800">Voices of Wisdom</h2>
       
-      <div className="flickity-viewport-wrapper">
-        <Flickity
-          className={'carousel'} 
-          options={flickityOptions} 
-          // 🚀 FIX: Ensure we don't use 'static' if we want it to refresh properly
+      <div className="relative">
+        {/* CAROUSEL CONTAINER */}
+        <div 
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide space-x-0"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {quotes.map((quote, index) => (
-            /* 📱 MOBILE FIX: Set width to 100% and remove unnecessary padding */
-            <div key={index} className="carousel-cell w-full px-1">
-              {/* 🎨 SHAPE FIX: Use aspect-square or a fixed ratio for that "rounded triangle/diamond" look on mobile */}
-              <div className={`quote-card gradient-${(index % 3) + 1} p-6 md:p-10 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-center items-center text-center min-h-[320px] md:min-h-[400px]`}>
+            <div key={index} className="min-w-full snap-center px-1">
+              <div className={`bg-gradient-to-br ${gradients[index % 3]} p-8 md:p-12 rounded-[2.5rem] text-white shadow-xl flex flex-col justify-center items-center text-center min-h-[350px] md:min-h-[400px]`}>
                 
-                {/* 🖋️ TEXT SIZE FIX: text-lg for mobile, text-3xl for laptop */}
-                <blockquote className="text-lg md:text-3xl font-serif italic font-medium leading-tight mb-6">
+                <blockquote className="text-xl md:text-3xl font-serif italic font-medium leading-relaxed mb-8">
                   "{quote.text}"
                 </blockquote>
                 
-                <cite className="text-[10px] md:text-sm font-sans uppercase tracking-widest font-black opacity-90 not-italic border-t border-white/20 pt-4">
+                <cite className="text-xs md:text-sm font-sans uppercase tracking-[0.2em] font-black opacity-90 not-italic border-t border-white/20 pt-6">
                   — {quote.sage}
                 </cite>
               </div>
             </div>
           ))}
-        </Flickity>
+        </div>
+
+        {/* CUSTOM DOTS */}
+        <div className="flex justify-center space-x-2 mt-6">
+          {quotes.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                scrollRef.current?.scrollTo({ left: scrollRef.current.offsetWidth * i, behavior: 'smooth' });
+                setActiveIndex(i);
+              }}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                activeIndex === i ? "w-8 bg-slate-800" : "w-2 bg-slate-300"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
