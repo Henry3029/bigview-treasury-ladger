@@ -7,6 +7,7 @@
 ;; ---------------------------------------------------------
 (use-trait sip-010-trait .sip-010-trait.sip-010-trait)
 (use-trait pox-trait .pox-trait.pox-trait)
+(use-trait bvw-trait .bigview-token.sip-010-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
@@ -105,6 +106,14 @@
         (ok {reward: final-user-reward, fee: dev-fee})
       )
     )
+  )
+)
+
+(define-public (reward-member (member principal) (reward-amount uint) (token-contract <bvw-trait>))
+  (begin
+    (asserts! (is-eq tx-sender (var-get dev-wallet)) ERR-FORBIDDEN)
+    ;; Contract sends BVW from its own balance to the member
+    (as-contract (contract-call? token-contract transfer reward-amount tx-sender member none))
   )
 )
 
