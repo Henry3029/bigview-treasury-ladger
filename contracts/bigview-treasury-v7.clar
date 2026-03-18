@@ -7,7 +7,7 @@
 ;; ---------------------------------------------------------
 (use-trait sip-010-trait .sip-010-trait-v2.sip-010-trait)
 (use-trait pox-trait .pox-trait-v2.pox-trait)
-(use-trait bvw-trait .bigview-token.sip-010-trait-v2)
+(use-trait bvw-trait .sip-010-trait-v2.sip-010-trait) 
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
@@ -126,7 +126,10 @@
     (asserts! (is-eq tx-sender (var-get dev-wallet)) ERR-FORBIDDEN)
     (var-set major-pool-address new-pool)
     ;; Crucial: The contract must explicitly allow the pool to lock its funds
-    (try! (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+    (asserts! 
+          (is-ok (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+                (err u500) ;; Error code for 'Failed to lock pool'
+                    )
     (ok true)
   )
 )
