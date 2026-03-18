@@ -5,9 +5,9 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait sip-010-trait .sip-010-trait.sip-010-trait)
-(use-trait pox-trait .pox-trait.pox-trait)
-(use-trait bvw-trait .bigview-token.sip-010-trait)
+(use-trait sip-010-trait .sip-010-trait-v2.sip-010-trait)
+(use-trait pox-trait .pox-trait-v2.pox-trait)
+(use-trait bvw-trait .bigview-token.sip-010-trait-v2)
 
 ;; ---------------------------------------------------------
 ;; Constants & Data Variables
