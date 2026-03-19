@@ -1,24 +1,32 @@
 "use client";
-import { usePrivy } from '@privy-io/react-auth';
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { UserSession, AppConfig } from '@stacks/connect';
+
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 
 interface StatusBadgeProps {
-  status: 'online' | 'offline' | 'maintenance' | string;
-  label: string;
+  status?: 'online' | 'offline' | 'maintenance' | string;
+  label?: string;
 }
 
-export default function StatusBadge({ status, label }: StatusBadgeProps) {
-  const { authenticated, user } = usePrivy();
-  
-  // 1. Correct way to find the Stacks address in Privy
-  // We look through linked accounts for one that looks like a Stacks address
-  const stacksAddress = user?.linkedAccounts?.find(
-    (acc: any) => acc.type === 'wallet' && acc.connectorType === 'stacks'
-  )?.address || user?.wallet?.address;
+export default function StatusBadge({ label }: StatusBadgeProps) {
+  const [address, setAddress] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-  // 2. Logic for the visual indicator
-  // If authenticated, we show "Success" colors, otherwise we show the passed-in "status"
-  const isConnected = authenticated && stacksAddress;
+  useEffect(() => {
+    // 2. CHECK SIGN-IN STATUS NATIVELY
+    if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      const stxAddress = userData.profile.stxAddress.testnet;
+      setAddress(stxAddress);
+      setIsConnected(true);
+    }
+  }, []);
+
+  // 3. Logic for the visual indicator
   const activeColor = isConnected ? 'bg-green-500' : 'bg-red-500';
   const bgColor = isConnected ? 'bg-green-50' : 'bg-red-50';
   const textColor = isConnected ? 'text-green-700' : 'text-red-700';
@@ -28,12 +36,12 @@ export default function StatusBadge({ status, label }: StatusBadgeProps) {
       ${bgColor} ${textColor} ${isConnected ? 'border-green-100' : 'border-red-100'}`}>
       
       {/* The Status Dot */}
-      <span className={`h-2 w-2 rounded-full animate-pulse ${activeColor}`}></span>
+      <span className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse' : ''} ${activeColor}`}></span>
       
       {/* The Label */}
       <span>
-        {isConnected 
-          ? `STX: ${stacksAddress.slice(0, 5)}...${stacksAddress.slice(-4)}` 
+        {isConnected && address
+          ? `STX: ${address.slice(0, 5)}...${address.slice(-4)}` 
           : label || "Disconnected"}
       </span>
     </div>

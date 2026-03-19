@@ -1,15 +1,16 @@
 "use client";
+
 import React, { useState } from 'react';
-import { usePrivy, useWallets } from '@privy-io/react-auth';
-import { openContractCall } from '@stacks/connect';
+import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { Loader2, Wallet, ArrowRight, ExternalLink, CheckCircle } from 'lucide-react';
 import { PostConditionMode } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
 
+// 1. Initialize the Stacks Session (This replaces Privy auth check)
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
+
 export default function DashboardButtons() {
-  const { authenticated } = usePrivy();
-  const { wallets } = useWallets();
-  
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,19 +28,16 @@ export default function DashboardButtons() {
   };
 
   const handleContractCall = async (functionName: string, args: any[]) => {
-    if (!authenticated) return notify("Please login first!", "info");
-
-    const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
-    if (!embeddedWallet) return notify("No embedded wallet found.", "error");
+    // 2. Simple Check: Is the Stacks wallet connected?
+    if (!userSession.isUserSignedIn()) {
+      return notify("Please connect your Stacks wallet first!", "info");
+    }
 
     setIsLoading(true);
     
     try {
-      // 🚀 THE FIX: Get the Privy session before the call
-      const userSession = await (embeddedWallet as any).getCoreSession?.();
-
       const options = {
-        userSession, // <--- ADD THIS LINE
+        userSession, // Use the native Stacks session
         contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
         contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
         functionName,
@@ -47,7 +45,6 @@ export default function DashboardButtons() {
         network: STACKS_TESTNET,
         postConditionMode: PostConditionMode.Allow,
         
-        // Highly recommended to add appDetails here too for the Privy popup
         appDetails: {
           name: 'Bigview Treasury',
           icon: window.location.origin + '/images/bigview-image.png',
@@ -71,7 +68,6 @@ export default function DashboardButtons() {
       notify("Request failed", "error");
     }
   };
-
 
   return (
     <div className="flex flex-col gap-6 p-4">
@@ -100,10 +96,9 @@ export default function DashboardButtons() {
         <h3 className="text-gray-400 text-[10px] uppercase tracking-[0.2em] font-black mb-4 ml-1">Treasury Actions</h3>
         
         <div className="flex flex-col gap-4">
-          {/* Main Stake Button - This is your money maker */}
           <button 
             disabled={isLoading}
-            onClick={() => window.location.href = '/stake'} // Redirect to the dedicated stake page
+            onClick={() => window.location.href = '/stake'} 
             className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
           >
             <div className="flex items-center gap-3">
@@ -115,7 +110,6 @@ export default function DashboardButtons() {
             <ArrowRight size={20} />
           </button>
 
-          {/* Secondary Claim Button */}
           <button 
             disabled={isLoading}
             onClick={() => handleContractCall('claim-rewards', [])}
@@ -126,7 +120,6 @@ export default function DashboardButtons() {
           </button>
         </div>
       </section>
-
     </div>
   );
 }

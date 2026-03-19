@@ -1,7 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
+import { UserSession, AppConfig } from '@stacks/connect';
+
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 
 interface HistoryItem {
   id: string;
@@ -11,18 +15,22 @@ interface HistoryItem {
 }
 
 export const RewardHistory = () => {
-  // 1. Swap Stacks Hook for Privy
-  const { user, authenticated } = usePrivy();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUserHistory() {
-      // 2. Get the address from Privy's wallet object
-      const stxWallet = user?.linkedAccounts.find((account) => account.type === 'wallet' && account.connectorType === 'stacks');
-      const address = stxWallet?.address;
+      // 2. NATIVE CHECK: Is the user connected to a Stacks wallet?
+      if (!userSession.isUserSignedIn()) {
+        setLoading(false);
+        return;
+      }
 
-      if (!authenticated || !address) {
+      // Get the address directly from the Stacks profile
+      const userData = userSession.loadUserData();
+      const address = userData.profile.stxAddress.testnet;
+
+      if (!address) {
         setLoading(false);
         return;
       }
@@ -43,7 +51,7 @@ export const RewardHistory = () => {
                   day: 'numeric',
                 })
               : 'Pending',
-            // Check if it's a contract call or a standard transfer
+            // Simplified check for display
             amount: tx.tx_type === 'contract_call' ? 'Contract' : 'STX', 
             status: tx.tx_status === 'success' ? 'Confirmed' : 'Pending',
           }));
@@ -57,7 +65,7 @@ export const RewardHistory = () => {
     }
 
     fetchUserHistory();
-  }, [user, authenticated]);
+  }, []); // Run once on mount
 
   if (loading) return <div className="p-4 text-gray-400 animate-pulse text-sm font-medium">Syncing history...</div>;
   

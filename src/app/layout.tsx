@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'; 
 import NextTopLoader from 'nextjs-toploader';
-import AppPrivyProvider from '@/components/PrivyProvider';
 import '@/styles/globals.css';
 import WalletButton from '@/components/WalletButton';
 import Image from 'next/image';
@@ -32,8 +31,6 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px #2563eb,0 0 5px #2563eb"
         />
-
-        <AppPrivyProvider>
           <Sidebar />
           
           <header className="sticky top-0 z-50 flex items-center justify-between p-4 bg-white/80 backdrop-blur-md shadow-sm border-b [grid-area:header]">
@@ -60,7 +57,6 @@ export default function RootLayout({
           <footer className="p-6 text-center text-[10px] uppercase tracking-widest text-gray-400 border-t [grid-area:footer]">
             © 2026 Bigview Treasury-Ledger
           </footer>
-        </AppPrivyProvider>
       </body>
     </html>
   );

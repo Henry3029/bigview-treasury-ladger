@@ -1,23 +1,32 @@
 "use client";
+
 import { useEffect, useState } from 'react';
 import { Loader2, Users, PieChart, TrendingUp } from 'lucide-react'; 
 import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
 import { STACKS_TESTNET } from '@stacks/network';
-import { usePrivy } from '@privy-io/react-auth';
+import { UserSession, AppConfig } from '@stacks/connect';
 
-// 1. CLEANED INTERFACE: Only keeping what we actually use
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
+
 interface DashboardDataProps {
   stake: string;
 }
 
 export default function DashboardData({ stake }: DashboardDataProps) {
   const [summary, setSummary] = useState<any>(null);
-  const { user } = usePrivy();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function fetchSummary() {
-      if (!user?.wallet?.address) return;
+      // 2. CHECK SIGN-IN STATUS NATIVELY
+      if (!userSession.isUserSignedIn()) return;
+
+      const userData = userSession.loadUserData();
+      const address = userData.profile.stxAddress.testnet;
+
+      if (!address) return;
 
       setIsLoading(true);
       try {
@@ -27,7 +36,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
           contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
           functionName: 'dashboard-summary',
           functionArgs: [],
-          senderAddress: user.wallet.address,
+          senderAddress: address, // Using native Stacks address
         });
         
         setSummary(cvToJSON(response));
@@ -39,7 +48,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
     }
 
     fetchSummary();
-  }, [user]);
+  }, []);
 
   // --- THE SPINNER LOGIC ---
   if (isLoading) {
@@ -53,7 +62,6 @@ export default function DashboardData({ stake }: DashboardDataProps) {
 
   if (!summary) return null;
 
-  // --- 2. THE CLEANED RETURN BLOCK ---
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
@@ -83,7 +91,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
 
       </div>
 
-      {/* Rewards Overview (New addition for better UI) */}
+      {/* Rewards Overview */}
       <div className="p-5 bg-slate-900 rounded-3xl shadow-sm flex items-center justify-between text-white">
         <div className="flex flex-col gap-1">
           <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Total Rewards Paid</span>

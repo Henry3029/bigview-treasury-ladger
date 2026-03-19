@@ -1,38 +1,33 @@
-'use client';
+"use client";
 
-import { usePrivy } from '@privy-io/react-auth';
+import { showConnect, authenticate } from '@stacks/connect';
+import { STACKS_TESTNET } from '@stacks/network';
+import { useState, useEffect } from 'react';
 
 export default function WalletButton() {
-  const { authenticated, login, logout, user } = usePrivy();
+  const [address, setAddress] = useState<string | null>(null);
 
-  // Finds the Stacks address in the Privy user object
-  const stacksAddress = user?.linkedAccounts?.find(
-    (acc: any) => acc.type === 'wallet' && acc.chainType === 'stacks'
-  )?.address || user?.wallet?.address;
+  const handleConnect = () => {
+    showConnect({
+      appDetails: {
+        name: 'Bigview Treasury',
+        icon: window.location.origin + '/bigview-image.png', // Put your logo in the public folder
+      },
+      onFinish: (data) => {
+        // This is where you get the real ST... address
+        const userData = data.userSession.loadUserData();
+        setAddress(userData.profile.stxAddress.testnet); 
+      },
+      userSession: undefined, // The library handles the session for you
+    });
+  };
 
-  // Condition 1: User is Logged In
-  if (authenticated && stacksAddress) {
-    return (
-      <button 
-        onClick={() => logout()}
-        className="btn-grain-outline py-2 px-6 flex items-center gap-2"
-      >
-        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        {stacksAddress.slice(0, 4)}...{stacksAddress.slice(-4)}
-      </button>
-    );
-  }
-
-  // Condition 2: User is NOT Logged In
   return (
     <button 
-  onClick={() => {
-    console.log("Login button was clicked!"); // This will show in your browser console
-    login();
-  }}
-  className="btn-grain py-2 px-8 font-bold tracking-tight shadow-lg"
->
-  Login or Sign Up
-</button>
+      onClick={handleConnect} 
+      className="btn-grain flex flex-col items-center justify-center disabled:opacity-50"
+    >
+      {address ? `STX: ${address.slice(0, 5)}...` : "Connect Wallet"}
+    </button>
   );
 }

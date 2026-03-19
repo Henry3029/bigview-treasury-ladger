@@ -1,24 +1,33 @@
 'use client';
 
-import { usePrivy } from '@privy-io/react-auth';
+import { UserSession, AppConfig } from '@stacks/connect';
 import { useState, useEffect } from 'react';
 import { PartyPopper, X } from 'lucide-react';
 
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
+
 export default function WelcomeBanner() {
-  const { user, authenticated } = usePrivy();
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
-    // Check if the user signed up in the last 60 seconds
-    if (authenticated && user?.createdAt) {
-      const now = new Date().getTime();
-      const signupTime = new Date(user.createdAt).getTime();
+    // 2. NATIVE CHECK: If signed in, show welcome for this session
+    if (userSession.isUserSignedIn()) {
+      // Logic: Show if they just connected in this browser session
+      // We use sessionStorage so it doesn't pop up every single page refresh
+      const hasSeenWelcome = sessionStorage.getItem('bigview_welcome_seen');
       
-      if (now - signupTime < 60000) {
+      if (!hasSeenWelcome) {
         setShowWelcome(true);
       }
     }
-  }, [authenticated, user]);
+  }, []);
+
+  const closeBanner = () => {
+    setShowWelcome(false);
+    sessionStorage.setItem('bigview_welcome_seen', 'true');
+  };
 
   if (!showWelcome) return null;
 
@@ -30,13 +39,13 @@ export default function WelcomeBanner() {
             <PartyPopper size={24} className="text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold">Welcome to the Treasury!</h2>
+            <h2 className="text-xl font-bold italic tracking-tight">Welcome to Bigview Treasury!</h2>
             <p className="text-blue-100 text-sm mt-1 max-w-md">
-              Your Stacks account has been created. You're now ready to stake STX and earn sBTC rewards.
+              Your Stacks wallet is connected. You're now ready to stake STX and manage your rewards directly on-chain.
             </p>
           </div>
         </div>
-        <button onClick={() => setShowWelcome(false)} className="text-white/60 hover:text-white">
+        <button onClick={closeBanner} className="text-white/60 hover:text-white transition-colors">
           <X size={20} />
         </button>
       </div>

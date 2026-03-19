@@ -1,23 +1,26 @@
 'use client';
+
 import { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth'; 
-import { User, ExternalLink, LogOut, Wallet, Plus, Shield, Link as LinkIcon } from 'lucide-react';
+import { showConnect, UserSession, AppConfig } from '@stacks/connect';
+import { User, ExternalLink, LogOut, Wallet, Shield } from 'lucide-react';
+
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 
 export default function ProfilePage() {
-  const { user, authenticated, logout, ready, linkWallet } = usePrivy();
   const [balance, setBalance] = useState<string>("0 STX");
   const [mounted, setMounted] = useState(false);
-
-  // 🎯 FIX: Find the Stacks address specifically
-  // Privy stores the stacks address in the 'wallet' type where the address starts with 'S'
-  const stacksWallet = user?.linkedAccounts.find(
-    (acc): acc is any => acc.type === 'wallet' && acc.address?.startsWith('S')
-  );
-  const address = stacksWallet?.address;
+  const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
+    if (userSession.isUserSignedIn()) {
+      setUserData(userSession.loadUserData());
+    }
   }, []);
+
+  const address = userData?.profile?.stxAddress?.testnet;
 
   // Fetch Balance from Hiro API
   useEffect(() => {
@@ -33,27 +36,45 @@ export default function ProfilePage() {
     }
   }, [address]);
 
-  if (!ready || !mounted) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-        <p className="text-blue-600 font-bold animate-pulse">Syncing Treasury Data...</p>
-      </div>
-    );
-  }
+  const handleLogout = () => {
+    userSession.signUserOut();
+    window.location.href = "/"; // Redirect to home after logout
+  };
 
-  if (!authenticated) {
+  const handleConnect = () => {
+    showConnect({
+      appDetails: {
+        name: 'Bigview Treasury',
+        icon: window.location.origin + '/logo.png',
+      },
+      onFinish: () => {
+        window.location.reload(); // Refresh to load the new user data
+      },
+      userSession,
+    });
+  };
+
+  if (!mounted) return null;
+
+  // 2. NATIVE AUTH CHECK
+  if (!userSession.isUserSignedIn()) {
     return (
-      <div className="min-h-[60vh] p-10 text-center flex flex-col items-center justify-center gap-4">
+      <div className="min-h-[60vh] p-10 text-center flex flex-col items-center justify-center gap-6">
         <Shield size={48} className="text-gray-300" />
-        <p className="text-gray-500 font-medium">Please login to view your Treasury profile.</p>
+        <p className="text-gray-500 font-medium">Please connect your Stacks wallet to view your profile.</p>
+        <button 
+          onClick={handleConnect}
+          className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-blue-700 transition-all"
+        >
+          Connect Wallet
+        </button>
       </div>
     );
   }
 
   const truncatedAddress = address 
     ? `${address.slice(0, 6)}...${address.slice(-4)}` 
-    : "Generating Stacks Address...";
+    : "No Address Found";
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 pb-24 flex flex-col gap-6">
@@ -66,7 +87,7 @@ export default function ProfilePage() {
           <div className="absolute bottom-0 right-0 bg-green-500 p-1 rounded-full border-2 border-white" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-slate-900">My Account</h2>
+          <h2 className="text-xl font-bold text-slate-900 tracking-tight italic">My Treasury Profile</h2>
           <p className="text-sm text-gray-500 font-mono tracking-tight bg-gray-100 px-2 py-0.5 rounded">
             {truncatedAddress}
           </p>
@@ -99,30 +120,17 @@ export default function ProfilePage() {
             <span className="font-semibold text-gray-700">View on Explorer</span>
           </div>
         </a>
-        
-        {/* Link Stacks Wallet Button */}
-        <button 
-          onClick={() => linkWallet()}
-          className="p-4 flex items-center justify-between border-b border-gray-100 hover:bg-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-50 rounded-lg text-orange-500">
-              <LinkIcon size={18} />
-            </div>
-            <span className="font-semibold text-gray-700">Link Stacks Wallet</span>
-          </div>
-        </button>
 
         {/* Logout Button */}
         <button 
-          onClick={() => logout()}
+          onClick={handleLogout}
           className="p-4 flex items-center justify-between hover:bg-red-50 text-red-500 transition-colors"
         >
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-50 rounded-lg">
               <LogOut size={18} />
             </div>
-            <span className="font-semibold">Logout</span>
+            <span className="font-semibold">Disconnect Wallet</span>
           </div>
         </button>
       </div>

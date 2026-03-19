@@ -1,16 +1,15 @@
 "use client";
+
 import React, { useState } from 'react';
-import { openContractCall } from '@stacks/connect';
+import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { STACKS_TESTNET } from '@stacks/network';
 import { AnchorMode, PostConditionMode } from '@stacks/transactions';
-// 1. IMPORT PRIVY HOOKS
-import { usePrivy, useWallets } from '@privy-io/react-auth';
+
+// 1. INITIALIZE NATIVE STACKS SESSION
+const appConfig = new AppConfig(['store_write', 'publish_data']);
+const userSession = new UserSession({ appConfig });
 
 export const ClaimButton = () => {
-  // 2. INITIALIZE PRIVY
-  const { authenticated, login } = usePrivy();
-  const { wallets } = useWallets();
-  
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,9 +24,9 @@ export const ClaimButton = () => {
   };
 
   const handleClaim = async () => {
-    // 3. AUTH CHECK
-    if (!authenticated) {
-      return login();
+    // 2. STACKS AUTH CHECK
+    if (!userSession.isUserSignedIn()) {
+      return notify("Please connect your Stacks wallet!", "info");
     }
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
@@ -41,14 +40,9 @@ export const ClaimButton = () => {
     setIsLoading(true);
 
     try {
-      // 4. FIND THE PRIVY WALLET & GET SESSION
-      const embeddedWallet = wallets.find((w) => w.walletClientType === 'privy');
-      
-      // This is the magic line that kills the "Origin" error:
-      const userSession = embeddedWallet ? await (embeddedWallet as any).getCoreSession?.() : undefined;
-
+      // 3. NATIVE CONTRACT CALL
       await openContractCall({
-        userSession, // <--- PASS THE SESSION HERE
+        userSession, // Use the direct userSession we initialized above
         network: STACKS_TESTNET,
         anchorMode: AnchorMode.Any,
         contractAddress: contractAddress,
