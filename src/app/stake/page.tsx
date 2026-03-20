@@ -55,8 +55,8 @@ export default function StakePage() {
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
       // POX-4 DETAILS (The "Secret" second argument)
-      const poxAddress = 'ST000000000000000000002AMW42H';
-      const poxName = 'pox-4';
+   const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS;
+const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME;
       
       // POST-CONDITION: Tells the wallet "I am okay with sending exactly this much STX"
       const postCondition = Pc.principal(userAddress)
