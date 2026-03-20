@@ -4,6 +4,7 @@ import WalletButton from '@/components/WalletButton';
 import Image from 'next/image';
 import BottomNav from '@/components/BottomNav';
 import Sidebar from '@/components/Sidebar';
+import MobileHeader from '@/components/MobileHeader';
 
 export const metadata: Metadata = {
   title: 'Bigview Treasury Ledger',
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased text-slate-900 bg-slate-50">
+      <MobileHeader />
         <div className="flex min-h-screen">
           {/* 1. SIDEBAR: Fixed on desktop, hidden on mobile */}
           <Sidebar />

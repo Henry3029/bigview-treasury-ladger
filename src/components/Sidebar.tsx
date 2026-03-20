@@ -37,7 +37,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="hidden lg:flex flex-col w-[260px] bg-white border-r h-screen fixed left-0 top-0 z-40 p-6">
+<aside className={`${isMobile ? 'flex' : 'hidden lg:flex'} flex-col w-full lg:w-[260px] bg-white h-full p-6`}>
       {/* BRANDING SECTION */}
       <div className="flex items-center gap-2 mb-10 px-2">
         <Image 
