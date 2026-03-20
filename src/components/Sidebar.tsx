@@ -20,7 +20,8 @@ import {
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
 
-export default function Sidebar() {
+// CHANGE THIS LINE:
+export default function Sidebar({ isMobile, closeMobileMenu }: any) { 
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
@@ -28,10 +29,7 @@ export default function Sidebar() {
     if (userSession.isUserSignedIn()) {
       const userData = userSession.loadUserData();
       const userAddr = userData.profile.stxAddress.testnet;
-      
-      // Make sure your .env.local has NEXT_PUBLIC_DEPLOYER_ADDR set to your wallet
       const deployerAddr = process.env.NEXT_PUBLIC_DEPLOYER_ADDR;
-      
       setIsAdmin(userAddr === deployerAddr);
     }
   }, []);
