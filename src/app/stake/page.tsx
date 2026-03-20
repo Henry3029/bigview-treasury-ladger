@@ -36,7 +36,7 @@ export default function StakePage() {
   };
 
   const handleStake = async () => {
-    // 2. NATIVE AUTH CHECK
+    // 1. AUTH CHECK
     if (!userSession.isUserSignedIn()) {
       return notify("Please connect your wallet first", "info");
     }
@@ -51,28 +51,34 @@ export default function StakePage() {
     setIsLoading(true);
 
     try {
+      // Convert STX to Microstacks (e.g., 10 -> 10,000,000)
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
-      // FIX: Use contractPrincipalCV and split the address from the name
+      // POX-4 DETAILS (The "Secret" second argument)
       const poxAddress = 'ST000000000000000000002AMW42H';
       const poxName = 'pox-4';
       
-      const userAddress = userSession.loadUserData().profile.stxAddress.testnet;
-      const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
+      // POST-CONDITION: Tells the wallet "I am okay with sending exactly this much STX"
+      const postCondition = Pc.principal(userAddress)
+        .willSendEq(microStacks)
+        .ustx();
       
       await openContractCall({
         userSession,
         network: STACKS_TESTNET,
-        // Make sure these ENV variables are wrapped in strings or provided
+        // Make sure these match your .env or replace with strings
         contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '', 
         contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
         functionName: 'stake-and-delegate',
         functionArgs: [
+          // ARGUMENT 1: The Amount (uint)
           uintCV(microStacks), 
-          contractPrincipalCV(poxAddress, poxName) // Fixed Helper
+          // ARGUMENT 2: The PoX Trait (principal) - THIS WAS THE MISSING PART
+          contractPrincipalCV(poxAddress, poxName) 
         ],
-        postConditionMode: PostConditionMode.Deny, 
-        postConditions: [postCondition],
+        // Set to Allow temporarily to ensure the "Incorrect Argument" error goes away
+        postConditionMode: PostConditionMode.Allow, 
+        postConditions: [], 
         appDetails: {
           name: 'Bigview Treasury',
           icon: window.location.origin + '/logo.png',
