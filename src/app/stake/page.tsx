@@ -51,31 +51,37 @@ export default function StakePage() {
     setIsLoading(true);
 
     try {
-      // Convert STX to Microstacks (e.g., 10 -> 10,000,000)
+      // 1. Convert STX to Microstacks
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
-      // POX-4 DETAILS (The "Secret" second argument)
-   const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS;
-const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME;
+      // 2. Get PoX details from Env (with manual fallbacks for safety)
+      const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS || 'ST000000000000000000002AMW42H';
+      const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME || 'pox-4';
       
-      // POST-CONDITION: Tells the wallet "I am okay with sending exactly this much STX"
+      // 3. DEFINE debugArgs BEFORE USING IT
+      const debugArgs = {
+        amount: microStacks.toString(),
+        poxAddress: poxAddress,
+        poxName: poxName,
+        contract: process.env.NEXT_PUBLIC_CONTRACT_NAME || 'Not Found'
+      };
+      
+      // 4. NOW the alert will work!
+      alert("DEBUG DATA: " + JSON.stringify(debugArgs, null, 2));
+      
+      // 5. Setup Post-Condition
       const postCondition = Pc.principal(userAddress)
         .willSendEq(microStacks)
         .ustx();
-        
-        alert("DEBUG DATA: " + JSON.stringify(debugArgs, null, 2));
       
       await openContractCall({
         userSession,
         network: STACKS_TESTNET,
-        // Make sure these match your .env or replace with strings
         contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '', 
         contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
         functionName: 'stake-and-delegate',
         functionArgs: [
-          // ARGUMENT 1: The Amount (uint)
           uintCV(microStacks), 
-          // ARGUMENT 2: The PoX Trait (principal) - THIS WAS THE MISSING PART
           contractPrincipalCV(poxAddress, poxName) 
         ],
         // Set to Allow temporarily to ensure the "Incorrect Argument" error goes away
