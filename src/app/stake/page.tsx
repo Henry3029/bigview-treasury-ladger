@@ -62,6 +62,8 @@ const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME;
       const postCondition = Pc.principal(userAddress)
         .willSendEq(microStacks)
         .ustx();
+        
+        alert("DEBUG DATA: " + JSON.stringify(debugArgs, null, 2));
       
       await openContractCall({
         userSession,
