@@ -1,61 +1,72 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Receipt, Wallet, User, History, LogOut } from 'lucide-react';
-import { UserSession, AppConfig } from '@stacks/connect';
+import { 
+  LayoutDashboard, 
+  ArrowLeftRight, 
+  Zap, 
+  Wallet, 
+  User, 
+  ShieldCheck, // Admin Icon
+  Settings 
+} from 'lucide-react';
+import Image from 'next/image';
 
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 const userSession = new UserSession({ appConfig });
 
 export default function Sidebar() {
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
-  const isActive = (path: string) => pathname === path;
 
-  const handleLogout = () => {
-    userSession.signUserOut();
-    window.location.replace('/'); 
-  };
+  useEffect(() => {
+    if (userSession.isUserSignedIn()) {
+      const userData = userSession.loadUserData();
+      const userAddr = userData.profile.stxAddress.testnet;
+      const deployerAddr = process.env.NEXT_PUBLIC_DEPLOYER_ADDR;
+      
+      // If the connected wallet matches your deployer address, show admin tools
+      setIsAdmin(userAddr === deployerAddr);
+    }
+  }, []);
 
   return (
-    <aside className="hidden lg:flex flex-col fixed left-0 top-0 h-screen w-[260px] bg-white border-r border-slate-100 p-6 z-40">
-      <div className="mb-10 px-2">
-        <h1 className="text-xl font-black text-blue-900 tracking-tight italic">Bigview</h1>
-      </div>
+    <aside className="hidden lg:flex flex-col w-[260px] bg-white border-r h-screen fixed left-0 top-0 z-40 p-6">
+      {/* ... Branding and Main Nav ... */}
 
-      <nav className="flex flex-col gap-2 flex-grow">
-        <SidebarLink href="/" icon={<LayoutDashboard size={20}/>} label="Dashboard" active={isActive('/')} />
-        <SidebarLink href="/stake" icon={<Receipt size={20}/>} label="Stake STX" active={isActive('/stake')} />
-        <SidebarLink href="/rewards" icon={<Wallet size={20}/>} label="My Rewards" active={isActive('/rewards')} />
-        <SidebarLink href="/history" icon={<History size={20}/>} label="History" active={isActive('/history')} />
-        <SidebarLink href="/me" icon={<User size={20}/>} label="Profile" active={isActive('/me')} />
-      </nav>
-
-      {/* Logout Button at the bottom of the sidebar */}
-      {userSession.isUserSignedIn() && (
-        <button 
-          onClick={handleLogout}
-          className="mt-auto flex items-center gap-3 p-3 rounded-xl font-bold text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-100 group"
-        >
-          <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
-          <span>Disconnect</span>
-        </button>
+      {/* 3. HIDDEN ADMIN TOOLS */}
+      {isAdmin && (
+        <div className="pt-6 border-t border-slate-50 space-y-2 animate-in fade-in slide-in-from-bottom-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-red-400 mb-4 px-2">Developer Tools</p>
+          
+          <SidebarLink 
+            href="/admin/mint" 
+            icon={<ShieldCheck size={20} />} 
+            label="Token Minter" 
+            active={pathname === '/admin/mint'} 
+            isOwnerTool
+          />
+        </div>
       )}
     </aside>
   );
 }
 
-function SidebarLink({ href, icon, label, active }: { href: string; icon: React.ReactNode; label: string; active: boolean }) {
+// Helper Component for Links
+function SidebarLink({ href, icon, label, active, isAdmin = false }: any) {
   return (
     <Link 
       href={href} 
-      className={`flex items-center gap-3 p-3 rounded-xl font-medium transition-all ${
+      className={`flex items-center gap-3 p-3 rounded-2xl font-bold transition-all ${
         active 
-          ? 'bg-blue-50 text-blue-600 shadow-sm' 
-          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+          ? 'bg-blue-600 text-white shadow-lg shadow-blue-100' 
+          : isAdmin 
+            ? 'text-slate-500 hover:bg-red-50 hover:text-red-600' 
+            : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600'
       }`}
     >
       {icon}
-      <span>{label}</span>
+      <span className="text-sm tracking-tight">{label}</span>
     </Link>
   );
 }
