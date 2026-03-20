@@ -5,6 +5,7 @@ import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { 
   uintCV, 
   principalCV,
+  contractPrincipalCV,
   PostConditionMode, 
   Pc 
 } from '@stacks/transactions';
@@ -52,21 +53,23 @@ export default function StakePage() {
     try {
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
-      // Standard PoX-4 Contract for Testnet
-      const poxContract = 'ST000000000000000000002AMW42H.pox-4';
+      // FIX: Use contractPrincipalCV and split the address from the name
+      const poxAddress = 'ST000000000000000000002AMW42H';
+      const poxName = 'pox-4';
       
-      // Create Post Condition: "I will send exactly X microstacks"
+      const userAddress = userSession.loadUserData().profile.stxAddress.testnet;
       const postCondition = Pc.principal(userAddress).willSendEq(microStacks).ustx();
       
       await openContractCall({
-        userSession, // 3. The magic happens here: Connect handles the wallet popup
+        userSession,
         network: STACKS_TESTNET,
-        contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!, 
-        contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
+        // Make sure these ENV variables are wrapped in strings or provided
+        contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '', 
+        contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME || '',
         functionName: 'stake-and-delegate',
         functionArgs: [
           uintCV(microStacks), 
-          principalCV(poxContract)
+          contractPrincipalCV(poxAddress, poxName) // Fixed Helper
         ],
         postConditionMode: PostConditionMode.Deny, 
         postConditions: [postCondition],

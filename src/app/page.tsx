@@ -12,15 +12,15 @@ const CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME || '';
 
 async function getDashboardData() {
   try {
-    // --- PART A: Fetch STX Balance ---
+    // 1. Fetch STX Balance
     const balanceRes = await fetch(
       `https://api.testnet.hiro.so/extended/v1/address/${CONTRACT_ADDRESS}/balances`,
-      { next: { revalidate: 60 } } // Better than 'no-store' for performance
+      { next: { revalidate: 60 } } 
     );
     const balanceData = await balanceRes.json();
     const stxBalance = (Number(balanceData?.stx?.balance) || 0) / 1_000_000;
 
-    // --- PART B: Read Treasury Data from Contract ---
+    // 2. Read Treasury Data from Contract
     const response = await fetchCallReadOnlyFunction({
       network: STACKS_TESTNET,
       contractAddress: CONTRACT_ADDRESS,
@@ -32,11 +32,11 @@ async function getDashboardData() {
 
     const parsedData = cvToJSON(response);
     
-    //  THE FIX: Check if the response was "ok" (success)
-    if (parsedData.success) {
-      const data = parsedData.value.value; // Drill down into the 'ok' contents
+    // 3. SAFE CHECK: Only process if the contract returned (ok ...)
+    if (parsedData && parsedData.success) {
+      const data = parsedData.value.value; 
 
-      const totalStakedSTX = Number(data['total-stakes'].value) / 1_000_000;
+      const totalStakedSTX = Number(data['total-stakes']?.value || 0) / 1_000_000;
 
       return {
         stake: `${totalStakedSTX.toLocaleString()} STX`,
@@ -44,13 +44,19 @@ async function getDashboardData() {
       };
     }
     
-    throw new Error("Contract returned an error");
+    // 4. INVISIBLE FALLBACK: If contract returns (err), just return defaults
+    console.warn("Contract returned an error response, using fallbacks.");
+    return {
+      stake: "0 STX",
+      treasuryBalance: `${stxBalance.toLocaleString()} STX`,
+    };
     
   } catch (error) {
+    // 5. GRACEFUL ERROR: Catch network timeouts or API downs
     console.error("Dashboard Fetch Error:", error);
     return {
-      stake: "N/A",
-      treasuryBalance: "0 STX",
+      stake: "Updating...",
+      treasuryBalance: "Fetching...",
     };
   }
 }

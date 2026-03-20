@@ -19,7 +19,6 @@ export default function RewardsPage() {
 
 // 2. The Real "Brain" Function
 async function getBlockchainData() {
-  // Use the network object you already imported at the top
   const network = STACKS_TESTNET; 
 
   try {
@@ -32,26 +31,35 @@ async function getBlockchainData() {
       senderAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '', 
     });
 
-    // 1. Convert Clarity to JSON
     const jsonResponse = cvToJSON(response);
 
-    // 2. Check if the contract returned an (ok ...) or an (err ...)
-    // Read-only functions often wrap results in a Response type
-    if (jsonResponse.success) {
-      const data = jsonResponse.value.value; // Drill down into the 'ok' value
+    if (jsonResponse && jsonResponse.success) {
+      const data = jsonResponse.value.value;
 
-      // 3. Divide by 1,000,000 for decimal STX
-      const rewards = Number(data['total-rewards'].value) / 1000000;
-      const stakes = Number(data['total-stakes'].value) / 1000000;
-
+      // 1. Process Total Rewards
+      const rewards = Number(data['total-rewards']?.value || 0) / 1000000;
       setTotalEarned(rewards.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+
+      // 2. Process Pending Rewards (Adding this fix!)
+      const pendingRewards = Number(data['pending-rewards']?.value || 0) / 1000000;
+      setPending(pendingRewards.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+
+      // 3. Process Total Stakes
+      const stakes = Number(data['total-stakes']?.value || 0) / 1000000;
       setLiveStaked(stakes.toLocaleString());
-      setMessage(null); // Clear the "Fetching..." message
+      
+      setStatus('success');
+    } else {
+      console.warn("Contract returned an (err ...)");
+      setStatus('error');
     }
   } catch (error) {
     console.error("Sync Error:", error);
-    setMessage("Sync failed. Are you on the right network?");
     setStatus('error');
+  } finally {
+    // THE CRITICAL FIX: This hides the "Fetching..." message 
+    // regardless of whether the fetch worked or failed.
+    setMessage(null); 
   }
 }
   // Run the brain function on load
