@@ -3,7 +3,14 @@
 import React, { useState } from 'react';
 import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { STACKS_TESTNET } from '@stacks/network';
-import { AnchorMode, PostConditionMode } from '@stacks/transactions';
+import { AnchorMode } from '@stacks/transactions';
+import { 
+  uintCV, 
+  principalCV,
+  contractPrincipalCV,
+  PostConditionMode, 
+  Pc 
+} from '@stacks/transactions';
 
 // 1. INITIALIZE NATIVE STACKS SESSION
 const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -31,6 +38,8 @@ export const ClaimButton = () => {
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME;
+    const sbtcAddress = process.env.NEXT_PUBLIC_SBTC_ADDRESS || 'ST1HTBVD3S9CXY9G368MGP5W7PLWSABKH6GZMZEZ';
+  const sbtcName = process.env.NEXT_PUBLIC_SBTC_NAME || 'sbtc-token';
 
     if (!contractAddress || !contractName) {
       notify("Configuration Error", "error");
@@ -48,7 +57,7 @@ export const ClaimButton = () => {
         contractAddress: contractAddress,
         contractName: contractName,
         functionName: 'claim-rewards', 
-        functionArgs: [], 
+        functionArgs: [ contractPrincipalCV(sbtcAddress, sbtcName) ],
         postConditionMode: PostConditionMode.Allow,
         
         appDetails: {
