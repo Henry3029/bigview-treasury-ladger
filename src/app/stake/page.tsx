@@ -5,7 +5,6 @@ import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { 
   uintCV, 
   principalCV,
-  contractPrincipalCV,
   PostConditionMode, 
   Pc 
 } from '@stacks/transactions';
@@ -58,16 +57,8 @@ export default function StakePage() {
       const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS || 'ST000000000000000000002AMW42H';
       const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME || 'pox-4';
       
-      // 3. DEFINE debugArgs BEFORE USING IT
-      const debugArgs = {
-        amount: microStacks.toString(),
-        poxAddress: poxAddress,
-        poxName: poxName,
-        contract: process.env.NEXT_PUBLIC_CONTRACT_NAME || 'Not Found'
-      };
-      
-      // 4. NOW the alert will work!
-      alert("DEBUG DATA: " + JSON.stringify(debugArgs, null, 2));
+      // 2. Join them with a dot using `${variable1}.${variable2}`
+const fullPoxPrincipal = `${poxAddress}.${poxName}`;
       
       // 5. Setup Post-Condition
       const postCondition = Pc.principal(userAddress)
@@ -82,7 +73,7 @@ export default function StakePage() {
         functionName: 'stake-and-delegate',
         functionArgs: [
           uintCV(microStacks), 
-          contractPrincipalCV(poxAddress, poxName) 
+          principalCV(fullPoxPrincipal)
         ],
         // Set to Allow temporarily to ensure the "Incorrect Argument" error goes away
         postConditionMode: PostConditionMode.Allow, 
