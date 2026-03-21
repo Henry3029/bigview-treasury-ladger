@@ -5,7 +5,7 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait sip-010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 (use-trait pox-trait 'SP000000000000000000002Q6VF78.pox-4.pox-trait)
 (use-trait bvw-trait .sip-010-trait-v2.sip-010-trait) 
 
@@ -82,7 +82,7 @@
   )
 )
 
-(define-public (claim-rewards (sbtc-token <ft-trait>)) ;; Using your trait name 'ft-trait'
+(define-public (claim-rewards (sbtc-token <sip-010-trait>))
   (let (
     (user tx-sender)
     (user-stake (get-user-stake user))
@@ -128,7 +128,8 @@
     (var-set major-pool-address new-pool)
     ;; Crucial: The contract must explicitly allow the pool to lock its funds
     (asserts! 
-          (is-ok (as-contract (contract-call? 'ST000000000000000000002AMW42H.pox-4 allow-contract-caller new-pool none)))
+          ;; Better version of the allow-contract-caller line:
+(is-ok (as-contract (contract-call? pox-trait-arg allow-contract-caller new-pool none)))
                 (err u500) ;; Error code for 'Failed to lock pool'
                     )
     (ok true)

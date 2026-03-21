@@ -1,8 +1,7 @@
 ;; @version 2
 ;; BigView Token (BVW) - SIP-010 Compliant
 
-;; Use the new -v2 name from your TOML
-(impl-trait .sip-010-trait-v2.sip-010-trait)
+(impl-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
 
 ;; ---------------------------------------------------------
 ;; Constants & Variables
