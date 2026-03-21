@@ -5,30 +5,24 @@ authors = ['Henry Goodluck Chigozie']
 telemetry = true
 cache_dir = './.clarinet'
 
-# 1. The Traits (No dependencies)
-[contracts.sip-010-trait-v2]
-path = 'contracts/sip-010-trait-v2.clar'
-clarity_version = 2
-epoch = '2.5'
-
-[contracts.pox-trait-v2]
-path = 'contracts/pox-trait-v2.clar'
-clarity_version = 2
-epoch = '2.5'
-
-# 2. Your Token (Depends on the SIP-010 trait)
+# 2. Your Token (Now depends on the remote requirement)
 [contracts.bigview-token]
 path = 'contracts/bigview-token.clar'
 clarity_version = 2
 epoch = '2.5'
-depends_on = ['sip-010-trait-v2']
+depends_on = [] # Removed local dependency
 
-# 3. The Treasury (Depends on everything)
-[contracts.bigview-treasury-v7]
-path = 'contracts/bigview-treasury-v7.clar'
+# 3. The Treasury (Depends on the others)
+[contracts.bigview-treasury-v8]
+path = 'contracts/bigview-treasury-v8.clar'
 clarity_version = 2
 epoch = '2.5'
-depends_on = ['sip-010-trait-v2', 'pox-trait-v2', 'bigview-token']
+depends_on = ['bigview-token']
+
+# 4. ADD THIS NEW SECTION
+[requirements]
+[[requirements.contracts]]
+source = "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard"
 
 [repl.analysis]
 passes = ['call_checker', 'check_checker']

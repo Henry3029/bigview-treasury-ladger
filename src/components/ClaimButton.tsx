@@ -38,7 +38,7 @@ export const ClaimButton = () => {
 
     const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
     const contractName = process.env.NEXT_PUBLIC_CONTRACT_NAME;
-    const sbtcAddress = process.env.NEXT_PUBLIC_SBTC_ADDRESS || 'ST1HTBVD3S9CXY9G368MGP5W7PLWSABKH6GZMZEZ';
+    const sbtcAddress = process.env.NEXT_PUBLIC_SBTC_ADDRESS || 'SM3VDXK3WZZSA84XXFKAFAF15NNZX32CTSG82JFQ4';
   const sbtcName = process.env.NEXT_PUBLIC_SBTC_NAME || 'sbtc-token';
 
     if (!contractAddress || !contractName) {
@@ -57,8 +57,9 @@ export const ClaimButton = () => {
         contractAddress: contractAddress,
         contractName: contractName,
         functionName: 'claim-rewards', 
-        functionArgs: [ contractPrincipalCV(sbtcAddress, sbtcName) ],
-        postConditionMode: PostConditionMode.Allow,
+        functionArgs: [ contractPrincipalCV(sbtcAddress, sbtcName)
+ ],
+        postConditionMode: PostConditionMode.Deny,
         
         appDetails: {
           name: 'Bigview Treasury',

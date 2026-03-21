@@ -5,6 +5,7 @@ import { openContractCall, UserSession, AppConfig } from '@stacks/connect';
 import { 
   uintCV, 
   principalCV,
+  contractPrincipalCV,
   PostConditionMode, 
   Pc 
 } from '@stacks/transactions';
@@ -54,11 +55,8 @@ export default function StakePage() {
       const microStacks = BigInt(Math.floor(Number(amount) * 1000000));
       
       // 2. Get PoX details from Env (with manual fallbacks for safety)
-      const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS || 'ST000000000000000000002AMW42H';
+      const poxAddress = process.env.NEXT_PUBLIC_POX_CONTRACT_ADDRESS || 'ST000000000000000000002Q6VF78';
       const poxName = process.env.NEXT_PUBLIC_POX_CONTRACT_NAME || 'pox-4';
-      
-      // 2. Join them with a dot using `${variable1}.${variable2}`
-const fullPoxPrincipal = `${poxAddress}.${poxName}`;
       
       // 5. Setup Post-Condition
       const postCondition = Pc.principal(userAddress)
@@ -73,14 +71,14 @@ const fullPoxPrincipal = `${poxAddress}.${poxName}`;
         functionName: 'stake-and-delegate',
         functionArgs: [
           uintCV(microStacks), 
-          principalCV(fullPoxPrincipal)
+          contractPrincipalCV(poxAddress, poxName)
         ],
         // Set to Allow temporarily to ensure the "Incorrect Argument" error goes away
-        postConditionMode: PostConditionMode.Allow, 
-        postConditions: [], 
+        postConditionMode: PostConditionMode.Deny, 
+        postConditions: [postCondition],
         appDetails: {
           name: 'Bigview Treasury',
-          icon: window.location.origin + '/logo.png',
+          icon: window.location.origin + '/bigview-image.png',
         },
         onFinish: (data) => {
           setIsLoading(false);

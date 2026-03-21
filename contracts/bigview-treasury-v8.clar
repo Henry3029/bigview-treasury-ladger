@@ -5,8 +5,8 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait sip-010-trait .sip-010-trait-v2.sip-010-trait)
-(use-trait pox-trait .pox-trait-v2.pox-trait)
+(use-trait ft-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
+(use-trait pox-trait 'SP000000000000000000002Q6VF78.pox-4.pox-trait)
 (use-trait bvw-trait .sip-010-trait-v2.sip-010-trait) 
 
 ;; ---------------------------------------------------------
@@ -82,12 +82,12 @@
   )
 )
 
-(define-public (claim-rewards (sbtc-token <sip-010-trait>))
+(define-public (claim-rewards (sbtc-token <ft-trait>)) ;; Using your trait name 'ft-trait'
   (let (
     (user tx-sender)
     (user-stake (get-user-stake user))
     (total-pool-stake (var-get total-staked-amount))
-    ;; Fetching balance of THIS contract
+    ;; 1. Get balance of the Treasury Contract
     (contract-sbtc-balance (unwrap! (contract-call? sbtc-token get-balance (as-contract tx-sender)) (err u500)))
   )
     (begin
@@ -100,9 +100,10 @@
         (dev-fee (/ (* total-user-reward u5) u100)) ;; 5% fee
         (final-user-reward (- total-user-reward dev-fee))
       )
-        ;; Step 4: Transfer Rewards
-        (try! (as-contract (contract-call? sbtc-token transfer dev-fee (as-contract tx-sender) (var-get dev-wallet) none)))
-        (try! (as-contract (contract-call? sbtc-token transfer final-user-reward (as-contract tx-sender) user none)))
+        ;; Step 4: Transfer Rewards using 'as-contract' to sign for the Treasury
+        (try! (as-contract (contract-call? sbtc-token transfer dev-fee tx-sender (var-get dev-wallet) none)))
+        (try! (as-contract (contract-call? sbtc-token transfer final-user-reward tx-sender user none)))
+        
         (ok {reward: final-user-reward, fee: dev-fee})
       )
     )
