@@ -5,24 +5,36 @@ authors = ['Henry Goodluck Chigozie']
 telemetry = true
 cache_dir = './.clarinet'
 
-# 2. Your Token (Now depends on the remote requirement)
+[[project.requirements]]
+contract_id = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard'
+
+[[project.requirements]]
+contract_id = 'SP000000000000000000002Q6VF78.pox-4'
 [contracts.bigview-token]
 path = 'contracts/bigview-token.clar'
 clarity_version = 2
 epoch = '2.5'
-depends_on = [] # Removed local dependency
 
-# 3. The Treasury (Depends on the others)
 [contracts.bigview-treasury-v8]
 path = 'contracts/bigview-treasury-v8.clar'
 clarity_version = 2
 epoch = '2.5'
-depends_on = ['bigview-token']
-
-# 4. ADD THIS NEW SECTION
-[requirements]
-[[requirements.contracts]]
-source = "SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard"
-
 [repl.analysis]
-passes = ['call_checker', 'check_checker']
+passes = [
+    'call_checker',
+    'check_checker',
+]
+
+[repl.analysis.lint_groups]
+
+[repl.analysis.lints]
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
