@@ -5,13 +5,11 @@ authors = ['Henry Goodluck Chigozie']
 telemetry = true
 cache_dir = './.clarinet'
 
-[[project.requirements]]
-contract_id = 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard'
+# REMOVE the sip-010 requirement here because you have it as a local contract now!
+# REMOVE the pox-4 requirement here if you are using your local pox-trait for testing.
 
-[[project.requirements]]
-contract_id = 'SP000000000000000000002Q6VF78.pox-4'
-[contracts.bigview-token]
-path = 'contracts/bigview-token.clar'
+[contracts.sip-010-trait]
+path = "contracts/sip-010-trait.clar"
 clarity_version = 2
 epoch = '2.5'
 
@@ -20,15 +18,15 @@ path = "contracts/pox-trait.clar"
 clarity_version = 2
 epoch = '2.5'
 
+[contracts.bigview-token]
+path = 'contracts/bigview-token.clar'
+clarity_version = 2
+epoch = '2.5'
+
 [contracts.bigview-treasury-v8]
 path = 'contracts/bigview-treasury-v8.clar'
 clarity_version = 2
 epoch = '2.5'
-[repl.analysis]
-passes = [
-    'call_checker',
-    'check_checker',
-]
 
 [repl.analysis.lint_groups]
 

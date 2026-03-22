@@ -1,0 +1,11 @@
+{
+  "name": "BigView",
+  "symbol": "BVW",
+  "decimals": 6,
+  "description": "The official utility and reward token for the BigView decentralized ecosystem.",
+  "image": "https://your-website.com/logo.png",
+  "properties": {
+    "website": "https://bigview.com",
+    "twitter": "@BigviewTV"
+  }
+}
