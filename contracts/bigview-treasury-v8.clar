@@ -7,7 +7,7 @@
 ;; Traits
 ;; ---------------------------------------------------------
 (use-trait sip-010-trait 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.sip-010-trait-ft-standard.sip-010-trait)
-(use-trait pox-trait .pox-4.pox-4-trait)
+(use-trait pox-trait .pox-trait.pox-trait)
 (use-trait bvw-trait .sip-010-trait-v2.sip-010-trait)
 
 ;; ---------------------------------------------------------
