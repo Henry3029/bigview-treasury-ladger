@@ -6,7 +6,6 @@
 ;; ---------------------------------------------------------
 ;; Traits
 ;; ---------------------------------------------------------
-(use-trait sip-010-trait .sip-010-trait.sip-010-trait)
 (impl-trait .sip-010-trait.sip-010-trait)
 (use-trait pox-trait .pox-trait.pox-trait)
 (use-trait bvw-trait .sip-010-trait.sip-010-trait)
@@ -68,7 +67,7 @@
       
       ;; Step 2: Delegate to Pool (Using as-contract to act on behalf of the treasury)
       ;; NOTE: The 'pox-trait-arg' MUST be the official pox-4 contract address
-      (try! (as-contract (contract-call? pox-trait-arg delegate-stx amount (var-get major-pool-address) none none)))
+      (try! (as-contract (contract-call? pox-trait-arg delegate-stx amount (var-get major-pool-address) none none none)))
       
       ;; Step 3: Updates
       (if (is-none (map-get? members { account: user }))
