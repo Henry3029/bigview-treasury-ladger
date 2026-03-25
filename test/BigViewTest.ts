@@ -1,43 +1,44 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { BigViewTreasury, BigViewToken } from "../typechain-types"; // Generated automatically
+import pkg from "hardhat";
+const { ethers } = pkg;
 
+// We use 'any' temporarily to avoid TypeChain path errors on mobile
 describe("BigView Treasury Production Suite", function () {
-  let treasury: BigViewTreasury;
-  let token: BigViewToken;
+  let treasury: any;
+  let token: any;
   let deployer: any;
   let alice: any;
   let bob: any;
 
   beforeEach(async function () {
-    // 1. Get Accounts (Equivalent to simnet.getAccounts)
+    // 1. Get Accounts
     [deployer, alice, bob] = await ethers.getSigners();
 
     // 2. Deploy Token
     const TokenFactory = await ethers.getContractFactory("BigViewToken");
     token = await TokenFactory.deploy();
 
-    // 3. Deploy Treasury (Equivalent to Clarinet's automatic deployment)
+    // 3. Deploy Treasury
     const TreasuryFactory = await ethers.getContractFactory("BigViewTreasury");
-    treasury = await TreasuryFactory.deploy(bob.address); // Pass bob as the initial pool
+    // We pass bob's address as the initial pool argument for the constructor
+    treasury = await TreasuryFactory.deploy(bob.address);
   });
 
   it("STAKING: Should allow Alice to stake and update global stats", async function () {
-    const stakeAmount = ethers.parseEther("1.0"); // 1 ETH
+    const stakeAmount = ethers.parseEther("1.0");
 
-    // Alice stakes 1 ETH
+    // We check for the 'Staked' event which is in the Solidity code I gave you
     await expect(treasury.connect(alice).stakeAndDelegate({ value: stakeAmount }))
-      .to.emit(treasury, "Transfer") // Optional: if you add events
-      .to.not.be.reverted;
+      .to.emit(treasury, "Staked")
+      .withArgs(alice.address, stakeAmount);
 
     expect(await treasury.totalStakedAmount()).to.equal(stakeAmount);
   });
 
-  it("SECURITY: Should block Alice from setting the major pool (Error 403 equivalent)", async function () {
-    // Only the devWallet (deployer) can do this. Alice should fail.
+  it("SECURITY: Should block Alice from setting the major pool", async function () {
+    // Alice tries to call a function meant for the devWallet (deployer)
     await expect(
       treasury.connect(alice).setMajorPool(bob.address)
-    ).to.be.revertedWithCustomError(treasury, "NotAuthorized"); 
-    // ^ Matches the "error NotAuthorized()" we put in your Solidity code
+    ).to.be.revertedWithCustomError(treasury, "NotAuthorized");
   });
 });
