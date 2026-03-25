@@ -1,0 +1,19 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+      "./src/**/*.{js,ts,jsx,tsx,mdx}", // 👈 This is the missing line!
+          "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+              "./components/**/*.{js,ts,jsx,tsx,mdx}",
+              "./styles/**/*.css",
+                  "./app/**/*.{js,ts,jsx,tsx,mdx}",
+                    ],
+                      theme: {
+                          extend: {
+                                colors: {
+                                        bankBlue: "#002D72",
+                                                bankGold: "#D4AF37",
+                                                      },
+                                                          },
+                                                            },
+                                                              plugins: [],
+                                                              } 
