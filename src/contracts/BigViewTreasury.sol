@@ -5,18 +5,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./BigViewToken.sol";
 
-/**
- * @title BigView Treasury (Governance & Reward Edition)
- */
 contract BigViewTreasury is ReentrancyGuard {
     // --- State Variables ---
-    BigViewToken public bvwToken;
+    BigViewToken public immutable rewardToken; // Matches our 'rewardToken' declaration
     address public devWallet;
     address public majorPoolAddress;
     
     uint256 public totalMembersCount;
     uint256 public totalStakedAmount;
-    uint256 public rewardRate = 10; // 10 BVW per 1 ETH (Scarce & Strong)
+    uint256 public rewardRate = 10; // 10 BVW per 1 ETH
 
     struct Member {
         bool isMember;
@@ -31,8 +28,9 @@ contract BigViewTreasury is ReentrancyGuard {
     error TransferFailed();
     error InvalidAmount();
 
+    // UPDATED: Standardized variable names
     constructor(address _tokenAddress, address _majorPool) {
-        bvwToken = BigViewToken(_tokenAddress);
+        rewardToken = BigViewToken(_tokenAddress); 
         devWallet = msg.sender;
         majorPoolAddress = _majorPool;
     }
@@ -52,13 +50,11 @@ contract BigViewTreasury is ReentrancyGuard {
         members[msg.sender].amount += msg.value;
         totalStakedAmount += msg.value;
 
-        // 2. GOVERNANCE: Mint BVW "Sidekick" tokens to the staker
-        // This gives them voting power in the DAO
+        // 2. GOVERNANCE: Minting the "Sidekick" tokens
         uint256 bvwToMint = msg.value * rewardRate;
-        bvwToken.mint(msg.sender, bvwToMint);
+        rewardToken.mint(msg.sender, bvwToMint); // Uses 'rewardToken'
 
-        // 3. INTERACTIONS: Send ETH to the Major Pool for investment
-        // We send 90% and keep 10% in treasury for immediate claims/liquidity
+        // 3. INTERACTIONS: 90/10 Split
         uint256 poolShare = (msg.value * 90) / 100;
         (bool success, ) = majorPoolAddress.call{value: poolShare}("");
         if (!success) revert TransferFailed();
@@ -71,16 +67,15 @@ contract BigViewTreasury is ReentrancyGuard {
         uint256 userStake = members[msg.sender].amount;
         if (userStake == 0 || totalStakedAmount == 0) revert NoStake();
 
-        IERC20 rewardToken = IERC20(_tokenAddress);
-        uint256 contractBalance = rewardToken.balanceOf(address(this));
+        IERC20 externalRewardToken = IERC20(_tokenAddress);
+        uint256 contractBalance = externalRewardToken.balanceOf(address(this));
 
-        // Logic: (My Stake / Total Staked) * Total Rewards in Treasury
         uint256 totalUserReward = (userStake * contractBalance) / totalStakedAmount;
         uint256 devFee = (totalUserReward * 5) / 100;
         uint256 finalUserReward = totalUserReward - devFee;
 
-        bool feeSent = rewardToken.transfer(devWallet, devFee);
-        bool rewardSent = rewardToken.transfer(msg.sender, finalUserReward);
+        bool feeSent = externalRewardToken.transfer(devWallet, devFee);
+        bool rewardSent = externalRewardToken.transfer(msg.sender, finalUserReward);
         
         if (!feeSent || !rewardSent) revert TransferFailed();
     }

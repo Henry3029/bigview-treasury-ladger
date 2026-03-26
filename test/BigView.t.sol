@@ -20,9 +20,11 @@ contract BigViewTest is Test {
         token = new BigViewToken();
         
         // 2. Deploy Treasury (Needs Token address and Major Pool address)
+        // Note: Constructor order is (token, pool)
         treasury = new BigViewTreasury(address(token), bob);
 
         // 3. AUTHORIZE Treasury to mint BVW tokens
+        // Make sure your BigViewToken.sol has the 'addMinter' function!
         token.addMinter(address(treasury));
         vm.stopPrank();
     }
@@ -30,7 +32,8 @@ contract BigViewTest is Test {
     // --- METADATA & SETUP ---
     function test_Metadata() public view {
         assertEq(token.name(), "BigView");
-        assertEq(address(treasury.bvwToken()), address(token));
+        // FIXED: Changed bvwToken() to rewardToken() to match your Treasury contract
+        assertEq(address(treasury.rewardToken()), address(token));
     }
 
     // --- STAKING & MINTING (The "Strong Token" Logic) ---
@@ -50,7 +53,8 @@ contract BigViewTest is Test {
     // --- GOVERNANCE & SECURITY ---
     function test_Security_AliceCannotChangePool() public {
         vm.prank(alice);
-        vm.expectRevert(NotAuthorized.selector);
+        // Explicitly check the error from the Treasury contract
+        vm.expectRevert(BigViewTreasury.NotAuthorized.selector);
         treasury.setMajorPool(alice);
     }
 
@@ -65,5 +69,23 @@ contract BigViewTest is Test {
         hoax(alice, 1 ether);
         vm.expectRevert(BigViewTreasury.InvalidAmount.selector);
         treasury.stakeAndDelegate{value: 0}();
+    }
+    
+    // --- FINANCIAL LOGIC (The 90/10 Split) ---
+    function test_Staking_Split_90_10() public {
+        uint256 stakeAmount = 1 ether;
+        uint256 expectedPoolShare = (stakeAmount * 90) / 100; // 0.9 ETH
+        uint256 expectedTreasuryShare = (stakeAmount * 10) / 100; // 0.1 ETH
+
+        uint256 bobBalanceBefore = address(bob).balance;
+
+        hoax(alice, 2 ether);
+        treasury.stakeAndDelegate{value: stakeAmount}();
+
+        // 1. Check if Bob (Major Pool) got 0.9 ETH
+        assertEq(address(bob).balance, bobBalanceBefore + expectedPoolShare);
+
+        // 2. Check if the Treasury contract kept 0.1 ETH
+        assertEq(address(treasury).balance, expectedTreasuryShare);
     }
 }
