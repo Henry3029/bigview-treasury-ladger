@@ -15,12 +15,16 @@ contract BigViewTest is Test {
 
     function setUp() public {
         vm.startPrank(dev);
+        
+        // 1. Deploy Token
         token = new BigViewToken();
-        // Updated constructor order: (token, pool)
+        
+        // 2. Deploy Treasury (tokenAddress, poolAddress)
         treasury = new BigViewTreasury(address(token), bob);
         
-        // Ensure Treasury has permission to mint
-        token.transferOwnership(address(treasury));
+        // 3. THE FIX: Add the treasury to the isMinter mapping
+        token.addMinter(address(treasury));
+        
         vm.stopPrank();
     }
 
@@ -30,7 +34,7 @@ contract BigViewTest is Test {
         assertEq(address(treasury.rewardToken()), address(token));
     }
 
-    // --- NEW BATCHING LOGIC TESTS ---
+    // --- BATCHING LOGIC TESTS ---
 
     function test_Staking_AccumulatesRewards() public {
         uint256 stakeAmount = 1 ether;
@@ -39,10 +43,10 @@ contract BigViewTest is Test {
         hoax(alice, 2 ether);
         treasury.stakeAndDelegate{value: stakeAmount}();
 
-        // 1. Alice's wallet balance should still be 0 (Batching is working!)
+        // Alice's wallet balance should still be 0 (Batching)
         assertEq(token.balanceOf(alice), 0);
 
-        // 2. Check if the Treasury "notebook" recorded her reward
+        // Check the Treasury "notebook" (Member struct)
         (,,uint256 unclaimed) = treasury.members(alice);
         assertEq(unclaimed, expectedReward);
     }
@@ -51,18 +55,17 @@ contract BigViewTest is Test {
         uint256 stakeAmount = 1 ether;
         uint256 expectedReward = stakeAmount * treasury.rewardRate();
 
-        // Alice stakes
         hoax(alice, 2 ether);
         treasury.stakeAndDelegate{value: stakeAmount}();
 
-        // Alice claims
+        // Alice claims her batch
         vm.prank(alice);
         treasury.claimGovernanceRewards();
 
-        // 3. Now Alice should have her tokens
+        // Now Alice should have her tokens
         assertEq(token.balanceOf(alice), expectedReward);
         
-        // 4. Unclaimed balance should be reset to 0
+        // Unclaimed balance should be reset to 0
         (,,uint256 unclaimedAfter) = treasury.members(alice);
         assertEq(unclaimedAfter, 0);
     }
@@ -73,6 +76,14 @@ contract BigViewTest is Test {
         vm.prank(alice);
         vm.expectRevert(BigViewTreasury.NotAuthorized.selector);
         treasury.setMajorPool(alice);
+    }
+
+    function test_Security_AliceCannotMint() public {
+        vm.startPrank(alice);
+        // Alice tries to bypass the Treasury to mint directly
+        vm.expectRevert("Not authorized to mint");
+        token.mint(alice, 1000000 ether);
+        vm.stopPrank();
     }
 
     function test_Revert_OnZeroStake() public {
@@ -101,19 +112,5 @@ contract BigViewTest is Test {
 
         assertEq(address(bob).balance, bobBalanceBefore + expectedPoolShare);
         assertEq(address(treasury).balance, expectedTreasuryShare);
-    }
-    
-    // --- SECURITY: ANTI-HACKER TEST ---
-    
-    function test_Security_AliceCannotMint() public {
-        // 1. Switch to Alice's perspective
-        vm.startPrank(alice);
-        
-        // 2. Alice tries to mint 1,000,000 BVW tokens to herself
-        // This SHOULD fail because she is not in the isMinter mapping
-        vm.expectRevert("Not authorized to mint");
-        token.mint(alice, 1000000 ether);
-        
-        vm.stopPrank();
     }
 }
