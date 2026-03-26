@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import pkg from "hardhat";
-const { ethers } = pkg;
+import hre from "hardhat";
+const { ethers } = hre;
 
 // We use 'any' temporarily to avoid TypeChain path errors on mobile
 describe("BigView Treasury Production Suite", function () {
