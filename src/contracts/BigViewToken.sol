@@ -2,42 +2,30 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/** .
- * @title BigView Token (BVW)
- * @dev SIP-010 equivalent in Solidity (ERC-20)
- */
-contract BigViewToken is ERC20, Ownable {
-    
-    // In Clarity, you defined decimals in a read-only function.
-    // In Solidity, we pass name and symbol to the constructor.
-    constructor() ERC20("BigView", "BVW") Ownable(msg.sender) {
-        // Initial mint to the contract deployer (Henry Goodluck Chigozie)
-        _mint(msg.sender, 1000000 * 10**decimals());
+contract BigViewToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
+    mapping(address => bool) public isMinter;
+
+    constructor() ERC20("BigView", "BVW") ERC20Permit("BigView") Ownable(msg.sender) {}
+
+    function addMinter(address _minter) external onlyOwner {
+        isMinter[_minter] = true;
     }
 
-    /**
-     * @dev Equivalent to your (mint ...) function.
-     * Only the owner (Henry) can call this.
-     */
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) external {
+        require(isMinter[msg.sender], "Not authorized to mint");
         _mint(to, amount);
     }
 
-    /**
-     * @dev In Solidity, decimals is usually 18 by default.
-     * To match your Clarity contract (u6), we override it here.
-     */
-    function decimals() public view virtual override returns (uint8) {
-        return 6;
+    // The following functions are overrides required by Solidity for ERC20Votes
+    function _update(address from, address to, uint256 value) internal override(ERC20, ERC20Votes) {
+        super._update(from, to, value);
     }
 
-    /** a
-     * @dev Equivalent to get-token-uri. 
-     * In Solidity, this is often handled by a baseURI or metadata standard.
-     */
-    function tokenURI() public pure returns (string memory) {
-        return "ipfs://Qme7ss3ARVgxv6rXqVPiURzNFo5S/bigview.json";
+    function nonces(address owner) public view override(ERC20Permit, Nonces) returns (uint256) {
+        return super.nonces(owner);
     }
 }
