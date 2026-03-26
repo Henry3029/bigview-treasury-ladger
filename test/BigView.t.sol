@@ -102,4 +102,18 @@ contract BigViewTest is Test {
         assertEq(address(bob).balance, bobBalanceBefore + expectedPoolShare);
         assertEq(address(treasury).balance, expectedTreasuryShare);
     }
+    
+    // --- SECURITY: ANTI-HACKER TEST ---
+    
+    function test_Security_AliceCannotMint() public {
+        // 1. Switch to Alice's perspective
+        vm.startPrank(alice);
+        
+        // 2. Alice tries to mint 1,000,000 BVW tokens to herself
+        // This SHOULD fail because she is not in the isMinter mapping
+        vm.expectRevert("Not authorized to mint");
+        token.mint(alice, 1000000 ether);
+        
+        vm.stopPrank();
+    }
 }
