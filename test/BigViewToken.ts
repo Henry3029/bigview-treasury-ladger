@@ -1,8 +1,13 @@
 import { expect } from "chai";
-import pkg from "hardhat";
-const { ethers } = pkg;
+import hre from "hardhat";
 
 describe("BigView Token (BVW) Suite", function () {
+  let ethers: any;
+
+  before(async function() {
+    ethers = hre.ethers;
+  });
+
   async function deployTokenFixture() {
     const [owner, alice, bob] = await ethers.getSigners();
     const Token = await ethers.getContractFactory("BigViewToken");
@@ -18,8 +23,10 @@ describe("BigView Token (BVW) Suite", function () {
 
   it("MINTING: Should allow the owner to mint new tokens", async function () {
     const { token, owner, alice } = await deployTokenFixture();
-    const mintAmount = ethers.parseUnits("100", 18); // Check if your .sol uses 18 or 6!
-    await token.mint(alice.address, mintAmount);
+    const mintAmount = ethers.parseUnits("100", 18); 
+    
+    // Explicitly connect owner to ensure minting permissions
+    await token.connect(owner).mint(alice.address, mintAmount);
     expect(await token.balanceOf(alice.address)).to.equal(mintAmount);
   });
 });
