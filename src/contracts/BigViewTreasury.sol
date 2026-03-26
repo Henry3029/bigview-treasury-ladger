@@ -7,7 +7,7 @@ import "./BigViewToken.sol";
 
 contract BigViewTreasury is ReentrancyGuard {
     // --- State Variables ---
-    BigViewToken public immutable rewardToken; // Matches our 'rewardToken' declaration
+    BigViewToken public immutable rewardToken;
     address public devWallet;
     address public majorPoolAddress;
     
@@ -18,6 +18,7 @@ contract BigViewTreasury is ReentrancyGuard {
     struct Member {
         bool isMember;
         uint256 amount;
+        uint256 unclaimedBVW; // BATCHING: Stores rewards until claimed
     }
 
     mapping(address => Member) public members;
@@ -27,8 +28,8 @@ contract BigViewTreasury is ReentrancyGuard {
     error NoStake();
     error TransferFailed();
     error InvalidAmount();
+    error NothingToClaim();
 
-    // UPDATED: Standardized variable names
     constructor(address _tokenAddress, address _majorPool) {
         rewardToken = BigViewToken(_tokenAddress); 
         devWallet = msg.sender;
@@ -36,46 +37,63 @@ contract BigViewTreasury is ReentrancyGuard {
     }
 
     /**
-     * @notice Stakes ETH, sends 90% to Pool, and MINTS Governance Tokens
+     * @notice Stakes ETH and records rewards for later claiming (Batching)
      */
     function stakeAndDelegate() external payable nonReentrant {
         if (msg.value == 0) revert InvalidAmount();
 
-        // 1. EFFECTS
+        // 1. Update Membership
         if (!members[msg.sender].isMember) {
             members[msg.sender].isMember = true;
             totalMembersCount += 1;
         }
         
+        // 2. Calculate and Store Rewards (Instead of minting immediately)
+        uint256 bvwToEarn = msg.value * rewardRate;
+        members[msg.sender].unclaimedBVW += bvwToEarn;
+        
         members[msg.sender].amount += msg.value;
         totalStakedAmount += msg.value;
 
-        // 2. GOVERNANCE: Minting the "Sidekick" tokens
-        uint256 bvwToMint = msg.value * rewardRate;
-        rewardToken.mint(msg.sender, bvwToMint); // Uses 'rewardToken'
-
-        // 3. INTERACTIONS: 90/10 Split
+        // 3. Interactions: 90/10 Split
         uint256 poolShare = (msg.value * 90) / 100;
         (bool success, ) = majorPoolAddress.call{value: poolShare}("");
         if (!success) revert TransferFailed();
     }
 
     /**
-     * @notice Claim Real Yield (ETH or sBTC) based on your Stake %
+     * @notice Claim accumulated BVW Governance Tokens in one transaction
      */
-    function claimRewards(address _tokenAddress) external nonReentrant {
+    function claimGovernanceRewards() external nonReentrant {
+        uint256 amount = members[msg.sender].unclaimedBVW;
+        if (amount == 0) revert NothingToClaim();
+
+        // Reset before minting (Security: Anti-Reentrancy)
+        members[msg.sender].unclaimedBVW = 0;
+        
+        rewardToken.mint(msg.sender, amount);
+    }
+
+    /**
+     * @notice Claim External Rewards (sBTC/USDT) sent to the contract
+     */
+    function claimExternalYield(address _tokenAddress) external nonReentrant {
         uint256 userStake = members[msg.sender].amount;
         if (userStake == 0 || totalStakedAmount == 0) revert NoStake();
 
-        IERC20 externalRewardToken = IERC20(_tokenAddress);
-        uint256 contractBalance = externalRewardToken.balanceOf(address(this));
+        IERC20 externalToken = IERC20(_tokenAddress);
+        uint256 contractBalance = externalToken.balanceOf(address(this));
+        if (contractBalance == 0) revert NothingToClaim();
 
+        // Math: (User Stake * Total Rewards) / Total Protocol Stake
         uint256 totalUserReward = (userStake * contractBalance) / totalStakedAmount;
+        if (totalUserReward == 0) revert NothingToClaim();
+
         uint256 devFee = (totalUserReward * 5) / 100;
         uint256 finalUserReward = totalUserReward - devFee;
 
-        bool feeSent = externalRewardToken.transfer(devWallet, devFee);
-        bool rewardSent = externalRewardToken.transfer(msg.sender, finalUserReward);
+        bool feeSent = externalToken.transfer(devWallet, devFee);
+        bool rewardSent = externalToken.transfer(msg.sender, finalUserReward);
         
         if (!feeSent || !rewardSent) revert TransferFailed();
     }

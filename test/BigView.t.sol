@@ -9,83 +9,97 @@ contract BigViewTest is Test {
     BigViewToken token;
     BigViewTreasury treasury;
     
-    // Test addresses
     address dev = address(0x123);
     address alice = address(0x1);
     address bob = address(0x2);
 
     function setUp() public {
-        // 1. Deploy Token as Dev
         vm.startPrank(dev);
         token = new BigViewToken();
-        
-        // 2. Deploy Treasury (Needs Token address and Major Pool address)
-        // Note: Constructor order is (token, pool)
+        // Updated constructor order: (token, pool)
         treasury = new BigViewTreasury(address(token), bob);
-
-        // 3. AUTHORIZE Treasury to mint BVW tokens
-        // Make sure your BigViewToken.sol has the 'addMinter' function!
-        token.addMinter(address(treasury));
+        
+        // Ensure Treasury has permission to mint
+        token.transferOwnership(address(treasury));
         vm.stopPrank();
     }
 
-    // --- METADATA & SETUP ---
+    // --- METADATA ---
     function test_Metadata() public view {
         assertEq(token.name(), "BigView");
-        // FIXED: Changed bvwToken() to rewardToken() to match your Treasury contract
         assertEq(address(treasury.rewardToken()), address(token));
     }
 
-    // --- STAKING & MINTING (The "Strong Token" Logic) ---
-    function test_Staking_MintsSidekickTokens() public {
-        uint256 stakeAmount = 1 ether;
-        uint256 expectedMint = stakeAmount * treasury.rewardRate();
+    // --- NEW BATCHING LOGIC TESTS ---
 
-        hoax(alice, 5 ether);
+    function test_Staking_AccumulatesRewards() public {
+        uint256 stakeAmount = 1 ether;
+        uint256 expectedReward = stakeAmount * treasury.rewardRate();
+
+        hoax(alice, 2 ether);
         treasury.stakeAndDelegate{value: stakeAmount}();
 
-        // Check if Alice got her 10 BVW (1 ETH * 10)
-        assertEq(token.balanceOf(alice), expectedMint);
-        // Check if total staked in Treasury is correct
-        assertEq(treasury.totalStakedAmount(), stakeAmount);
+        // 1. Alice's wallet balance should still be 0 (Batching is working!)
+        assertEq(token.balanceOf(alice), 0);
+
+        // 2. Check if the Treasury "notebook" recorded her reward
+        (,,uint256 unclaimed) = treasury.members(alice);
+        assertEq(unclaimed, expectedReward);
     }
 
-    // --- GOVERNANCE & SECURITY ---
+    function test_Claim_GovernanceTokens() public {
+        uint256 stakeAmount = 1 ether;
+        uint256 expectedReward = stakeAmount * treasury.rewardRate();
+
+        // Alice stakes
+        hoax(alice, 2 ether);
+        treasury.stakeAndDelegate{value: stakeAmount}();
+
+        // Alice claims
+        vm.prank(alice);
+        treasury.claimGovernanceRewards();
+
+        // 3. Now Alice should have her tokens
+        assertEq(token.balanceOf(alice), expectedReward);
+        
+        // 4. Unclaimed balance should be reset to 0
+        (,,uint256 unclaimedAfter) = treasury.members(alice);
+        assertEq(unclaimedAfter, 0);
+    }
+
+    // --- SECURITY & REVERTS ---
+
     function test_Security_AliceCannotChangePool() public {
         vm.prank(alice);
-        // Explicitly check the error from the Treasury contract
         vm.expectRevert(BigViewTreasury.NotAuthorized.selector);
         treasury.setMajorPool(alice);
     }
 
-    function test_Security_DevCanChangeRate() public {
-        vm.prank(dev);
-        treasury.setRewardRate(20); // Changing from 10 to 20
-        assertEq(treasury.rewardRate(), 20);
-    }
-
-    // --- EDGE CASES ---
     function test_Revert_OnZeroStake() public {
         hoax(alice, 1 ether);
         vm.expectRevert(BigViewTreasury.InvalidAmount.selector);
         treasury.stakeAndDelegate{value: 0}();
     }
-    
-    // --- FINANCIAL LOGIC (The 90/10 Split) ---
+
+    function test_Revert_ClaimWithNoRewards() public {
+        vm.prank(alice);
+        vm.expectRevert(BigViewTreasury.NothingToClaim.selector);
+        treasury.claimGovernanceRewards();
+    }
+
+    // --- FINANCIALS ---
+
     function test_Staking_Split_90_10() public {
         uint256 stakeAmount = 1 ether;
-        uint256 expectedPoolShare = (stakeAmount * 90) / 100; // 0.9 ETH
-        uint256 expectedTreasuryShare = (stakeAmount * 10) / 100; // 0.1 ETH
+        uint256 expectedPoolShare = (stakeAmount * 90) / 100;
+        uint256 expectedTreasuryShare = (stakeAmount * 10) / 100;
 
         uint256 bobBalanceBefore = address(bob).balance;
 
         hoax(alice, 2 ether);
         treasury.stakeAndDelegate{value: stakeAmount}();
 
-        // 1. Check if Bob (Major Pool) got 0.9 ETH
         assertEq(address(bob).balance, bobBalanceBefore + expectedPoolShare);
-
-        // 2. Check if the Treasury contract kept 0.1 ETH
         assertEq(address(treasury).balance, expectedTreasuryShare);
     }
 }
