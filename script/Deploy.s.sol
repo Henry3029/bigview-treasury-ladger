@@ -12,7 +12,7 @@ contract DeployBigView is Script {
         
         // 2. Define the Major Pool (Bob's address or a multisig)
         // You can also move this to .env if you prefer
-        address majorPool = 0x_YOUR_MAJOR_POOL_ADDRESS_HERE; 
+        address majorPool = 0xa24112B301B9eb4475633523590DBd0e591D3C56;
 
         vm.startBroadcast(deployerPrivateKey);
 
