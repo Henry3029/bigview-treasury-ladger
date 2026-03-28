@@ -15,10 +15,10 @@ contract DeployBigView is Script {
         address majorPool = 0xa24112B301B9eb4475633523590DBd0e591D3C56;
 
         vm.startBroadcast(deployerPrivateKey);
-
-        // 3. Deploy BigView Token
-        BigViewToken token = new BigViewToken();
-        console.log("BigViewToken deployed at:", address(token));
+        
+        // 3. Use Existing BigView Token
+        BigViewToken token = BigViewToken(0xC7157e186F70a6Eac2E085B5579720CdABf51449);
+        console.log("Using existing Token at:", address(token));
 
         // 4. Deploy BigView Treasury
         BigViewTreasury treasury = new BigViewTreasury(address(token), majorPool);
