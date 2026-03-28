@@ -1,54 +1,42 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Loader2, Users, PieChart, TrendingUp } from 'lucide-react'; 
-import { fetchCallReadOnlyFunction, cvToJSON } from '@stacks/transactions';
-import { STACKS_TESTNET } from '@stacks/network';
-import { UserSession, AppConfig } from '@stacks/connect';
+import { useReadContracts } from 'wagmi';
+import { formatEther } from 'viem';
+import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
 
-// 1. INITIALIZE NATIVE STACKS SESSION
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
+export default function DashboardData() {
+  const [mounted, setMounted] = useState(false);
+  const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
 
-interface DashboardDataProps {
-  stake: string;
-}
-
-export default function DashboardData({ stake }: DashboardDataProps) {
-  const [summary, setSummary] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
+  // Hydration fix for Next.js
   useEffect(() => {
-    async function fetchSummary() {
-      // 2. CHECK SIGN-IN STATUS NATIVELY
-      if (!userSession.isUserSignedIn()) return;
-
-      const userData = userSession.loadUserData();
-      const address = userData.profile.stxAddress.testnet;
-
-      if (!address) return;
-
-      setIsLoading(true);
-      try {
-        const response = await fetchCallReadOnlyFunction({
-          network: STACKS_TESTNET,
-          contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS!,
-          contractName: process.env.NEXT_PUBLIC_CONTRACT_NAME!,
-          functionName: 'dashboard-summary',
-          functionArgs: [],
-          senderAddress: address, // Using native Stacks address
-        });
-        
-        setSummary(cvToJSON(response));
-        setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
-        console.error("Error fetching summary:", error);
-      }
-    }
-
-    fetchSummary();
+    setMounted(true);
   }, []);
+
+  // 1. Fetch Global Treasury Data
+  const { data, isLoading, isError } = useReadContracts({
+    contracts: [
+      {
+        address: treasuryAddress as `0x${string}`,
+        abi: treasuryAbi,
+        functionName: 'totalMembersCount',
+      },
+      {
+        address: treasuryAddress as `0x${string}`,
+        abi: treasuryAbi,
+        functionName: 'totalStakedAmount',
+      },
+      {
+        address: treasuryAddress as `0x${string}`,
+        abi: treasuryAbi,
+        functionName: 'rewardRate',
+      }
+    ],
+  });
+
+  if (!mounted) return null;
 
   // --- THE SPINNER LOGIC ---
   if (isLoading) {
@@ -60,7 +48,10 @@ export default function DashboardData({ stake }: DashboardDataProps) {
     );
   }
 
-  if (!summary) return null;
+  // Extract values from the results array safely
+  const totalMembers = data?.[0]?.result ? Number(data[0].result).toString() : "0";
+  const totalStaked = data?.[1]?.result ? formatEther(data[1].result as bigint) : "0";
+  const rate = data?.[2]?.result ? Number(data[2].result).toString() : "0";
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,7 +64,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
             <span className="text-[10px] uppercase font-black tracking-widest">Members</span>
           </div>
           <span className="text-2xl font-bold text-slate-900">
-            {summary?.value['total-members']?.value || "0"}
+            {totalMembers}
           </span>
         </div>
         
@@ -81,22 +72,22 @@ export default function DashboardData({ stake }: DashboardDataProps) {
         <div className="p-5 bg-blue-600 rounded-3xl shadow-lg flex flex-col gap-2 text-white">
           <div className="flex items-center gap-2 opacity-80">
             <TrendingUp size={14} />
-            <span className="text-[10px] uppercase font-black tracking-widest text-blue-100">Staked</span>
+            <span className="text-[10px] uppercase font-black tracking-widest text-blue-100">Global Stake</span>
           </div>
           <span className="text-2xl font-bold">
-            {summary?.value['total-stakes']?.value ? `${(parseInt(summary.value['total-stakes'].value) / 1000000).toLocaleString()}` : stake}
-            <span className="text-xs ml-1 opacity-70">STX</span>
+            {Number(totalStaked).toLocaleString()}
+            <span className="text-xs ml-1 opacity-70">ETH</span>
           </span>
         </div>
 
       </div>
 
-      {/* Rewards Overview */}
+      {/* Reward Rate Overview */}
       <div className="p-5 bg-slate-900 rounded-3xl shadow-sm flex items-center justify-between text-white">
         <div className="flex flex-col gap-1">
-          <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Total Rewards Paid</span>
+          <span className="text-[10px] uppercase font-black tracking-widest text-slate-400">Current Reward Rate</span>
           <span className="text-xl font-bold">
-            {summary?.value['total-rewards']?.value || "0"} <span className="text-xs text-orange-400">sBTC</span>
+            {rate} <span className="text-xs text-orange-400">BVW per 1 ETH</span>
           </span>
         </div>
         <PieChart className="text-slate-700" size={32} />

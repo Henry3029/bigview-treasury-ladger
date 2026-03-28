@@ -1,109 +1,106 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { UserSession, AppConfig } from '@stacks/connect';
-
-// 1. INITIALIZE NATIVE STACKS SESSION
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
+import { useAccount } from 'wagmi';
+import { ExternalLink, CheckCircle2, Clock, history as HistoryIcon } from 'lucide-react';
 
 interface HistoryItem {
   id: string;
   date: string;
-  amount: string;
+  type: string;
   status: string;
 }
 
 export const RewardHistory = () => {
+  const { address, isConnected } = useAccount();
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchUserHistory() {
-      // 2. NATIVE CHECK: Is the user connected to a Stacks wallet?
-      if (!userSession.isUserSignedIn()) {
+      if (!isConnected || !address) {
         setLoading(false);
         return;
       }
 
-      // Get the address directly from the Stacks profile
-      const userData = userSession.loadUserData();
-      const address = userData.profile.stxAddress.testnet;
-
-      if (!address) {
-        setLoading(false);
-        return;
-      }
+      const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS?.toLowerCase();
 
       try {
-        // Fetching real transaction data from the Testnet API
+        // Fetching real transaction data from Base Sepolia Testnet
+        // Note: You can also use Alchemy or Infura for this, but Basescan is standard.
         const res = await fetch(
-          `https://api.testnet.hiro.so/extended/v1/address/${address}/transactions?limit=5`
+          `https://api-sepolia.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${process.env.NEXT_PUBLIC_BASESCAN_API_KEY}`
         );
         const data = await res.json();
 
-        if (data.results) {
-          const formattedData = data.results.map((tx: any) => ({
-            id: tx.tx_id,
-            date: tx.burn_block_time 
-              ? new Date(tx.burn_block_time * 1000).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })
-              : 'Pending',
-            // Simplified check for display
-            amount: tx.tx_type === 'contract_call' ? 'Contract' : 'STX', 
-            status: tx.tx_status === 'success' ? 'Confirmed' : 'Pending',
-          }));
-          setHistory(formattedData);
+        if (data.status === "1" && data.result) {
+          // Filter transactions specifically interacting with your Treasury
+          const filtered = data.result
+            .filter((tx: any) => tx.to?.toLowerCase() === treasuryAddress)
+            .slice(0, 5) // Get latest 5
+            .map((tx: any) => ({
+              id: tx.hash,
+              date: new Date(parseInt(tx.timeStamp) * 1000).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+              }),
+              type: tx.functionName?.split('(')[0] || 'Transaction',
+              status: tx.isError === "0" ? 'Confirmed' : 'Failed',
+            }));
+          
+          setHistory(filtered);
         }
       } catch (err) {
-        console.error("Error fetching reward history:", err);
+        console.error("Error fetching Base history:", err);
       } finally {
         setLoading(false);
       }
     }
 
     fetchUserHistory();
-  }, []); // Run once on mount
+  }, [address, isConnected]);
 
   if (loading) return <div className="p-4 text-gray-400 animate-pulse text-sm font-medium">Syncing history...</div>;
   
   if (history.length === 0) return (
-    <div className="p-8 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-      <p className="text-gray-400 text-sm italic">No recent activity found on-chain.</p>
+    <div className="p-8 text-center bg-gray-50 rounded-[2rem] border border-dashed border-gray-200">
+      <p className="text-gray-400 text-sm italic">No recent treasury activity found.</p>
     </div>
   );
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-end px-1">
-        <h3 className="text-blue-950 font-bold text-lg">Recent Activity</h3>
-        <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">Live Data</span>
+      <div className="flex justify-between items-end px-1 mt-6">
+        <h3 className="text-slate-900 font-black text-xl italic tracking-tight">Recent Activity</h3>
+        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-lg">Base Sepolia</span>
       </div>
 
       {history.map((item) => (
-        <div key={item.id} className="bg-white p-4 rounded-3xl flex justify-between items-center shadow-sm border border-gray-100 hover:border-blue-100 transition-colors">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm ${
-              item.status === 'Confirmed' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
+        <div key={item.id} className="bg-white p-5 rounded-[2rem] flex justify-between items-center shadow-sm border border-slate-100 hover:border-blue-200 transition-all group">
+          <div className="flex items-center gap-4">
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+              item.status === 'Confirmed' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
             }`}>
-              {item.status === 'Confirmed' ? '✓' : '⧗'}
+              {item.status === 'Confirmed' ? <CheckCircle2 size={20} /> : <Clock size={20} />}
             </div>
             <div>
-              <p className="font-bold text-gray-900 leading-tight">{item.status}</p>
-              <p className="text-xs text-gray-400 font-medium">{item.date}</p>
+              <p className="font-bold text-slate-900 leading-tight capitalize">
+                {item.type.replace(/([A-Z])/g, ' $1').trim()}
+              </p>
+              <p className="text-xs text-slate-400 font-medium">{item.date}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="font-black text-gray-900">{item.amount}</p>
+            <p className={`text-xs font-bold mb-1 ${item.status === 'Confirmed' ? 'text-green-600' : 'text-red-500'}`}>
+              {item.status}
+            </p>
             <a 
-              href={`https://explorer.hiro.so/txid/${item.id}?chain=testnet`} 
+              href={`https://sepolia.basescan.org/tx/${item.id}`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[10px] text-blue-400 font-mono hover:underline"
+              className="flex items-center gap-1 text-[10px] text-blue-500 font-mono hover:underline justify-end"
             >
-              {item.id.substring(0, 6)}...
+              {item.id.substring(0, 6)}... <ExternalLink size={10} />
             </a>
           </div>
         </div>

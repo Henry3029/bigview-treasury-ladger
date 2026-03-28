@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { ExternalLink, CheckCircle2, AlertCircle, Info } from 'lucide-react';
 
 interface TreasuryTableProps {
   address: string | null;
@@ -30,23 +31,23 @@ export default function TreasuryTable({ address }: TreasuryTableProps) {
         return;
       }
 
+      const apiKey = process.env.NEXT_PUBLIC_BASESCAN_API_KEY;
+
       try {
-        // We don't necessarily need a notification for every fetch, 
-        // but it's good for the initial load!
+        // Fetching from Base Sepolia API
         const res = await fetch(
-          `https://api.testnet.hiro.so/extended/v1/address/${address}/transactions`,
+          `https://api-sepolia.basescan.org/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&sort=desc&apikey=${apiKey}`,
           { cache: 'no-store' }
         );
         const data = await res.json();
-        setTransactions(data.results || []);
         
-        if (data.results?.length > 0) {
-          notify("Transactions updated.", "success");
+        if (data.status === "1" && data.result) {
+          setTransactions(data.result.slice(0, 10) || []);
+          notify("Base transactions updated.", "success");
         }
       } catch (err) {
         console.error("Failed to fetch history", err);
-        // Fixed: Added the 'error' type here
-        notify("Could not connect to the Stacks API.", "error"); 
+        notify("Could not connect to the Base Explorer.", "error"); 
       } finally {
         setLoading(false);
       }
@@ -55,46 +56,56 @@ export default function TreasuryTable({ address }: TreasuryTableProps) {
     fetchHistory();
   }, [address]);
 
-  if (!address) return <div className="p-4 bg-slate-50 rounded-xl text-slate-500 italic">Please sign in to see your history.</div>;
-  if (loading && transactions.length === 0) return <div className="p-4 animate-pulse text-slate-400">Loading history...</div>;
+  if (!address) return <div className="p-6 bg-slate-50 rounded-[2rem] text-slate-400 font-medium italic border border-dashed border-slate-200 text-center">Please sign in to see your history.</div>;
+  if (loading && transactions.length === 0) return <div className="p-4 animate-pulse text-slate-400 font-black uppercase tracking-widest text-xs">Syncing Ledger...</div>;
 
   return (
-    <div className="space-y-4">
-      {/* Moved the message ABOVE the table for better layout */}
+    <div className="space-y-6">
+      {/* Dynamic Notification Toast */}
       {message && (
-        <div className={`p-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+        <div className={`p-4 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-3 shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-top-2 ${
           status === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 
           status === 'error' ? 'bg-red-50 text-red-700 border border-red-100' : 
           'bg-blue-50 text-blue-700 border border-blue-100'
         }`}>
+          {status === 'success' && <CheckCircle2 size={16} />}
+          {status === 'error' && <AlertCircle size={16} />}
+          {status === 'info' && <Info size={16} />}
           {message}
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b text-left text-slate-500 text-sm font-semibold">
-              <th className="py-4 px-2">ID</th>
-              <th className="py-4 px-2">Status</th>
-              <th className="py-4 px-2 text-right">Type</th>
+            <tr className="bg-slate-50/50 text-left text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+              <th className="py-5 px-6">Tx Hash</th>
+              <th className="py-5 px-6">Status</th>
+              <th className="py-5 px-6 text-right">Method</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-50">
             {transactions.map((tx: any) => (
-              <tr key={tx.tx_id} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
-                <td className="py-4 px-2 font-mono text-xs text-orange-600">
-                  {tx.tx_id.substring(0, 10)}...
+              <tr key={tx.hash} className="hover:bg-slate-50/80 transition-colors group">
+                <td className="py-5 px-6">
+                  <a 
+                    href={`https://sepolia.basescan.org/tx/${tx.hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-[11px] text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    {tx.hash.substring(0, 12)}... <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 </td>
-                <td className="py-4 px-2">
-                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                    tx.tx_status === 'success' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                <td className="py-5 px-6">
+                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                    tx.isError === '0' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                   }`}>
-                    {tx.tx_status}
+                    {tx.isError === '0' ? 'Confirmed' : 'Failed'}
                   </span>
                 </td>
-                <td className="py-4 px-2 text-sm text-slate-700 text-right">
-                  {tx.tx_type.replace('_', ' ')}
+                <td className="py-5 px-6 text-[11px] font-bold text-slate-600 text-right capitalize">
+                  {tx.functionName ? tx.functionName.split('(')[0].replace(/([A-Z])/g, ' $1') : 'Transfer'}
                 </td>
               </tr>
             ))}

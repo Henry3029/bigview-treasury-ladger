@@ -1,17 +1,36 @@
+"use client";
+
+import React from 'react';
+import { TrendingUp, Percent } from 'lucide-react';
+
 // We tell the component to expect "totalStaked" and "apy" as inputs (props)
 export const StatisticsGrid = ({ totalStaked, apy }: { totalStaked: string, apy: string }) => {
   return (
     <div className="grid grid-cols-2 gap-4 mb-8">
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <p className="text-gray-500 text-xs italic font-medium">Pool APY</p>
-        {/* Now it shows the variable instead of just "9.5%" */}
-        <p className="text-xl font-bold text-green-600">{apy}%</p>
+      {/* Pool APY / Reward Rate Card */}
+      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-green-600">
+          <Percent size={14} strokeWidth={3} />
+          <p className="text-[10px] uppercase font-black tracking-widest opacity-70">Pool APY</p>
+        </div>
+        {/* Shows the variable passed from your contract data */}
+        <p className="text-2xl font-black text-slate-900 tracking-tight">
+          {apy}%
+        </p>
       </div>
       
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-        <p className="text-gray-500 text-xs italic font-medium">Total Staked</p>
-        {/* This will show the real number from your contract */}
-        <p className="text-xl font-bold text-gray-800">{totalStaked} STX</p>
+      {/* Global Staked Card */}
+      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-blue-600">
+          <TrendingUp size={14} strokeWidth={3} />
+          <p className="text-[10px] uppercase font-black tracking-widest opacity-70">Global Staked</p>
+        </div>
+        <div className="flex items-baseline gap-1">
+          <p className="text-2xl font-black text-slate-900 tracking-tight">
+            {totalStaked}
+          </p>
+          <span className="text-[10px] font-black text-slate-400">ETH</span>
+        </div>
       </div>
     </div>
   );

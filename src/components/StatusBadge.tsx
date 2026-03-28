@@ -1,39 +1,32 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { UserSession, AppConfig } from '@stacks/connect';
-
-// 1. INITIALIZE NATIVE STACKS SESSION
-const appConfig = new AppConfig(['store_write', 'publish_data']);
-const userSession = new UserSession({ appConfig });
+import { useAccount } from 'wagmi';
 
 interface StatusBadgeProps {
-  status?: 'online' | 'offline' | 'maintenance' | string;
   label?: string;
 }
 
 export default function StatusBadge({ label }: StatusBadgeProps) {
-  const [address, setAddress] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const { address, isConnected } = useAccount();
+  const [mounted, setMounted] = useState(false);
 
+  // Prevents hydration mismatch between server and client
   useEffect(() => {
-    // 2. CHECK SIGN-IN STATUS NATIVELY
-    if (userSession.isUserSignedIn()) {
-      const userData = userSession.loadUserData();
-      const stxAddress = userData.profile.stxAddress.testnet;
-      setAddress(stxAddress);
-      setIsConnected(true);
-    }
+    setMounted(true);
   }, []);
 
-  // 3. Logic for the visual indicator
+  if (!mounted) return null;
+
+  // Logic for the visual indicator
   const activeColor = isConnected ? 'bg-green-500' : 'bg-red-500';
   const bgColor = isConnected ? 'bg-green-50' : 'bg-red-50';
   const textColor = isConnected ? 'text-green-700' : 'text-red-700';
+  const borderColor = isConnected ? 'border-green-100' : 'border-red-100';
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border transition-all
-      ${bgColor} ${textColor} ${isConnected ? 'border-green-100' : 'border-red-100'}`}>
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all
+      ${bgColor} ${textColor} ${borderColor}`}>
       
       {/* The Status Dot */}
       <span className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse' : ''} ${activeColor}`}></span>
@@ -41,7 +34,7 @@ export default function StatusBadge({ label }: StatusBadgeProps) {
       {/* The Label */}
       <span>
         {isConnected && address
-          ? `STX: ${address.slice(0, 5)}...${address.slice(-4)}` 
+          ? `BASE: ${address.slice(0, 6)}...${address.slice(-4)}` 
           : label || "Disconnected"}
       </span>
     </div>
