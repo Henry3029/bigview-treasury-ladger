@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { usePrivy } from '@privy-io/react-auth'; // 1. Swapped from Wagmi
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -20,7 +20,11 @@ import {
 export default function Sidebar({ isMobile, closeMobileMenu }: { isMobile?: boolean, closeMobileMenu?: () => void }) { 
   const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
-  const { address, isConnected } = useAccount();
+  
+  // 2. Using Privy for address and connection status
+  const { user, authenticated } = usePrivy();
+  const address = user?.wallet?.address;
+  const isConnected = authenticated;
 
   useEffect(() => {
     if (isConnected && address) {
@@ -32,16 +36,18 @@ export default function Sidebar({ isMobile, closeMobileMenu }: { isMobile?: bool
   }, [address, isConnected]);
 
   return (
-    <aside className={`flex flex-col h-full font-inter ${
+    // 3. Updated background to neutral-950 for the deep dark look
+    <aside className={`flex flex-col h-full ${
       isMobile 
-        ? 'w-full px-4 bg-slate-950' 
-        : 'w-[280px] bg-slate-950 border-r border-white/5 p-6 shadow-2xl'
+        ? 'w-full px-4 bg-neutral-950' 
+        : 'w-[280px] bg-neutral-950 border-r border-white/5 p-6 shadow-2xl'
     }`}>
       
       {/* BRANDING SECTION */}
       {!isMobile && (
         <div className="flex items-center gap-3 mb-12 px-2">
-          <div className="p-2.5 bg-blue-600 rounded-[1.2rem] shadow-lg shadow-blue-900/40 border border-white/20">
+          {/* 4. Changed Blue box to Gold box to match OPay/Bigview theme */}
+          <div className="p-2.5 bg-amber-500 rounded-[1.2rem] shadow-lg shadow-amber-900/20 border border-white/20">
             <Image 
               src="/logo.png" 
               alt="Logo" 
@@ -51,8 +57,8 @@ export default function Sidebar({ isMobile, closeMobileMenu }: { isMobile?: bool
             />
           </div>
           <div className="flex flex-col">
-            <span className='font-black text-2xl tracking-tighter text-white italic leading-none'>Bigview</span>
-            <span className="text-[8px] font-black text-blue-500 uppercase tracking-[0.4em] mt-1">Treasury</span>
+            <span className='font-black text-2xl tracking-tighter text-white italic leading-none uppercase'>Bigview</span>
+            <span className="text-[8px] font-black text-amber-500 uppercase tracking-[0.4em] mt-1">Treasury</span>
           </div>
         </div>
       )}
@@ -89,8 +95,8 @@ export default function Sidebar({ isMobile, closeMobileMenu }: { isMobile?: bool
       {!isMobile && (
         <div className="mt-auto pt-8">
            <div className="p-5 bg-white/[0.03] rounded-3xl border border-white/5 relative overflow-hidden group hover:bg-white/[0.05] transition-all">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-blue-600/10 rounded-full blur-2xl" />
-              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.3em] mb-2">Protocol Status</p>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/10 rounded-full blur-2xl" />
+              <p className="text-[8px] font-black text-neutral-500 uppercase tracking-[0.3em] mb-2">Protocol Status</p>
               <div className="flex items-center justify-between">
                 <p className="text-xs font-black text-white italic uppercase">Base Sepolia</p>
                 <div className="flex items-center gap-1.5">
@@ -112,20 +118,20 @@ function SidebarLink({ href, icon, label, active, isOwnerTool = false, onClick }
       onClick={onClick}
       className={`flex items-center justify-between p-4 rounded-2xl font-black transition-all duration-300 group ${
         active 
-          ? 'bg-blue-600 text-white shadow-[0_10px_25px_rgba(37,99,235,0.3)] border border-white/20' 
+          ? 'bg-amber-500 text-black shadow-[0_10px_25px_rgba(245,158,11,0.2)] border border-white/20' 
           : isOwnerTool 
-            ? 'text-slate-500 hover:bg-red-500/10 hover:text-red-500 border border-transparent' 
-            : 'text-slate-400 hover:bg-white/[0.05] hover:text-white border border-transparent'
+            ? 'text-neutral-500 hover:bg-red-500/10 hover:text-red-500' 
+            : 'text-neutral-400 hover:bg-white/[0.05] hover:text-white'
       }`}
     >
       <div className="flex items-center gap-4">
-        <span className={`${active ? 'text-white' : 'group-hover:text-blue-500 transition-colors'}`}>
+        <span className={`${active ? 'text-black' : 'group-hover:text-amber-500 transition-colors'}`}>
           {icon}
         </span>
         <span className="text-[13px] uppercase tracking-tighter italic">{label}</span>
       </div>
       
-      {active && <ChevronRight size={14} className="text-white/60 animate-in slide-in-from-left-2 duration-300" />}
+      {active && <ChevronRight size={14} className="text-black/60 animate-in slide-in-from-left-2 duration-300" />}
     </Link>
   );
 }
