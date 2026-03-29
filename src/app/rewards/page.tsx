@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { formatUnits } from 'viem';
 import { StatisticsGrid } from '@/components/StatisticsGrid';
+import WisdomCarousel from '@/components/WisdomCarousel';
 import { RewardHeader } from '@/components/RewardHeader';
 import { RewardHistory } from '@/components/RewardHistory';
 import { RefreshCcw, AlertCircle, Loader2 } from 'lucide-react';
@@ -48,6 +49,7 @@ export default function RewardsPage() {
 
   return (
     <main className="min-h-screen bg-slate-50 p-6 pb-24 flex flex-col gap-8 max-w-6xl mx-auto">
+    <WisdomCarousel />
       
       {/* 4. Status Notifications */}
       <div className="flex items-center justify-between">

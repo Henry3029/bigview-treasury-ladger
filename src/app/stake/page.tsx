@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
+import WisdomCarousel from '@/components/WisdomCarousel';
 import { useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { Wallet, Zap, Loader2, Info, CheckCircle2, AlertCircle } from 'lucide-react';
@@ -80,6 +81,7 @@ export default function StakePage() {
 
   return (
     <main className="min-h-screen p-6 pb-32 bg-slate-50 flex flex-col items-center">
+    <WisdomCarousel />
       
       {/* Dynamic Notification Toast */}
       {message && (
