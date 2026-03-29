@@ -57,54 +57,76 @@ export default function RewardsPage() {
   }, [data]);
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6 pb-24 flex flex-col gap-8 max-w-6xl mx-auto">
-      {/* 4. Carousel at the very top */}
-      <WisdomCarousel />
+    // 1. Full-width background and standard padding
+    <main className="min-h-screen w-full bg-slate-50 pb-32">
       
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tighter italic">Rewards Hub</h1>
-          <p className="text-slate-500 text-sm font-medium">Monitor your staking performance on Base.</p>
+      {/* 2. THE WRAPPER: Matches Dashboard & Stake for total consistency */}
+      <div className="w-full max-w-2xl mx-auto px-4 py-6 space-y-6">
+        
+        {/* 3. Carousel at the very top */}
+        <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+          <WisdomCarousel />
         </div>
         
-        <button 
-          onClick={() => refetch()}
-          disabled={isLoading}
-          className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm active:scale-90"
-        >
-          {isLoading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCcw size={20} />}
-        </button>
-      </div>
-
-      {!isConnected && (
-        <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center gap-3 text-blue-700 text-sm font-bold">
-          <AlertCircle size={18} />
-          Connect your wallet to see your personalized reward stats.
+        {/* Header Section */}
+        <div className="flex items-center justify-between px-2">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter italic uppercase">Rewards Hub</h1>
+            <p className="text-slate-500 text-[10px] md:text-sm font-bold uppercase tracking-widest opacity-70">Monitor performance on Base</p>
+          </div>
+          
+          <button 
+            onClick={() => refetch()}
+            disabled={isLoading}
+            className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm active:scale-90"
+          >
+            {isLoading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCcw size={20} />}
+          </button>
         </div>
-      )}
 
-      {isError && (
-        <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-sm font-bold">
-          <AlertCircle size={18} />
-          Error syncing with Base Sepolia. Please try again.
+        {/* Dynamic Alerts */}
+        {!isConnected && (
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-[1.5rem] flex items-center gap-3 text-blue-700 text-[11px] font-black uppercase tracking-tight">
+            <AlertCircle size={18} />
+            Connect wallet for personalized stats
+          </div>
+        )}
+
+        {isError && (
+          <div className="p-4 bg-red-50 border border-red-100 rounded-[1.5rem] flex items-center gap-3 text-red-600 text-[11px] font-black uppercase tracking-tight">
+            <AlertCircle size={18} />
+            Error syncing with Base Sepolia
+          </div>
+        )}
+
+        {/* 4. Main Stats Section */}
+        <div className="space-y-4">
+          <RewardHeader 
+            totalEarned={totalEarned} 
+            pending={pending} 
+          />
+          
+          <StatisticsGrid 
+            apy={liveApy} 
+            totalStaked={liveStaked} 
+          />
         </div>
-      )}
 
-      {/* 5. Header: Total Earned & Pending */}
-      <RewardHeader 
-        totalEarned={totalEarned} 
-        pending={pending} 
-      />
+        {/* 5. History Section */}
+        <div className="pt-4">
+          <div className="flex items-center gap-2 mb-6 ml-1">
+            <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recent Yield Events</h3>
+          </div>
+          <RewardHistory />
+        </div>
 
-      {/* 6. Statistics Grid: APY & Global Staked */}
-      <StatisticsGrid 
-        apy={liveApy} 
-        totalStaked={liveStaked} 
-      />
-
-      <div className="mt-4">
-        <h3 className="text-lg font-black text-slate-900 mb-6 italic tracking-tight">Recent Yield Events</h3>
-        <RewardHistory />
+        {/* Branding Footer */}
+        <div className="text-center pt-8 opacity-30">
+          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
+            Bigview Protocol • Base L2
+          </p>
+        </div>
       </div>
     </main>
   );

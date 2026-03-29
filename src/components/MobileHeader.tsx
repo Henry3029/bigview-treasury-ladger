@@ -1,23 +1,40 @@
 "use client";
-import React, { useState } from 'react';
-import { X, Menu, Bell, User } from 'lucide-react'; 
+import React, { useState, useEffect } from 'react';
+import { X, Menu, Bell, User, Wallet } from 'lucide-react'; 
 import Image from 'next/image';
 import Sidebar from './Sidebar'; 
 import ProfileDrawer from './ProfileDrawer';
 import NotificationDropdown, { Notification } from './NotificationDropdown';
-// import { useWatchContractEvent } from 'wagmi'; // Hidden until events are added to ABI
-import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
+import { usePrivy, useWallets } from '@privy-io/react-auth'; // Switched to Privy
 
 export default function MobileHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [hasUnread, setHasUnread] = useState(false); 
+  const [hasUnread, setHasUnread] = useState(true);
 
-  // Local state to store notifications
-  const [notifications, setNotifications] = useState<Notification[]>([
+  // PRIVY HOOKS
+  const { login, authenticated, user, ready } = usePrivy();
+  const { wallets } = useWallets();
+  const [activeAddress, setActiveAddress] = useState<string | null>(null);
+
+  // Address logic: Checks external wallets first, then embedded Privy wallet
+  useEffect(() => {
+    const walletAddress = wallets[0]?.address || user?.wallet?.address;
+    if (authenticated && walletAddress) {
+      setActiveAddress(walletAddress);
+    } else {
+      setActiveAddress(null);
+    }
+  }, [authenticated, wallets, user]);
+
+  const truncatedAddress = activeAddress 
+    ? `${activeAddress.slice(0, 4)}...${activeAddress.slice(-4)}`
+    : "";
+
+  const [notifications] = useState<Notification[]>([
     {
-      id: 'welcome',
+      id: '1',
       title: 'Welcome to Bigview',
       description: 'Your treasury dashboard is live on Base Sepolia.',
       type: 'success',
@@ -25,51 +42,23 @@ export default function MobileHeader() {
     }
   ]);
 
-  /* NOTE: useWatchContractEvent is disabled because BigViewTreasury.json 
-    does not currently contain an 'eventName' called 'Stake'.
-  */
-  
-  // Example function you can call from other components to add a notification
-  const addNotification = (title: string, desc: string) => {
-    const newNotif: Notification = {
-      id: Math.random().toString(),
-      title: title,
-      description: desc,
-      type: 'success',
-      time: 'JUST NOW'
-    };
-    setNotifications(prev => [newNotif, ...prev]);
-    setHasUnread(true);
-  };
-
   const handleToggleNotifications = () => {
     setIsNotifOpen(!isNotifOpen);
-    if (!isNotifOpen) {
-      setHasUnread(false);
-    }
+    if (!isNotifOpen) setHasUnread(false);
   };
+
+  // Prevent UI flicker while Privy is loading
+  if (!ready) return <div className="h-[65px] bg-white border-b border-slate-100" />;
 
   return (
     <>
       <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 sticky top-0 z-[60]">
         
-        <div className="flex items-center gap-2">
-          <button onClick={() => setIsMenuOpen(true)} className="p-2 text-slate-600 hover:bg-slate-100 rounded-md">
-            <Menu size={24} />
-          </button>
-
-          <div className="flex items-center gap-2 px-1">
-            <div className="p-1 bg-blue-600 rounded-lg shadow-sm">
-              <Image src="/logo.png" alt="Bigview" width={22} height={22} className="brightness-0 invert" />
-            </div>
-            <span className="font-bold text-slate-900 tracking-tight text-md">Bigview</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1 relative">
+        {/* LEFT SIDE: Profile + Notifications */}
+        <div className="flex items-center gap-1.5 relative">
           <button 
             onClick={handleToggleNotifications} 
-            className="p-2 text-slate-600 hover:bg-slate-50 rounded-full relative transition-transform active:scale-90"
+            className="p-2 text-slate-600 hover:bg-slate-50 rounded-full relative active:scale-90"
           >
             <Bell size={20} />
             {hasUnread && (
@@ -83,21 +72,68 @@ export default function MobileHeader() {
             notifications={notifications}
           />
 
-          <button onClick={() => setIsProfileOpen(true)} className="ml-1 p-0.5 border border-slate-200 rounded-full overflow-hidden bg-slate-50 active:scale-95">
-            <div className="w-7 h-7 flex items-center justify-center text-slate-400">
-              <User size={18} />
-            </div>
+          <div className="flex items-center gap-2">
+            {authenticated ? (
+              /* LOGGED IN: Green Dot + Shortened Address */
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full shadow-inner">
+                <div className="w-2 h-2 bg-[#00D094] rounded-full shadow-[0_0_8px_#00D094]"></div>
+                <span className="text-[11px] font-black tracking-tighter text-slate-900 tabular-nums uppercase">
+                  {truncatedAddress}
+                </span>
+              </div>
+            ) : (
+              /* LOGGED OUT: Privy Connect Trigger */
+              <button 
+                onClick={login}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-full shadow-lg shadow-blue-100 active:scale-95 transition-all"
+              >
+                <Wallet size={12} strokeWidth={3} />
+                <span className="text-[10px] font-black uppercase tracking-wider">Connect</span>
+              </button>
+            )}
+
+            <button 
+              onClick={() => setIsProfileOpen(true)}
+              className="p-0.5 border border-slate-200 rounded-full overflow-hidden bg-slate-50 active:scale-95 transition-transform"
+            >
+              <div className="w-7 h-7 flex items-center justify-center text-slate-400">
+                <User size={18} />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: Menu + Logo */}
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => setIsMenuOpen(true)}
+            className="p-2 text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+          >
+            <Menu size={24} />
           </button>
+
+          <div className="flex items-center gap-2 px-1">
+            <div className="p-1 bg-blue-600 rounded-lg shadow-sm">
+              <Image 
+                src="/images/bigview-image.png"
+                alt="BigView" 
+                width={22} 
+                height={22} 
+                className="object-contain"
+              />
+            </div>
+            <span className="font-black text-slate-900 tracking-tighter text-md italic">Bigview</span>
+          </div>
         </div>
       </header>
 
-      {/* NAVIGATION DRAWER */}
+      {/* NAVIGATION DRAWER - Sliding from Right */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[100] lg:hidden">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[85%] max-w-[300px] bg-white shadow-2xl flex flex-col">
+          <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-[300px] bg-white shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
             <div className="p-4 flex justify-between items-center border-b border-slate-100">
-              <span className="font-bold text-slate-900 text-lg">Menu</span>
+              <span className="font-bold text-slate-900 text-lg italic uppercase tracking-tighter">Menu</span>
               <button onClick={() => setIsMenuOpen(false)} className="p-2 text-slate-400"><X size={24} /></button>
             </div>
             <div className="flex-1 overflow-y-auto">

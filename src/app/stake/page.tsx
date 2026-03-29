@@ -96,12 +96,17 @@ export default function StakePage() {
   };
 
   return (
-    <main className="min-h-screen p-6 pb-32 bg-slate-50 flex flex-col items-center">
-      <WisdomCarousel />
+    // Added w-full to main to ensure it spans the screen
+    <main className="min-h-screen w-full p-4 pb-32 bg-slate-50 flex flex-col items-center">
+      
+      {/* 1. Ensure Carousel is full width but contained */}
+      <div className="w-full max-w-lg mb-6">
+        <WisdomCarousel />
+      </div>
       
       {/* Toast Notification */}
       {message && (
-        <div className={`fixed top-6 z-50 w-[90%] max-w-md p-4 rounded-3xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
+        <div className={`fixed top-6 z-50 w-[92%] max-w-md p-4 rounded-3xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
           status === 'success' ? 'bg-white border-green-100 text-green-600' : 
           status === 'error' ? 'bg-white border-red-100 text-red-600' : 
           'bg-white border-blue-100 text-blue-600'
@@ -111,16 +116,20 @@ export default function StakePage() {
         </div>
       )}
 
-      <div className="w-full max-w-md mt-12 bg-white p-10 rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-white">
-        <div className="mb-10 text-center">
-          <div className="w-16 h-16 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white mx-auto mb-6 shadow-xl shadow-blue-100 rotate-3">
-            <Zap size={32} fill="currentColor" />
+      {/* 2. THE STAKE CARD: Added w-full so it expands on mobile */}
+      <div className="w-full max-w-md mt-4 bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-white">
+        
+        <div className="mb-8 text-center">
+          <div className="w-14 h-14 bg-blue-600 rounded-[1.2rem] flex items-center justify-center text-white mx-auto mb-4 shadow-xl shadow-blue-100 rotate-3">
+            <Zap size={28} fill="currentColor" />
           </div>
-          <h2 className="text-3xl font-black text-slate-900 mb-2 italic tracking-tighter uppercase">Stake ETH</h2>
-          <p className="text-xs text-slate-400 font-bold tracking-widest leading-relaxed">
+          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 italic tracking-tighter uppercase">Stake ETH</h2>
+          <p className="text-[10px] text-slate-400 font-bold tracking-widest leading-relaxed">
             LOCK ASSETS ON <span className="text-blue-600">BASE SEPOLIA</span> TO EARN BVW REWARDS
           </p>
         </div>
+
+        {/* ... rest of your code stays the same ... */}
 
         <div className="space-y-8">
           <div className="space-y-3">

@@ -32,10 +32,14 @@ export default function RootLayout({
               {/* 3. MOBILE HEADER: Already contains your Logo, Bell, and Profile */}
               <MobileHeader /> 
 
-              {/* 4. MAIN CONTENT AREA */}
-              <main className="flex-grow p-4 pb-32 lg:pb-12 max-w-5xl mx-auto w-full">
-                {children}
-              </main>
+        {/* 4. MAIN CONTENT AREA */}
+<main className="flex-grow w-full min-h-screen">
+  {/* We removed 'p-4' and 'max-w-5xl' from here. 
+     Now your pages (Dashboard, Stake, etc.) can decide 
+     their own width and padding!
+  */}
+  {children}
+</main>
 
               {/* 5. DESKTOP FOOTER: Hidden on mobile for that clean App feel */}
               <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-widest text-gray-400 border-t bg-white">
