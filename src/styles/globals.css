@@ -5,42 +5,42 @@
 @tailwind utilities;
 
 :root {
-  --bg-main: #F8FAFC; /* Clean Slate-50 background */
-  --accent-blue: #2563EB; /* Professional Bigview Blue */
-  --accent-green: #00D094; /* Your Balance Card Green */
+  /* 1. OPay Dark Theme Colors */
+  --bg-main: #060606; /* Near-black background seen in OPay */
+  --accent-gold: #fbbf24; /* Golden color for your primary balance card */
+  --card-dark: #121212; /* Darker grey for the icon grid boxes */
 }
 
 body {
+  /* Applying the deep OPay dark theme */
   background-color: var(--bg-main);
-  color: #0F172A; /* Slate-900 for high-contrast text */
+  color: #F8FAFC; 
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
-  @apply antialiased;
+  @apply antialiased overflow-x-hidden;
 }
 
 @layer components {
-  /* Updated to rounded-3xl - No more "dumb" giant bubbles */
-  .btn-grain {
-    @apply bg-blue-600 text-white px-8 py-4 rounded-2xl font-black 
-           transition-all duration-300 shadow-lg shadow-blue-100
-           hover:bg-blue-700 active:scale-95 flex items-center justify-center gap-2 
-           italic uppercase tracking-tight text-sm;
+  /* 2. THE BALANCE CARD: Golden-Orange Gradient like the OPay green box */
+  .opay-gold-card {
+    @apply bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 
+           rounded-[2rem] p-6 shadow-xl shadow-amber-950/20 text-white;
   }
 
-  .btn-grain-outline {
-    @apply bg-white text-slate-900 px-8 py-4 rounded-2xl font-black 
-           transition-all duration-300 border border-slate-200 shadow-sm
-           hover:bg-slate-50 active:scale-95 flex items-center justify-center gap-2
-           italic uppercase tracking-tight text-sm;
+  /* 3. ICON GRID BUTTONS: Matching the OPay "Action" tiles */
+  .opay-action-tile {
+    @apply bg-[#121212] border border-white/5 rounded-[2rem] p-4 
+           flex flex-col items-center justify-center gap-3 transition-all
+           hover:bg-neutral-800 active:scale-95;
   }
 
-  /* THE NEW STANDARD CARD: Uses rounded-3xl as we discussed */
+  /* 4. THE GLASS EFFECT: For the "You May Also Like" style sections */
   .glass-card {
-    @apply bg-white border border-slate-100 rounded-3xl p-6 shadow-sm shadow-slate-200/50;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] p-6;
   }
 
-  /* Typography shortcuts for the Inter font */
+  /* High-end Fintech Typography */
   .heading-heavy {
-    @apply font-black italic tracking-tighter uppercase;
+    @apply font-black italic tracking-tighter uppercase leading-none;
   }
 }

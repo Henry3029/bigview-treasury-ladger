@@ -3,25 +3,32 @@
 import React, { useEffect, useState } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useBalance } from 'wagmi';
-import { User, ExternalLink, LogOut, Wallet, Shield, Copy, Check } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  ChevronRight, 
+  History, 
+  User, 
+  Settings, 
+  Headphones, 
+  Lock, 
+  Info,
+  ExternalLink,
+  EyeOff,
+  LogOut,
+  Copy,
+  Check
+} from 'lucide-react';
 
-export default function ProfilePage() {
+export default function MePage() {
   const { login, logout, authenticated, ready, user } = usePrivy();
   const { wallets } = useWallets();
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // Get the primary wallet address from Privy
   const address = wallets[0]?.address as `0x${string}`;
+  const { data: balanceData } = useBalance({ address });
 
-  // Fetch ETH Balance on Base Sepolia
-  const { data: balanceData } = useBalance({
-    address: address,
-  });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   const handleCopy = () => {
     if (address) {
@@ -33,133 +40,120 @@ export default function ProfilePage() {
 
   if (!mounted || !ready) return null;
 
-  // Unauthenticated State
+  // Unauthenticated State (Login Screen)
   if (!authenticated) {
     return (
-      <div className="min-h-[70vh] p-10 text-center flex flex-col items-center justify-center gap-8 bg-slate-50">
-        <div className="p-8 bg-white rounded-[2.5rem] shadow-xl border border-slate-100 relative">
-          <Shield size={56} className="text-blue-500 mx-auto" />
-          <div className="absolute -top-2 -right-2 bg-blue-100 p-2 rounded-full animate-pulse">
-            <Shield size={16} className="text-blue-600" />
-          </div>
-        </div>
-        <div className="max-w-xs">
-          <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter italic">Secure Profile</h2>
-          <p className="text-slate-500 font-medium leading-relaxed">
-            Please sign in with <span className="text-blue-600 font-bold">Privy</span> to manage your Base Sepolia treasury assets.
-          </p>
+      <main className="min-h-screen bg-[#060606] flex flex-col items-center justify-center p-8">
+        <div className="w-20 h-20 bg-amber-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(245,158,11,0.3)]">
+          <Lock size={32} className="text-black" />
         </div>
         <button 
           onClick={login}
-          className="bg-blue-600 text-white px-12 py-5 rounded-[1.5rem] font-black text-lg hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 active:scale-95"
+          className="w-full max-w-xs py-4 bg-amber-500 text-black font-black rounded-2xl uppercase tracking-widest active:scale-95 transition-all"
         >
-          Connect & Sign In
+          Sign In to Bigview
         </button>
-      </div>
+      </main>
     );
   }
 
-  const truncatedAddress = address 
-    ? `${address.slice(0, 6)}...${address.slice(-4)}` 
-    : "No Address Found";
-
   return (
-    <main className="min-h-screen bg-slate-50 p-6 pb-24 flex flex-col gap-6 max-w-2xl mx-auto font-inter">
+    <main className="min-h-screen bg-[#060606] text-white pb-32 font-inter">
       
-      {/* Identity Header: Swapped blue circle for sleek avatar */}
-      <div className="flex items-center gap-4 p-2 animate-in fade-in slide-in-from-top-4 duration-700">
-        <div className="relative">
-          <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 border border-white shadow-sm overflow-hidden">
-            {user?.google?.picture ? (
-               <img src={user.google.picture} alt="Profile" className="w-full h-full object-cover" />
-            ) : (
-              <User size={32} strokeWidth={1.5} />
-            )}
+      {/* 1. THE TOP GOLD BOX (Replacing the OPay Green) */}
+      <div className="w-full bg-gradient-to-b from-[#B8860B] via-[#8B6508] to-[#060606] px-6 pt-12 pb-12">
+        <div className="flex justify-between items-start mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-[1.8rem] bg-black/20 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
+              {user?.google?.picture ? (
+                <img src={user.google.picture} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <User size={32} className="text-white" />
+              )}
+            </div>
+            <div>
+              <h1 className="text-2xl font-black italic tracking-tighter uppercase leading-none text-white">Hi, Henry</h1>
+              <div className="flex items-center gap-2 mt-2">
+                <span className="bg-white/20 backdrop-blur-sm text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-white/10">Upgrade to Tier 3</span>
+              </div>
+            </div>
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-slate-50 shadow-sm" />
-        </div>
-        
-        <div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tighter italic uppercase">Treasury Profile</h2>
-          <button 
-            onClick={handleCopy}
-            className="flex items-center gap-2 mt-0.5 text-[10px] text-blue-600 font-bold bg-blue-50 px-2.5 py-1 rounded-lg uppercase tracking-widest hover:bg-blue-100 transition-colors"
-          >
-            {truncatedAddress}
-            {copied ? <Check size={10} /> : <Copy size={10} />}
+          <button className="p-3 bg-black/20 rounded-2xl border border-white/10 text-white shadow-lg">
+            <Settings size={20} />
           </button>
         </div>
-      </div>
 
-      {/* Wallet Balance Card: Fixed corners to rounded-3xl and cleaned up layout */}
-      <div className="bg-slate-900 p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group border border-white/5">
-        <div className="absolute -right-10 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-[60px]" />
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-4 opacity-50">
-            <Wallet size={14} className="text-blue-400" />
-            <span className="text-[9px] uppercase tracking-[0.2em] font-black">Available Balance</span>
+        {/* 2. THE BALANCE CARD WITH ACTIVE SHIELD */}
+        <div className="bg-neutral-900/80 p-6 rounded-[2.5rem] border border-white/5 backdrop-blur-xl flex items-center justify-between shadow-2xl">
+          <div>
+            <p className="text-neutral-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+              Total Balance <EyeOff size={12} className="inline ml-1 opacity-50" />
+            </p>
+            <h2 className="text-4xl font-black italic tracking-tighter uppercase tabular-nums">
+              {balanceData ? parseFloat(balanceData.formatted).toFixed(4) : "0.0000"} 
+              <span className="text-xs ml-1 text-amber-500 uppercase">ETH</span>
+            </h2>
+            <p className="text-amber-500 text-[9px] font-black mt-2 uppercase italic tracking-widest">
+              Interest Credited Today ****
+            </p>
           </div>
-          
-          <div className="flex items-baseline gap-2">
-            <h3 className="text-4xl font-black italic tracking-tighter tabular-nums">
-              {balanceData ? parseFloat(balanceData.formatted).toFixed(4) : "0.0000"}
-            </h3>
-            <span className="text-blue-500 font-black text-lg italic uppercase tracking-tighter">ETH</span>
-          </div>
-          
-          <div className="mt-6 flex gap-3">
-            <div className="px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
-              <p className="text-[8px] font-black text-blue-400/60 uppercase tracking-widest mb-0.5">Network</p>
-              <p className="text-[10px] font-bold text-white uppercase tracking-tight">Base Sepolia</p>
-            </div>
-            <div className="px-3 py-1.5 bg-white/5 rounded-xl border border-white/10">
-              <p className="text-[8px] font-black text-blue-400/60 uppercase tracking-widest mb-0.5">Provider</p>
-              <p className="text-[10px] font-bold text-white uppercase tracking-tight">{user?.linkedAccounts[0]?.type || 'Wallet'}</p>
+
+          {/* SPREADING SHIELD ANIMATION */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
+            <div className="w-16 h-16 bg-[#00D094] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(0,208,148,0.4)] relative z-10">
+              <ShieldCheck size={32} className="text-[#004D3C]" strokeWidth={2.5} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Actions List: Updated with rounded-3xl and better spacing */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col">
-        <a 
-          href={`https://sepolia.basescan.org/address/${address}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-5 flex items-center justify-between border-b border-slate-50 hover:bg-slate-50 transition-all group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
-              <ExternalLink size={20} />
-            </div>
+      <div className="px-6 space-y-4 -mt-4">
+        {/* 3. SAFETY TIPS BANNER */}
+        <div className="bg-[#00D094] p-4 rounded-2xl flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
             <div>
-              <span className="font-black text-slate-800 text-sm block italic uppercase tracking-tight">Basescan Explorer</span>
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">View On-Chain Activity</span>
+              <p className="text-[#004D3C] text-[10px] font-black uppercase">3 Safety Tips</p>
+              <p className="text-[#004D3C]/70 text-[9px] font-bold">Make your account more secure.</p>
             </div>
           </div>
-          <span className="text-slate-300 group-hover:translate-x-1 transition-transform">→</span>
-        </a>
+          <button className="px-4 py-1.5 bg-[#004D3C] text-white text-[9px] font-black rounded-full uppercase">View</button>
+        </div>
 
+        {/* 4. LINKS SECTION */}
+        <div className="bg-neutral-900/60 rounded-[2.5rem] border border-white/5 p-2 shadow-xl">
+          <ProfileItem icon={<History className="text-blue-500" />} title="Transaction History" href="/history" />
+          <ProfileItem icon={<Lock className="text-emerald-500" />} title="Account Limits" href="/limits" />
+          <ProfileItem icon={<Info className="text-amber-500" />} title="About Bigview" href="/about" />
+          <ProfileItem icon={<Headphones className="text-pink-500" />} title="Customer Service" href="/contact" />
+        </div>
+
+        {/* 5. LOGOUT BUTTON */}
         <button 
           onClick={() => logout()}
-          className="p-5 flex items-center justify-between hover:bg-red-50 text-red-500 transition-all group"
+          className="w-full flex items-center gap-4 p-5 bg-red-500/5 hover:bg-red-500/10 border border-red-500/10 rounded-[2rem] transition-all group"
         >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-red-50 rounded-xl">
-              <LogOut size={20} />
-            </div>
-            <div>
-              <span className="font-black text-sm block italic uppercase tracking-tight">Disconnect Wallet</span>
-              <span className="text-[9px] font-bold text-red-300 uppercase tracking-widest">End Session Safely</span>
-            </div>
+          <div className="w-10 h-10 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-500">
+            <LogOut size={20} />
           </div>
+          <span className="font-black text-sm italic uppercase tracking-tight text-red-500">End Session</span>
         </button>
       </div>
-
-      <div className="text-center pt-4 opacity-20">
-        <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.4em]">Bigview Protocol • v1.0</p>
-      </div>
     </main>
+  );
+}
+
+function ProfileItem({ icon, title, href }: { icon: React.ReactNode, title: string, href: string }) {
+  return (
+    <button className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-all rounded-[1.8rem] group">
+      <div className="flex items-center gap-4">
+        <div className="w-10 h-10 bg-neutral-800 rounded-2xl flex items-center justify-center border border-white/5">
+          {icon}
+        </div>
+        <h4 className="text-sm font-black italic uppercase tracking-tight text-neutral-200">{title}</h4>
+      </div>
+      <ChevronRight size={18} className="text-neutral-700 group-hover:text-white transition-colors" />
+    </button>
   );
 }

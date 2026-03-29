@@ -10,8 +10,8 @@ export default function WelcomeBanner() {
 
   useEffect(() => {
     if (ready && authenticated) {
-      // Logic: Only show once per browser session
-      const hasSeenWelcome = sessionStorage.getItem('bigview_welcome_seen');
+      // 1. CHANGE: Added '_v2' to the key to reset it so you can see it now
+      const hasSeenWelcome = sessionStorage.getItem('bigview_welcome_seen_v2');
       if (!hasSeenWelcome) {
         setShowWelcome(true);
       }
@@ -20,21 +20,21 @@ export default function WelcomeBanner() {
 
   const closeBanner = () => {
     setShowWelcome(false);
-    sessionStorage.setItem('bigview_welcome_seen', 'true');
+    sessionStorage.setItem('bigview_welcome_seen_v2', 'true');
   };
 
   if (!showWelcome) return null;
 
   return (
-    // 1. THE OVERLAY: Dims the rest of the app like OPay
+    // THE OVERLAY: Dims the rest of the app like OPay
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-500">
       
       <div className="relative w-full max-w-sm flex flex-col items-center">
         
-        {/* 2. THE MODAL CARD: High-end Fintech aesthetic */}
-        <div className="w-full bg-gradient-to-b from-slate-900 via-slate-900 to-black text-white p-8 rounded-[2.5rem] relative overflow-hidden shadow-[0_0_50px_rgba(37,99,235,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
+        {/* 2. CHANGE: Swapped rounded-[2.5rem] for rounded-3xl to match your app standard */}
+        <div className="w-full bg-gradient-to-b from-slate-900 via-slate-900 to-black text-white p-8 rounded-3xl relative overflow-hidden shadow-[0_0_50px_rgba(37,99,235,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
           
-          {/* Decorative Glows */}
+          {/* Decorative Glows (OPay Aesthetic) */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/20 rounded-full blur-[60px] -mr-10 -mt-10" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-[40px] -ml-10 -mb-10" />
 
@@ -80,7 +80,7 @@ export default function WelcomeBanner() {
           </div>
         </div>
 
-        {/* 3. THE DISMISS BUTTON: Floating below the card like OPay */}
+        {/* THE DISMISS BUTTON: Floating below the card like OPay screenshot */}
         <button 
           onClick={closeBanner} 
           className="mt-8 p-4 bg-white/10 hover:bg-white/20 rounded-full border border-white/10 transition-all group backdrop-blur-md"

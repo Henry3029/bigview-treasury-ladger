@@ -4,12 +4,11 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { wagmiConfig } from "@privy-io/wagmi"; // 1. Use the official Privy-Wagmi bridge
 
-// 1. Setup Wagmi Config for Base Sepolia
-export const config = createConfig({
+// 2. This config is much more stable for Privy
+const config = createConfig({
   chains: [baseSepolia],
-  // DISABLE auto-reconnect on mount to prevent the app from "guessing" the user
-  reconnectOnMount: false, 
   transports: {
     [baseSepolia.id]: http(),
   },
@@ -22,27 +21,23 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""} 
       config={{
-        // 2. Define exactly what options appear in the modal
         loginMethods: ['google', 'email', 'wallet', 'apple'],
-
         appearance: {
           theme: "light",
-          accentColor: "#2563eb", // Matches your Bigview brand blue
-          showWalletLoginFirst: false, // Shows Google/Email/Socials first for a modern look
+          accentColor: "#2563eb",
+          showWalletLoginFirst: false,
         },
-
-        // 3. Prevent automatic wallet creation until they actually log in
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
-          requireUserPasswordOnCreate: false, // Makes it smoother for mobile users
+          requireUserPasswordOnCreate: false,
         },
-
         defaultChain: baseSepolia,
         supportedChains: [baseSepolia],
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={config}>
+        {/* 3. Wrap children in WagmiProvider ONLY if strictly needed */}
+        <WagmiProvider config={config} reconnectOnMount={false}>
           {children}
         </WagmiProvider>
       </QueryClientProvider>

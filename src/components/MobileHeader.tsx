@@ -4,29 +4,27 @@ import React from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { Bell, Menu, User, Copy } from 'lucide-react';
 
-export default function MobileHeader() {
-  const { user, authenticated, login } = usePrivy();
+// 1. We add 'onMenuClick' here so the Layout can listen to this button
+export default function MobileHeader({ onMenuClick }: { onMenuClick: () => void }) {
+  const { user, authenticated, login, configureWallet } = usePrivy();
   const address = user?.wallet?.address;
 
-  // Helper to copy address
   const copyAddress = () => {
     if (address) {
       navigator.clipboard.writeText(address);
-      alert("Address copied!");
+      // No alert needed, it's cleaner without it
     }
   };
 
   return (
-    // bg-white/80 and backdrop-blur ensures it is visible and glassy
-    // h-20 gives it a defined height so it doesn't disappear
-    <header className="sticky top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-md border-b border-slate-100 z-[100] flex items-center px-4 justify-between">
+    <header className="fixed top-0 left-0 right-0 h-20 bg-white/90 backdrop-blur-md border-b border-slate-100 z-[100] flex items-center px-4 justify-between">
       
-      {/* 1. LEFT SIDE: Notification Bell replaces the Logo */}
+      {/* 1. LEFT SIDE: Notification */}
       <button className="p-2.5 bg-slate-50 rounded-2xl text-slate-400 hover:text-blue-600 transition-colors">
         <Bell size={20} />
       </button>
 
-      {/* 2. CENTER: User Address (Keeping it right where it was) */}
+      {/* 2. CENTER: Address */}
       <div className="flex flex-col items-center">
         {authenticated && address ? (
           <button 
@@ -49,10 +47,12 @@ export default function MobileHeader() {
         )}
       </div>
 
-      {/* 3. RIGHT SIDE: Profile and Hamburger Grouped */}
+      {/* 3. RIGHT SIDE: Profile and Hamburger */}
       <div className="flex items-center gap-2">
-        {/* Profile Avatar Spot */}
-        <button className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 border border-white shadow-sm overflow-hidden">
+        <button 
+          onClick={authenticated ? configureWallet : login}
+          className="w-10 h-10 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 border border-white shadow-sm overflow-hidden active:scale-95 transition-transform"
+        >
           {user?.google?.picture ? (
              <img src={user.google.picture} alt="Profile" className="w-full h-full object-cover" />
           ) : (
@@ -60,12 +60,14 @@ export default function MobileHeader() {
           )}
         </button>
 
-        {/* Hamburger Menu */}
-        <button className="p-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors">
+        {/* 2. THE FIX: We call 'onMenuClick' here when the hamburger is tapped */}
+        <button 
+          onClick={onMenuClick}
+          className="p-2.5 text-slate-600 hover:bg-slate-50 rounded-xl transition-colors active:scale-95"
+        >
           <Menu size={24} />
         </button>
       </div>
-
     </header>
   );
 }

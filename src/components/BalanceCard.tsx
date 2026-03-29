@@ -7,17 +7,17 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
   const [showBalance, setShowBalance] = useState(true);
 
   return (
-    <div className="w-full p-6 bg-[#00D094] rounded-[2.5rem] text-slate-900 shadow-lg shadow-emerald-100/30">
+    /* 1. OPay Gold Gradient using your global CSS class */
+    <div className="w-full p-6 opay-gold-card shadow-2xl shadow-amber-900/20">
       
-      {/* TOP ROW: Text first, then Eye Icon next to it */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/60">
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">
             Available Balance
           </span>
           <button 
             onClick={() => setShowBalance(!showBalance)}
-            className="p-1 hover:bg-black/5 rounded-full transition-colors"
+            className="p-1 hover:bg-white/10 rounded-full transition-colors text-white"
           >
             {showBalance ? <Eye size={14} /> : <EyeOff size={14} />}
           </button>
@@ -25,25 +25,24 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
         
         <Link 
           href="/history" 
-          className="flex items-center gap-1 text-[10px] font-black uppercase tracking-tight hover:opacity-70 transition-opacity"
+          className="flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-white/90 hover:opacity-70 transition-opacity"
         >
-          History
+          Transaction History
           <ChevronRight size={14} />
         </Link>
       </div>
 
-      {/* BOTTOM ROW: Clean balance and Top Up button */}
       <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-black italic tracking-tighter tabular-nums">
+        {/* Tabular nums makes the ETH balance look like a pro banking app */}
+        <h2 className="text-4xl font-black italic tracking-tighter tabular-nums text-white">
           {showBalance ? amount : "••••••"}
         </h2>
 
-        <button className="flex items-center gap-1.5 px-6 py-3 bg-slate-900 text-white rounded-full text-xs font-black shadow-xl active:scale-95 transition-all">
-          <Plus size={18} strokeWidth={3} />
-          TOP UP
+        <button className="flex items-center gap-1.5 px-6 py-3 bg-neutral-950 text-amber-400 rounded-full text-[10px] font-black shadow-2xl active:scale-95 transition-all border border-white/5">
+          <Plus size={16} strokeWidth={3} />
+          + ADD MONEY
         </button>
       </div>
-
     </div>
   );
 }
