@@ -17,8 +17,8 @@ export default function StakePage() {
   const { login, authenticated, ready, user } = usePrivy();
   const address = user?.wallet?.address as `0x${string}`;
   
-  // Fetch user balance for the "Max" button
-  const { data: balanceData } = useBalance({ address });
+  // Fetch user balance and allow manual refresh after a successful stake
+  const { data: balanceData, refetch: refreshBalance } = useBalance({ address });
 
   const { data: hash, error, isPending, writeContract } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
@@ -47,7 +47,12 @@ export default function StakePage() {
       return notify("Enter a valid amount", "error");
     }
 
+    // Using your preferred variable name
     const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
+
+    if (!treasuryAddress) {
+      return notify("Treasury address missing in .env", "error");
+    }
 
     try {
       writeContract({
@@ -66,24 +71,35 @@ export default function StakePage() {
     if (isConfirmed) {
       notify("Stake confirmed on Base!", "success");
       setAmount('');
+      refreshBalance(); // This updates the "Balance: X ETH" display immediately
     }
     if (error) {
-      const errorMsg = error.message?.includes("insufficient funds") 
+      const errorMsg = error.message?.toLowerCase().includes("insufficient") 
         ? "Insufficient ETH for gas" 
         : "Transaction rejected";
       notify(errorMsg, "error");
     }
-  }, [isConfirmed, error]);
+  }, [isConfirmed, error, refreshBalance]);
 
   if (!mounted) return null;
 
   const isLoading = isPending || isConfirming;
 
+  // Helper to leave a tiny bit of ETH for the network fee (Gas)
+  const setMaxAmount = () => {
+    if (balanceData) {
+      const bal = parseFloat(balanceData.formatted);
+      const gasBuffer = 0.003; // Safe buffer for Base Sepolia
+      const maxStake = bal > gasBuffer ? (bal - gasBuffer).toFixed(5) : "0";
+      setAmount(maxStake);
+    }
+  };
+
   return (
     <main className="min-h-screen p-6 pb-32 bg-slate-50 flex flex-col items-center">
-    <WisdomCarousel />
+      <WisdomCarousel />
       
-      {/* Dynamic Notification Toast */}
+      {/* Toast Notification */}
       {message && (
         <div className={`fixed top-6 z-50 w-[90%] max-w-md p-4 rounded-3xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
           status === 'success' ? 'bg-white border-green-100 text-green-600' : 
@@ -126,7 +142,7 @@ export default function StakePage() {
               <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-end">
                 <span className="font-black text-slate-300 text-xs tracking-widest uppercase mb-1">Ether</span>
                 <button 
-                  onClick={() => balanceData && setAmount(formatEther(balanceData.value))}
+                  onClick={setMaxAmount}
                   className="text-[10px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-widest transition-colors"
                 >
                   Max
@@ -160,7 +176,7 @@ export default function StakePage() {
               <Info size={18} />
             </div>
             <p className="text-[10px] font-medium leading-relaxed uppercase tracking-wider">
-              Rewards accrue every block. Unstaking may be subject to a cooldown period.
+              Rewards accrue every block. Stake your ETH to start earning BVW automatically.
             </p>
           </div>
         </div>

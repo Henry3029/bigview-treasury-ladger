@@ -16,42 +16,51 @@ export default function RewardsPage() {
   const { address, isConnected } = useAccount();
   
   // --- 1. Storage Containers (State) ---
-  const [liveApy, setLiveApy] = useState("12.5"); // Can be hardcoded or fetched from a separate oracle
+  const [liveApy] = useState("12.5"); 
   const [liveStaked, setLiveStaked] = useState("0.00");
   const [totalEarned, setTotalEarned] = useState("0.00");
   const [pending, setPending] = useState("0.00");
 
   const contractAddress = process.env.NEXT_PUBLIC_TREASURY_CONTRACT_ADDRESS as `0x${string}`;
 
-  // 2. The New "Brain": Unified Contract Read
-  // Assuming your Solidity contract has a 'getUserSummary(address)' function
+  // 2. The Correct "Brain": Read from the 'members' mapping in your ABI
   const { data, isError, isLoading, refetch } = useReadContract({
     address: contractAddress,
     abi: treasuryAbi,
-    functionName: 'getUserSummary',
+    functionName: 'members', // Matching the name in your BigViewTreasury.json
     args: [address],
     query: {
       enabled: !!address && isConnected,
     }
   });
 
-  // 3. Process the Blockchain Data
+  // 3. Process the Blockchain Data from the 'members' mapping
   useEffect(() => {
     if (data && Array.isArray(data)) {
-      // Logic: [stakedAmount, earnedAmount, pendingAmount]
-      const [staked, earned, pendingRewards] = data as [bigint, bigint, bigint];
+      // The ABI says 'members' returns: [isMember (bool), amount (uint256), unclaimedBVW (uint256)]
+      const [isMember, amount, unclaimedBVW] = data;
 
-      setLiveStaked(formatUnits(staked, 18)); // ETH has 18 decimals
-      setTotalEarned(Number(formatUnits(earned, 18)).toLocaleString(undefined, { minimumFractionDigits: 2 }));
-      setPending(Number(formatUnits(pendingRewards, 18)).toLocaleString(undefined, { minimumFractionDigits: 2 }));
+      if (isMember) {
+        // Amount is the ETH/Staked value
+        setLiveStaked(formatUnits(amount, 18));
+        
+        // unclaimedBVW is the pending reward (BVW Token)
+        const formattedPending = Number(formatUnits(unclaimedBVW, 18)).toLocaleString(undefined, { 
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 
+        });
+        
+        setPending(formattedPending);
+        setTotalEarned(formattedPending); // Setting total as pending for now since it's the live value
+      }
     }
   }, [data]);
 
   return (
     <main className="min-h-screen bg-slate-50 p-6 pb-24 flex flex-col gap-8 max-w-6xl mx-auto">
-    <WisdomCarousel />
+      {/* 4. Carousel at the very top */}
+      <WisdomCarousel />
       
-      {/* 4. Status Notifications */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter italic">Rewards Hub</h1>
@@ -81,19 +90,18 @@ export default function RewardsPage() {
         </div>
       )}
 
-      {/* 1. Header: Total Earned & Pending */}
+      {/* 5. Header: Total Earned & Pending */}
       <RewardHeader 
         totalEarned={totalEarned} 
         pending={pending} 
       />
 
-      {/* 2. Statistics Grid: APY & Global Staked */}
+      {/* 6. Statistics Grid: APY & Global Staked */}
       <StatisticsGrid 
         apy={liveApy} 
         totalStaked={liveStaked} 
       />
 
-      {/* 3. Transaction/Reward History */}
       <div className="mt-4">
         <h3 className="text-lg font-black text-slate-900 mb-6 italic tracking-tight">Recent Yield Events</h3>
         <RewardHistory />

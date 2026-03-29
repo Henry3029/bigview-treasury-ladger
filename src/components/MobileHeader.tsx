@@ -1,43 +1,46 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Menu, Bell, User } from 'lucide-react'; 
 import Image from 'next/image';
 import Sidebar from './Sidebar'; 
 import ProfileDrawer from './ProfileDrawer';
 import NotificationDropdown, { Notification } from './NotificationDropdown';
-import { useWatchContractEvent } from 'wagmi'; // 1. Import Wagmi hook
-import { treasuryAbi } from '@/lib/abi'; // Ensure you have your ABI exported here
+// import { useWatchContractEvent } from 'wagmi'; // Hidden until events are added to ABI
+import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
 
 export default function MobileHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [hasUnread, setHasUnread] = useState(false); // Start false until an event hits
+  const [hasUnread, setHasUnread] = useState(false); 
 
-  // 2. Local state to store live notifications
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  // Local state to store notifications
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: 'welcome',
+      title: 'Welcome to Bigview',
+      description: 'Your treasury dashboard is live on Base Sepolia.',
+      type: 'success',
+      time: 'JUST NOW'
+    }
+  ]);
 
-  // 3. LISTEN FOR EVENTS (e.g., "Stake" event)
-  useWatchContractEvent({
-    address: process.env.NEXT_PUBLIC_TREASURY_CONTRACT_ADDRESS as `0x${string}`,
-    abi: treasuryAbi,
-    eventName: 'Stake', // Change this to whatever your contract event is named
-    onLogs(logs) {
-      console.log('New Event Detected!', logs);
-      
-      const newNotif: Notification = {
-        id: Math.random().toString(),
-        title: 'New Stake Detected',
-        description: 'A new deposit has been confirmed on Base Sepolia.',
-        type: 'success',
-        time: 'JUST NOW'
-      };
-
-      // Add to the top of the list and show the red dot
-      setNotifications(prev => [newNotif, ...prev]);
-      setHasUnread(true);
-    },
-  });
+  /* NOTE: useWatchContractEvent is disabled because BigViewTreasury.json 
+    does not currently contain an 'eventName' called 'Stake'.
+  */
+  
+  // Example function you can call from other components to add a notification
+  const addNotification = (title: string, desc: string) => {
+    const newNotif: Notification = {
+      id: Math.random().toString(),
+      title: title,
+      description: desc,
+      type: 'success',
+      time: 'JUST NOW'
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+    setHasUnread(true);
+  };
 
   const handleToggleNotifications = () => {
     setIsNotifOpen(!isNotifOpen);
@@ -64,7 +67,10 @@ export default function MobileHeader() {
         </div>
 
         <div className="flex items-center gap-1 relative">
-          <button onClick={handleToggleNotifications} className="p-2 text-slate-600 hover:bg-slate-50 rounded-full relative transition-transform active:scale-90">
+          <button 
+            onClick={handleToggleNotifications} 
+            className="p-2 text-slate-600 hover:bg-slate-50 rounded-full relative transition-transform active:scale-90"
+          >
             <Bell size={20} />
             {hasUnread && (
               <span className="absolute top-2 right-2.5 w-2 h-2 bg-red-500 border-2 border-white rounded-full animate-pulse"></span>
