@@ -96,47 +96,45 @@ export default function StakePage() {
   };
 
   return (
-    // Added w-full to main to ensure it spans the screen
-    <main className="min-h-screen w-full p-4 pb-32 bg-slate-50 flex flex-col items-center">
+    // Added pt-24 to ensure content starts below your new fixed header
+    <main className="min-h-screen w-full p-4 pt-24 pb-32 bg-slate-50 flex flex-col items-center font-inter">
       
-      {/* 1. Ensure Carousel is full width but contained */}
+      {/* 1. Wisdom Carousel */}
       <div className="w-full max-w-lg mb-6">
         <WisdomCarousel />
       </div>
       
-      {/* Toast Notification */}
+      {/* Toast Notification: Updated to rounded-2xl */}
       {message && (
-        <div className={`fixed top-6 z-50 w-[92%] max-w-md p-4 rounded-3xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
+        <div className={`fixed top-24 z-50 w-[92%] max-w-md p-4 rounded-2xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${
           status === 'success' ? 'bg-white border-green-100 text-green-600' : 
           status === 'error' ? 'bg-white border-red-100 text-red-600' : 
           'bg-white border-blue-100 text-blue-600'
         }`}>
-          {status === 'success' ? <CheckCircle2 size={20} /> : status === 'error' ? <AlertCircle size={20} /> : <Info size={20} />}
-          <span className="text-sm font-black italic tracking-tight">{message}</span>
+          {status === 'success' ? <CheckCircle2 size={18} /> : status === 'error' ? <AlertCircle size={18} /> : <Info size={18} />}
+          <span className="text-xs font-black italic tracking-tight uppercase">{message}</span>
         </div>
       )}
 
-      {/* 2. THE STAKE CARD: Added w-full so it expands on mobile */}
-      <div className="w-full max-w-md mt-4 bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl shadow-slate-200/50 border border-white">
+      {/* 2. THE STAKE CARD: Changed from [3rem] to rounded-3xl */}
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl shadow-slate-200/40 border border-slate-100">
         
         <div className="mb-8 text-center">
-          <div className="w-14 h-14 bg-blue-600 rounded-[1.2rem] flex items-center justify-center text-white mx-auto mb-4 shadow-xl shadow-blue-100 rotate-3">
+          <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg shadow-blue-100 rotate-3 transition-transform hover:rotate-0">
             <Zap size={28} fill="currentColor" />
           </div>
-          <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2 italic tracking-tighter uppercase">Stake ETH</h2>
-          <p className="text-[10px] text-slate-400 font-bold tracking-widest leading-relaxed">
-            LOCK ASSETS ON <span className="text-blue-600">BASE SEPOLIA</span> TO EARN BVW REWARDS
+          <h2 className="text-2xl font-black text-slate-900 mb-1 italic tracking-tighter uppercase">Stake ETH</h2>
+          <p className="text-[9px] text-slate-400 font-bold tracking-[0.2em] leading-relaxed uppercase">
+            Lock Assets on <span className="text-blue-600">Base Sepolia</span>
           </p>
         </div>
 
-        {/* ... rest of your code stays the same ... */}
-
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div className="space-y-3">
-            <div className="flex justify-between items-end px-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Deposit Amount</label>
-              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
-                Balance: {balanceData ? parseFloat(balanceData.formatted).toFixed(4) : '0.00'} ETH
+            <div className="flex justify-between items-end px-1">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deposit Amount</label>
+              <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md italic uppercase">
+                Bal: {balanceData ? parseFloat(balanceData.formatted).toFixed(4) : '0.00'} ETH
               </span>
             </div>
             
@@ -146,15 +144,16 @@ export default function StakePage() {
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
-                className="w-full p-7 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-blue-500 focus:bg-white outline-none transition-all font-black text-3xl placeholder:text-slate-200"
+                // Updated input corners to rounded-2xl
+                className="w-full p-6 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:border-blue-500 focus:bg-white outline-none transition-all font-black text-3xl placeholder:text-slate-200 tabular-nums"
               />
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-end">
-                <span className="font-black text-slate-300 text-xs tracking-widest uppercase mb-1">Ether</span>
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 flex flex-col items-end">
+                <span className="font-black text-slate-300 text-[10px] tracking-widest uppercase">Ether</span>
                 <button 
                   onClick={setMaxAmount}
-                  className="text-[10px] font-black text-blue-500 hover:text-blue-700 uppercase tracking-widest transition-colors"
+                  className="text-[10px] font-black text-blue-600 hover:text-blue-800 uppercase tracking-tighter transition-colors"
                 >
-                  Max
+                  MAX AMOUNT
                 </button>
               </div>
             </div>
@@ -163,33 +162,32 @@ export default function StakePage() {
           <button 
             onClick={handleStake}
             disabled={isLoading || !ready}
-            className={`w-full py-6 bg-blue-600 text-white rounded-[1.5rem] font-black text-xl shadow-2xl shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3 ${
+            // Updated button corners to rounded-2xl
+            className={`w-full py-5 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3 italic uppercase tracking-tight ${
               isLoading ? 'opacity-80 cursor-not-allowed' : 'hover:bg-blue-700'
             }`}
           >
             {isLoading ? (
               <>
-                <Loader2 className="animate-spin" size={24} />
-                <span>Confirming...</span>
+                <Loader2 className="animate-spin" size={20} />
+                <span>Processing...</span>
               </>
             ) : (
               <>
-                <Wallet size={24} />
+                <Wallet size={20} />
                 <span>Stake Assets</span>
               </>
             )}
           </button>
 
-          <div className="pt-4 border-t border-slate-50 flex items-center gap-4 text-slate-400">
-            <div className="p-3 bg-slate-50 rounded-2xl">
-              <Info size={18} />
-            </div>
-            <p className="text-[10px] font-medium leading-relaxed uppercase tracking-wider">
-              Rewards accrue every block. Stake your ETH to start earning BVW automatically.
+          <div className="pt-6 border-t border-slate-50 flex items-start gap-3 text-slate-400">
+            <Info size={14} className="mt-0.5 text-blue-400" />
+            <p className="text-[9px] font-bold leading-relaxed uppercase tracking-wider">
+              Rewards accrue every block. Stake your ETH to start earning <span className="text-slate-600">BVW</span> automatically.
             </p>
           </div>
         </div>
       </div>
     </main>
   );
-}
+  }

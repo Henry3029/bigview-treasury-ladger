@@ -1,5 +1,4 @@
 import React from 'react';
-import WelcomeBanner from '@/components/WelcomeBanner';
 import DashboardData from '@/components/DashboardData';
 import DashboardButtons from '@/components/DashboardButtons';
 import StatusBadge from '@/components/StatusBadge';
@@ -57,7 +56,6 @@ export default async function Dashboard() {
         
         {/* 1. WELCOME SECTION */}
         <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <WelcomeBanner />
         </div>
 
         {/* 2. THE NEW OPAY-STYLE BALANCE CARD */}

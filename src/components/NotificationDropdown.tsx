@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { CheckCircle2, AlertCircle, Clock, X } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Clock, X, Bell, Trash2 } from 'lucide-react';
 
 export interface Notification {
   id: string;
@@ -22,46 +22,77 @@ export default function NotificationDropdown({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute top-14 right-0 w-[320px] bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] animate-in fade-in zoom-in duration-200">
-      {/* HEADER */}
-      <div className="p-4 border-b border-slate-50 flex items-center justify-between">
-        <span className="font-black text-xs uppercase tracking-widest text-slate-900">Notifications</span>
-        <button onClick={onClose} className="p-1 hover:bg-slate-50 rounded-lg text-slate-400">
-          <X size={16} />
-        </button>
-      </div>
+    // 1. THE FULL-SCREEN OVERLAY: Dark & Blurred like the OPay pop-ups
+    <div className="fixed inset-0 z-[200] bg-slate-950/95 backdrop-blur-md animate-in slide-in-from-bottom-full duration-500 font-inter">
+      
+      <div className="flex flex-col h-full w-full max-w-lg mx-auto">
+        
+        {/* 2. THE HEADER: Aggressive Fintech Style */}
+        <div className="p-6 flex items-center justify-between border-b border-white/5 bg-black/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-600/20 rounded-xl">
+              <Bell size={20} className="text-blue-500" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">Activity</h2>
+              <p className="text-[9px] text-slate-500 font-bold tracking-[0.2em] uppercase">Bigview Protocol</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose} 
+            className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white/40 transition-all active:scale-90"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-      {/* NOTIFICATION LIST */}
-      <div className="max-h-[350px] overflow-y-auto">
-        {notifications.length > 0 ? (
-          notifications.map((n) => (
-            <div key={n.id} className="p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
-              <div className="flex gap-3">
-                <div className="mt-0.5">
-                  {n.type === 'success' && <CheckCircle2 size={18} className="text-emerald-500" />}
-                  {n.type === 'error' && <AlertCircle size={18} className="text-red-500" />}
-                  {n.type === 'pending' && <Clock size={18} className="text-amber-500 animate-pulse" />}
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-900 leading-tight">{n.title}</p>
-                  <p className="text-[11px] text-slate-500 mt-1 leading-snug">{n.description}</p>
-                  <p className="text-[9px] font-black text-slate-300 uppercase mt-2 tracking-tighter">{n.time}</p>
+        {/* 3. NOTIFICATION LIST: High-Contrast Dark Theme */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {notifications.length > 0 ? (
+            notifications.map((n) => (
+              <div 
+                key={n.id} 
+                className="p-5 bg-white/[0.03] border border-white/[0.05] rounded-3xl hover:bg-white/[0.05] transition-all group"
+              >
+                <div className="flex gap-4">
+                  <div className="mt-1">
+                    {n.type === 'success' && <CheckCircle2 size={22} className="text-emerald-500" />}
+                    {n.type === 'error' && <AlertCircle size={22} className="text-red-500" />}
+                    {n.type === 'pending' && <Clock size={22} className="text-blue-500 animate-pulse" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="text-[13px] font-black text-white italic uppercase tracking-tight">{n.title}</p>
+                      <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{n.time}</span>
+                    </div>
+                    <p className="text-xs text-slate-400 font-medium leading-relaxed mb-3">
+                      {n.description}
+                    </p>
+                    {/* Tiny network badge */}
+                    <span className="text-[8px] font-black text-blue-500/50 bg-blue-500/10 px-2 py-0.5 rounded-md uppercase tracking-widest">
+                      Base Sepolia
+                    </span>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="h-full flex flex-col items-center justify-center text-center opacity-30">
+              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                <Bell size={32} className="text-slate-500" />
+              </div>
+              <p className="text-sm font-black text-slate-500 italic uppercase tracking-widest">No New Activity</p>
             </div>
-          ))
-        ) : (
-          <div className="p-10 text-center">
-            <p className="text-xs font-bold text-slate-400 italic">No new activity</p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* FOOTER */}
-      <div className="p-3 bg-slate-50/50 rounded-b-2xl text-center">
-        <button className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline">
-          Mark all as read
-        </button>
+        {/* 4. THE FOOTER: Floating Action */}
+        <div className="p-6 bg-black/40 border-t border-white/5 backdrop-blur-xl">
+          <button className="w-full py-5 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-[0.2em] shadow-xl hover:bg-blue-50 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+            <Trash2 size={16} />
+            Clear All History
+          </button>
+        </div>
       </div>
     </div>
   );

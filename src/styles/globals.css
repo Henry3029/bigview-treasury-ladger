@@ -1,44 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --grain-bg: #F2EFE9;
-  --grain-gold: #EAB308;
+  --bg-main: #F8FAFC; /* Clean Slate-50 background */
+  --accent-blue: #2563EB; /* Professional Bigview Blue */
+  --accent-green: #00D094; /* Your Balance Card Green */
 }
 
 body {
-  background: radial-gradient(
-    circle at 50% 40%, 
-    rgba(255, 249, 229, 1) 0%, 
-    rgba(242, 239, 233, 1) 70%
-  );
-  background-color: var(--grain-bg);
-  color: #1A1A1A;
+  background-color: var(--bg-main);
+  color: #0F172A; /* Slate-900 for high-contrast text */
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
+  @apply antialiased;
 }
 
 @layer components {
+  /* Updated to rounded-3xl - No more "dumb" giant bubbles */
   .btn-grain {
-    @apply bg-[#EAB308] text-[#1A1A1A] px-8 py-3 rounded-full font-semibold 
-           transition-all duration-300 shadow-md border border-[#D4A017]
-           hover:bg-[#F2EFE9] hover:text-[#EAB308] hover:scale-105
-           active:scale-95 flex items-center justify-center gap-2;
+    @apply bg-blue-600 text-white px-8 py-4 rounded-2xl font-black 
+           transition-all duration-300 shadow-lg shadow-blue-100
+           hover:bg-blue-700 active:scale-95 flex items-center justify-center gap-2 
+           italic uppercase tracking-tight text-sm;
   }
 
   .btn-grain-outline {
-    @apply bg-transparent text-[#1A1A1A] px-8 py-3 rounded-full font-semibold 
-           transition-all duration-300 border-2 border-[#E5E2DA]
-           hover:border-[#EAB308] hover:bg-[#FFF9E5]
-           active:scale-95 flex items-center justify-center gap-2;
+    @apply bg-white text-slate-900 px-8 py-4 rounded-2xl font-black 
+           transition-all duration-300 border border-slate-200 shadow-sm
+           hover:bg-slate-50 active:scale-95 flex items-center justify-center gap-2
+           italic uppercase tracking-tight text-sm;
   }
 
-  .btn-secondary {
-    @apply bg-[#E5E2DA] hover:bg-[#DEDAD0] text-[#1A1A1A] px-8 py-3 rounded-full font-medium transition-all border border-[#D6D3CB];
-  }
-
+  /* THE NEW STANDARD CARD: Uses rounded-3xl as we discussed */
   .glass-card {
-    @apply bg-white/30 backdrop-blur-md border border-white/40 rounded-3xl p-8;
+    @apply bg-white border border-slate-100 rounded-3xl p-6 shadow-sm shadow-slate-200/50;
+  }
+
+  /* Typography shortcuts for the Inter font */
+  .heading-heavy {
+    @apply font-black italic tracking-tighter uppercase;
   }
 }

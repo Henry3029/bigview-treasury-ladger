@@ -1,13 +1,44 @@
 "use client";
 import React, { useEffect, useState, useRef } from 'react';
+import { Quote, Sparkles, TrendingUp, Trophy, Target, Lightbulb } from 'lucide-react';
 
 const quotes = [
-  { text: "Discipline is the bridge between goals and accomplishments.", sage: "Jim Rohn" },
-  { text: "The only way to predict your future is to create It", sage: "Abraham Lincoln" },
-  { text: "The only true wisdom is in knowing you know nothing.", sage: "Socrates" },
-  { text: "Your time is limited, don't waste it living someone else's life.", sage: "Steve Jobs" },
-  { text: "Life is what happens when you're busy making other plans.", sage: "John Lennon" },
-  { text: "The journey of a thousand miles begins with one step.", sage: "Lao Tzu" },
+  { 
+    text: "Discipline is the bridge between goals and accomplishments.", 
+    sage: "Jim Rohn",
+    color: "from-emerald-900 via-green-800 to-black",
+    icon: <Target className="text-emerald-400" size={20} />
+  },
+  { 
+    text: "The only way to predict your future is to create it.", 
+    sage: "Abraham Lincoln", 
+    color: "from-blue-900 via-indigo-950 to-black",
+    icon: <Sparkles className="text-blue-300" size={20} />
+  },
+  { 
+    text: "The only true wisdom is in knowing you know nothing.", 
+    sage: "Socrates",
+    color: "from-slate-900 via-slate-800 to-black",
+    icon: <Lightbulb className="text-yellow-400" size={20} />
+  },
+  { 
+    text: "Your time is limited, don't waste it living someone else's life.", 
+    sage: "Steve Jobs",
+    color: "from-red-900 via-orange-950 to-black",
+    icon: <Trophy className="text-orange-400" size={20} />
+  },
+  { 
+    text: "Life is what happens when you're busy making other plans.", 
+    sage: "John Lennon",
+    color: "from-purple-900 via-indigo-900 to-black",
+    icon: <TrendingUp className="text-purple-300" size={20} />
+  },
+  { 
+    text: "The journey of a thousand miles begins with one step.", 
+    sage: "Lao Tzu",
+    color: "from-teal-900 via-emerald-950 to-black",
+    icon: <Quote className="text-teal-400" size={20} />
+  },
 ];
 
 export default function WisdomCarousel() {
@@ -26,7 +57,7 @@ export default function WisdomCarousel() {
         });
         setActiveIndex(nextIndex);
       }
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [activeIndex]);
@@ -38,17 +69,9 @@ export default function WisdomCarousel() {
     }
   };
 
-  const gradients = [
-    "from-blue-600 to-indigo-700",
-    "from-orange-500 to-red-600",
-    "from-emerald-500 to-teal-700"
-  ];
-
   return (
-    // Lowered 'my-10' to 'my-4' and removed white background/border to let it float
-    <section className="w-full max-w-md mx-auto my-4 overflow-hidden">
+    <section className="w-full max-w-md mx-auto my-2 overflow-hidden font-inter">
       <div className="relative">
-        {/* CAROUSEL CONTAINER */}
         <div 
           ref={scrollRef}
           onScroll={handleScroll}
@@ -56,26 +79,39 @@ export default function WisdomCarousel() {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {quotes.map((quote, index) => (
-            <div key={index} className="min-w-full snap-center px-1">
-              {/* Reduced min-h from 350px to 140px for that compact look */}
-              <div className={`bg-gradient-to-br ${gradients[index % 3]} p-6 rounded-[2rem] text-white shadow-lg flex flex-col justify-center min-h-[140px] relative`}>
+            <div key={index} className="min-w-full snap-center px-2">
+              <div className={`bg-gradient-to-br ${quote.color} p-6 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[160px] relative overflow-hidden group`}>
                 
-                {/* Decorative Quote Icon */}
-                <span className="absolute top-4 left-6 text-white/20 text-4xl font-serif">“</span>
+                {/* Decorative Shine Elements (OPay Aesthetic) */}
+                <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
+                <div className="absolute -bottom-10 -left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl" />
                 
-                <blockquote className="text-sm md:text-base font-bold leading-snug mb-3 relative z-10 px-4">
-                  {quote.text}
+                {/* Icon Header */}
+                <div className="flex items-center gap-3 mb-4 relative z-10">
+                  <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
+                    {quote.icon}
+                  </div>
+                  <span className="text-[9px] font-black text-white/40 tracking-[0.3em] uppercase italic">Bigview Insight</span>
+                </div>
+                
+                <blockquote className="text-sm md:text-base font-black leading-tight mb-2 relative z-10 italic tracking-tight uppercase">
+                  "{quote.text}"
                 </blockquote>
                 
-                <cite className="text-[10px] font-black uppercase tracking-widest opacity-80 not-italic px-4">
+                <cite className="text-[10px] font-bold text-white/50 uppercase tracking-widest not-italic relative z-10">
                   — {quote.sage}
                 </cite>
+
+                {/* Hidden Background Text for depth */}
+                <div className="absolute -right-4 bottom-2 text-white/[0.03] text-6xl font-black italic select-none">
+                  WISE
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* COMPACT DOTS */}
+        {/* COMPACT DOTS: Positioned inside the card area for a cleaner look */}
         <div className="flex justify-center space-x-1.5 mt-3">
           {quotes.map((_, i) => (
             <button
@@ -84,8 +120,8 @@ export default function WisdomCarousel() {
                 scrollRef.current?.scrollTo({ left: scrollRef.current.offsetWidth * i, behavior: 'smooth' });
                 setActiveIndex(i);
               }}
-              className={`h-1 rounded-full transition-all duration-300 ${
-                activeIndex === i ? "w-4 bg-slate-400" : "w-1 bg-slate-200"
+              className={`h-1 rounded-full transition-all duration-500 ${
+                activeIndex === i ? "w-6 bg-slate-400" : "w-1.5 bg-slate-200"
               }`}
             />
           ))}

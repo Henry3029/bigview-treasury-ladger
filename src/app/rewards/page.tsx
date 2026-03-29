@@ -57,49 +57,50 @@ export default function RewardsPage() {
   }, [data]);
 
   return (
-    // 1. Full-width background and standard padding
-    <main className="min-h-screen w-full bg-slate-50 pb-32">
+    // Added pt-24 to ensure content starts safely below the fixed header
+    <main className="min-h-screen w-full bg-slate-50 pt-24 pb-32 font-inter">
       
-      {/* 2. THE WRAPPER: Matches Dashboard & Stake for total consistency */}
-      <div className="w-full max-w-2xl mx-auto px-4 py-6 space-y-6">
+      {/* THE WRAPPER: Consistent width across all pages */}
+      <div className="w-full max-w-2xl mx-auto px-6 space-y-6">
         
-        {/* 3. Carousel at the very top */}
-        <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {/* Wisdom Carousel with smooth fade-in */}
+        <div className="w-full animate-in fade-in slide-in-from-bottom-2 duration-700">
           <WisdomCarousel />
         </div>
         
-        {/* Header Section */}
-        <div className="flex items-center justify-between px-2">
+        {/* Header Section: Minimalist and Bold */}
+        <div className="flex items-center justify-between px-1 mt-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter italic uppercase">Rewards Hub</h1>
-            <p className="text-slate-500 text-[10px] md:text-sm font-bold uppercase tracking-widest opacity-70">Monitor performance on Base</p>
+            <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] opacity-80">Syncing with Base Sepolia</p>
           </div>
           
           <button 
             onClick={() => refetch()}
             disabled={isLoading}
-            className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm active:scale-90"
+            // Updated to rounded-2xl to match Header icons
+            className="p-3 bg-white border border-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-100 transition-all shadow-sm active:scale-90"
           >
-            {isLoading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCcw size={20} />}
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <RefreshCcw size={18} />}
           </button>
         </div>
 
-        {/* Dynamic Alerts */}
+        {/* Dynamic Alerts: Updated to rounded-2xl */}
         {!isConnected && (
-          <div className="p-4 bg-blue-50 border border-blue-100 rounded-[1.5rem] flex items-center gap-3 text-blue-700 text-[11px] font-black uppercase tracking-tight">
-            <AlertCircle size={18} />
+          <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center gap-3 text-blue-700 text-[10px] font-black uppercase tracking-tight italic">
+            <AlertCircle size={16} className="text-blue-400" />
             Connect wallet for personalized stats
           </div>
         )}
 
         {isError && (
-          <div className="p-4 bg-red-50 border border-red-100 rounded-[1.5rem] flex items-center gap-3 text-red-600 text-[11px] font-black uppercase tracking-tight">
-            <AlertCircle size={18} />
+          <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-[10px] font-black uppercase tracking-tight italic">
+            <AlertCircle size={16} className="text-red-400" />
             Error syncing with Base Sepolia
           </div>
         )}
 
-        {/* 4. Main Stats Section */}
+        {/* Main Stats Section: Ensure sub-components (RewardHeader/StatisticsGrid) use rounded-3xl internaly */}
         <div className="space-y-4">
           <RewardHeader 
             totalEarned={totalEarned} 
@@ -112,22 +113,22 @@ export default function RewardsPage() {
           />
         </div>
 
-        {/* 5. History Section */}
-        <div className="pt-4">
+        {/* History Section: Sleek Labeling */}
+        <div className="pt-6">
           <div className="flex items-center gap-2 mb-6 ml-1">
             <div className="w-1.5 h-4 bg-blue-600 rounded-full" />
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recent Yield Events</h3>
+            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Recent Yield Events</h3>
           </div>
           <RewardHistory />
         </div>
 
         {/* Branding Footer */}
-        <div className="text-center pt-8 opacity-30">
-          <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]">
+        <div className="text-center pt-10 opacity-20">
+          <p className="text-[8px] font-black text-slate-400 uppercase tracking-[0.5em]">
             Bigview Protocol • Base L2
           </p>
         </div>
       </div>
     </main>
   );
-}
+ }
