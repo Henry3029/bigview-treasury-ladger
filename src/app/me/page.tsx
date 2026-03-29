@@ -1,4 +1,67 @@
-// ... (Keep all your existing imports and logic/hooks) ...
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useBalance } from 'wagmi';
+import { User, ExternalLink, LogOut, Wallet, Shield, Copy, Check } from 'lucide-react';
+
+export default function ProfilePage() {
+  const { login, logout, authenticated, ready, user } = usePrivy();
+  const { wallets } = useWallets();
+  const [mounted, setMounted] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Get the primary wallet address from Privy
+  const address = wallets[0]?.address as `0x${string}`;
+
+  // Fetch ETH Balance on Base Sepolia
+  const { data: balanceData } = useBalance({
+    address: address,
+  });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleCopy = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  if (!mounted || !ready) return null;
+
+  // Unauthenticated State
+  if (!authenticated) {
+    return (
+      <div className="min-h-[70vh] p-10 text-center flex flex-col items-center justify-center gap-8 bg-slate-50">
+        <div className="p-8 bg-white rounded-[2.5rem] shadow-xl border border-slate-100 relative">
+          <Shield size={56} className="text-blue-500 mx-auto" />
+          <div className="absolute -top-2 -right-2 bg-blue-100 p-2 rounded-full animate-pulse">
+            <Shield size={16} className="text-blue-600" />
+          </div>
+        </div>
+        <div className="max-w-xs">
+          <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter italic">Secure Profile</h2>
+          <p className="text-slate-500 font-medium leading-relaxed">
+            Please sign in with <span className="text-blue-600 font-bold">Privy</span> to manage your Base Sepolia treasury assets.
+          </p>
+        </div>
+        <button 
+          onClick={login}
+          className="bg-blue-600 text-white px-12 py-5 rounded-[1.5rem] font-black text-lg hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 active:scale-95"
+        >
+          Connect & Sign In
+        </button>
+      </div>
+    );
+  }
+
+  const truncatedAddress = address 
+    ? `${address.slice(0, 6)}...${address.slice(-4)}` 
+    : "No Address Found";
 
   return (
     <main className="min-h-screen bg-slate-50 p-6 pb-24 flex flex-col gap-6 max-w-2xl mx-auto font-inter">
