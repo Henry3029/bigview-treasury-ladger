@@ -1,160 +1,169 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther } from 'viem';
-import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { createWalletClient, custom, parseEther } from 'viem';
+import { baseSepolia } from 'viem/chains';
 import { ArrowDown, RefreshCw } from 'lucide-react';
 
 export default function SwapInterface() {
   const [amountIn, setAmountIn] = useState("");
-  const [amountOut, setAmountOut] = useState("0");
+  const [amountOut, setAmountOut] = useState("0.00");
   const [mounted, setMounted] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [quoteData, setQuoteData] = useState<any>(null);
 
   const { login, authenticated, ready } = usePrivy();
-  const { data: hash, error, isPending, writeContract } = useWriteContract();
+  const { wallets } = useWallets();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  useEffect(() => { setMounted(true); }, []);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // --- MOCK PRICE CALCULATION (ETH to USDC) ---
+  // --- REAL 0X PRICE FETCHING ---
   useEffect(() => {
     const getPrice = async () => {
       if (!amountIn || isNaN(Number(amountIn)) || Number(amountIn) <= 0) {
-        setAmountOut("0");
+        setAmountOut("0.00");
         return;
       }
       setIsCalculating(true);
       
-      // Simulate Base Sepolia RPC delay
-      setTimeout(() => {
-        // Mock Rate: 1 ETH = 3500 USDC
-        const mockRate = 3500;
-        const result = Number(amountIn) * mockRate;
-        setAmountOut(result.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+      try {
+        // Convert ETH to Wei (10^18)
+        const sellAmountWei = parseEther(amountIn).toString();
+        
+        // Calling the API route we created earlier
+        const res = await fetch(`/api/swap?sellToken=ETH&buyToken=USDC&sellAmount=${sellAmountWei}`);
+        const data = await res.json();
+
+        if (data.buyAmount) {
+          // USDC is 6 decimals on Base
+          const formattedOut = (Number(data.buyAmount) / 10 ** 6).toFixed(2);
+          setAmountOut(formattedOut);
+          setQuoteData(data); // Store the full transaction data
+        }
+      } catch (err) {
+        console.error("0x Fetch Error:", err);
+      } finally {
         setIsCalculating(false);
-      }, 600);
+      }
     };
 
-    const timeoutId = setTimeout(getPrice, 400);
+    const timeoutId = setTimeout(getPrice, 500); // Debounce
     return () => clearTimeout(timeoutId);
   }, [amountIn]);
 
   const handleSwap = async () => {
-    if (!ready) return;
+    if (!ready || !authenticated) return login();
+    if (!quoteData) return;
 
-    if (!authenticated) {
-      login();
-      return;
-    }
+    const wallet = wallets[0];
+    if (!wallet) return alert("Please connect your wallet");
 
-    const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
-
+    setIsCalculating(true);
     try {
-      writeContract({
-        address: treasuryAddress as `0x${string}`,
-        abi: treasuryAbi,
-        functionName: 'stakeAndDelegate', // Or your specific swap/deposit function
-        args: [],
-        value: parseEther(amountIn),
+      const provider = await wallet.getEthereumProvider();
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(provider)
       });
+
+      // Execute the swap using the data returned by 0x
+      const hash = await walletClient.sendTransaction({
+        to: quoteData.to as `0x${string}`,
+        data: quoteData.data as `0x${string}`,
+        value: BigInt(quoteData.value),
+      });
+
+      console.log("Transaction Hash:", hash);
+      alert("Swap successful! Your fee was sent to the Bigview wallet.");
+      setAmountIn("");
     } catch (err) {
       console.error("Swap Error:", err);
+    } finally {
+      setIsCalculating(false);
     }
   };
 
-  useEffect(() => {
-    if (isConfirmed) {
-      alert("Swap successful on Base Sepolia!");
-      setAmountIn("");
-    }
-  }, [isConfirmed]);
-
   if (!mounted) return null;
 
-  const loading = isPending || isConfirming;
-
   return (
-    <div className="w-full bg-white rounded-[2.5rem] p-8 shadow-2xl border border-slate-50">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-black text-slate-800 tracking-tight italic">Bigview Swap</h2>
-        <div className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-full border border-blue-100 uppercase tracking-widest">
-          Base Sepolia
-        </div>
+  /* 1. Main Container: Using Bigview Violet and rounded-bigview */
+  <div className="w-full bg-violet-background rounded-bigview p-6 shadow-2xl border border-white/5 max-w-md mx-auto font-inter">
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-lg font-black text-white tracking-tight italic uppercase">Bigview Swap</h2>
+      <div className="px-2 py-1 bg-gold-buttons/10 text-gold-buttons text-[8px] font-black rounded-bigview border border-gold-buttons/20 uppercase tracking-widest italic">
+        Base Sepolia Live
       </div>
-
-      {/* INPUT BOX (ETH) */}
-      <div className="group bg-slate-50 p-6 rounded-[2rem] mb-2 border-2 border-transparent focus-within:border-blue-100 transition-all">
-        <div className="flex justify-between items-center mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          <span>Pay</span>
-          <span className="text-blue-500/50">Wallet Connected</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <input 
-            type="number"
-            placeholder="0.00"
-            className="bg-transparent text-3xl font-black outline-none w-full text-slate-800 placeholder:text-slate-200"
-            value={amountIn}
-            onChange={(e) => setAmountIn(e.target.value)}
-          />
-          <div className="flex items-center bg-white shadow-sm border border-slate-100 pl-2 pr-4 py-2 rounded-2xl gap-2 shrink-0">
-            <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold">ETH</div>
-            <span className="font-black text-sm text-slate-700 uppercase">ETH</span>
-          </div>
-        </div>
-      </div>
-
-      {/* REVERSE ICON */}
-      <div className="flex justify-center -my-5 relative z-10">
-        <div className="bg-white border-[6px] border-slate-50 p-3 rounded-2xl shadow-xl text-blue-600 hover:rotate-180 transition-transform duration-500 cursor-pointer">
-          <ArrowDown size={18} strokeWidth={3} />
-        </div>
-      </div>
-
-      {/* OUTPUT BOX (USDC) */}
-      <div className="bg-slate-50 p-6 rounded-[2rem] mb-8 border-2 border-transparent">
-        <div className="flex justify-between items-center mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-          <span>Receive (Estimated)</span>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-3xl font-black text-slate-800 overflow-hidden truncate">
-            {isCalculating ? <RefreshCw className="animate-spin text-slate-300" size={24} /> : amountOut}
-          </div>
-          <div className="flex items-center bg-white shadow-sm border border-slate-100 pl-2 pr-4 py-2 rounded-2xl gap-2 shrink-0">
-            <div className="w-7 h-7 bg-green-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold tracking-tighter italic">USDC</div>
-            <span className="font-black text-sm text-slate-700 uppercase">USDC</span>
-          </div>
-        </div>
-      </div>
-
-      {/* PRICE INFO TABLE */}
-      {amountIn && (
-        <div className="px-4 mb-6 space-y-2">
-          <div className="flex justify-between text-[11px] font-bold">
-            <span className="text-slate-400 uppercase tracking-tighter">Slippage Tolerance</span>
-            <span className="text-slate-600">0.5%</span>
-          </div>
-          <div className="flex justify-between text-[11px] font-bold">
-            <span className="text-slate-400 uppercase tracking-tighter">Route</span>
-            <span className="text-blue-500 underline decoration-dotted">Base → Bigview Liquidity</span>
-          </div>
-        </div>
-      )}
-
-      <button 
-        disabled={!amountIn || loading || isCalculating}
-        onClick={handleSwap}
-        className="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black text-lg shadow-2xl shadow-slate-200 hover:bg-blue-600 transition-all disabled:opacity-20 disabled:grayscale uppercase tracking-widest"
-      >
-        {loading ? "Signing Transaction..." : isCalculating ? "Fetching Quote..." : "Swap Assets"}
-      </button>
     </div>
-  );
+
+    {/* INPUT BOX (ETH) */}
+    <div className="group bg-black/40 p-5 rounded-bigview mb-1.5 border border-white/5 focus-within:border-gold-buttons/40 transition-all">
+      <div className="flex justify-between items-center mb-2 text-[9px] font-black text-white/30 uppercase tracking-widest">
+        <span>You Pay</span>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <input 
+          type="number"
+          placeholder="0.00"
+          className="bg-transparent text-2xl font-black outline-none w-full text-white placeholder:text-white/10 font-inter"
+          value={amountIn}
+          onChange={(e) => setAmountIn(e.target.value)}
+        />
+        <div className="flex items-center bg-violet-glow/10 border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
+          <span className="font-black text-xs text-gold-buttons uppercase italic">ETH</span>
+        </div>
+      </div>
+    </div>
+
+    {/* REVERSE ICON - Bigview Gold Style */}
+    <div className="flex justify-center -my-4 relative z-10">
+      <div className="bg-gold-buttons text-text-color p-2 rounded-bigview border-[4px] border-violet-background shadow-xl transition-transform hover:scale-110">
+        <ArrowDown size={14} strokeWidth={4} />
+      </div>
+    </div>
+
+    {/* OUTPUT BOX (USDC) */}
+    <div className="bg-white/[0.02] p-5 rounded-bigview mb-6 border border-white/5">
+      <div className="flex justify-between items-center mb-2 text-[9px] font-black text-white/30 uppercase tracking-widest">
+        <span>You Receive (After 1% Bigview Fee)</span>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="text-2xl font-black text-white/40 font-inter">
+          {isCalculating ? <RefreshCw className="animate-spin text-white/20" size={20} /> : amountOut}
+        </div>
+        <div className="flex items-center bg-white/5 border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
+          <span className="font-black text-xs text-emerald-500 uppercase italic">USDC</span>
+        </div>
+      </div>
+    </div>
+
+    {/* PRICE INFO TABLE */}
+    {amountIn && (
+      <div className="px-2 mb-6 space-y-1">
+        <div className="flex justify-between text-[9px] font-black uppercase italic">
+          <span className="text-white/20">Slippage Protection</span>
+          <span className="text-white/40">Auto (0.5%)</span>
+        </div>
+        <div className="flex justify-between text-[9px] font-black uppercase italic">
+          <span className="text-white/20">Provider</span>
+          <span className="text-gold-buttons/80">0x Aggregator</span>
+        </div>
+      </div>
+    )}
+
+    {/* Primary Action Button: Bigview Gold */}
+    <button 
+      disabled={!amountIn || isCalculating}
+      onClick={handleSwap}
+      className="w-full py-4 bg-gold-buttons text-text-color rounded-bigview font-black text-base shadow-xl shadow-gold-buttons/10 hover:opacity-90 transition-all disabled:opacity-20 uppercase tracking-widest italic"
+    >
+      {isCalculating ? "Fetching Best Price..." : "Execute Swap"}
+    </button>
+
+    <p className="text-[8px] text-white/30 text-center mt-4 font-bold uppercase italic tracking-tighter">
+      1% Protocol fee supports the Bigview Nigeria Ecosystem
+    </p>
+  </div>
+);
 }

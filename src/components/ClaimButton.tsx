@@ -2,24 +2,18 @@
 
 import React, { useState } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { encodeFunctionData, createPublicClient, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
 
 export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
+  const [isConfirming, setIsConfirming] = useState(false);
 
-  // 1. Privy Hooks for onboarding
   const { login, ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const wallet = wallets[0]; // Gets the active wallet (Embedded or External)
-
-  // 2. Wagmi Hooks for the transaction
-  const { data: hash, error, isPending, writeContract } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const wallet = wallets[0]; 
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
@@ -31,12 +25,11 @@ export const ClaimButton = () => {
   };
 
   const handleClaim = async () => {
-    // 3. ENHANCED VALIDATION
-    if (!ready) return; // Wait for Privy to load
+    if (!ready) return;
 
     if (!authenticated) {
       notify("Redirecting to login...", "info");
-      login(); // This triggers Privy's "Social + Wallet" modal
+      login();
       return;
     }
 
@@ -44,58 +37,87 @@ export const ClaimButton = () => {
       return notify("No wallet connected!", "error");
     }
 
-    // Ensure we are on Base Sepolia (Chain ID 84532)
-    if (wallet.chainId !== 'eip155:84532') {
-      await wallet.switchChain(84532);
-    }
-
-    const treasuryAddress = "0xD9f4Ef73dd57c40c5e5FE0e2bbd9Ba4535645f44";
+    setIsConfirming(true);
 
     try {
-      writeContract({
-        address: treasuryAddress as `0x${string}`,
+      // 1. Ensure correct chain
+      if (wallet.chainId !== 'eip155:84532') {
+        await wallet.switchChain(84532);
+      }
+
+      // 2. Encode the function call (Translator)
+      const data = encodeFunctionData({
         abi: treasuryAbi,
-        functionName: 'claimRewards',
-        args: [], 
+        functionName: 'claimGovernanceRewards',
+        args: [],
       });
-    } catch (err) {
-      console.error("Contract call failed:", err);
-      notify("Transaction failed.", "error");
+
+      // 3. Send Transaction via Privy
+      const treasuryAddress = "0xD9f4Ef73dd57c40c5e5FE0e2bbd9Ba4535645f44";
+      const txHash = await wallet.sendTransaction({
+        to: treasuryAddress as `0x${string}`,
+        data: data,
+        // value is 0 by default for claims
+      });
+
+      notify("Transaction sent! Waiting for confirmation...", "info");
+
+      // 4. Manual Wait for Receipt (Viem Public Client)
+      const publicClient = createPublicClient({
+        chain: baseSepolia,
+        transport: http(),
+      });
+
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}` });
+
+      if (receipt.status === 'success') {
+        notify('Claim Successful!', 'success');
+      } else {
+        notify('Transaction reverted on-chain.', 'error');
+      }
+
+    } catch (err: any) {
+      console.error("Claim failed:", err);
+      const errorMsg = err.message?.includes("User rejected") 
+        ? "Transaction rejected." 
+        : "Claim failed.";
+      notify(errorMsg, "error");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
-  // Keep your existing validation/UI feedback logic
-  React.useEffect(() => {
-    if (isConfirmed) notify('Claim Successful!', 'success');
-    if (error) notify(error.message || 'Transaction failed.', 'error');
-  }, [isConfirmed, error]);
-
-  const isLoading = isPending || isConfirming;
-
   return (
     <>
-      {/* Your existing notification UI remains exactly the same */}
       {message && (
-        <div className={`mx-4 mb-4 p-4 border rounded-2xl flex items-center gap-2 animate-in fade-in slide-in-from-top-2 ${
-          status === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 
-          status === 'error' ? 'bg-red-50 border-red-200 text-red-700' : 
-          'bg-blue-50 border-blue-200 text-blue-700'
+        /* 1. Status Message: Using Bigview rounding and text-color logic */
+        <div className={`mx-4 mb-4 p-4 border rounded-bigview flex items-center gap-2 animate-in fade-in slide-in-from-top-2 shadow-sm ${
+          status === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 
+          status === 'error' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 
+          'bg-gold-buttons/10 border-gold-buttons/20 text-gold-buttons'
         }`}>
+          {/* Animated Status Dot */}
           <div className={`w-2 h-2 rounded-full animate-pulse ${
-            status === 'success' ? 'bg-green-500' : 
+            status === 'success' ? 'bg-emerald-500' : 
             status === 'error' ? 'bg-red-500' : 
-            'bg-blue-500'
+            'bg-gold-buttons'
           }`}></div>
-          <span className="text-sm font-medium">{message}</span>
+          
+          <span className="text-[10px] font-black uppercase tracking-tight italic">
+            {message}
+          </span>
         </div>
       )}
       
+      {/* 2. Main Action Button: Using bg-gold-buttons and text-text-color */}
       <button 
         onClick={handleClaim}
-        disabled={isLoading || !ready}
-        className={`btn-grain py-2 px-6 transition-all ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
+        disabled={isConfirming || !ready}
+        className={`bg-gold-buttons text-text-color py-3 px-8 rounded-bigview transition-all font-black uppercase text-xs italic tracking-widest shadow-xl ${
+          isConfirming ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'
+        }`}
       >
-        {isLoading ? 'Processing...' : !authenticated ? 'Connect to Claim' : 'Claim Now'}
+        {isConfirming ? 'Processing...' : !authenticated ? 'Connect to Claim' : 'Claim Now'}
       </button>
     </>
   );

@@ -14,6 +14,7 @@ import { X } from 'lucide-react';
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-inter', // ðŸ‘ˆ Add this line!
 });
 
 // Dummy data to show inside the bell when it opens
@@ -43,65 +44,70 @@ export default function RootLayout({
   const [isNotifOpen, setIsNotifOpen] = useState(false); // NEW STATE FOR BELL
 
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased text-white bg-neutral-950 overflow-x-hidden`}>
-        <Providers>
-          <WelcomeBanner />
+  <html lang="en">
+    {/* Clean Slate: Ensure the main background is consistent everywhere */}
+    <body className={`${inter.variable} font-inter antialiased text-text-color bg-violet-main-background overflow-x-hidden`}>
+      <Providers>
+        <WelcomeBanner />
 
-          {/* 1. NOTIFICATION DROPDOWN (OPay Style) */}
-          <NotificationDropdown 
-            isOpen={isNotifOpen} 
-            onClose={() => setIsNotifOpen(false)} 
-            notifications={DUMMY_NOTIFICATIONS}
+        {/* 1. NOTIFICATION DROPDOWN */}
+        <NotificationDropdown 
+          isOpen={isNotifOpen} 
+          onClose={() => setIsNotifOpen(false)} 
+          notifications={DUMMY_NOTIFICATIONS}
+        />
+
+        {/* 2. MOBILE SIDEBAR DRAWER */}
+        <div className={`lg:hidden fixed inset-0 z-[150] transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+          <div 
+            className="absolute inset-0 bg-black/60 backdrop-blur-md" 
+            onClick={() => setIsMenuOpen(false)} 
           />
+          {/* UPDATED: Changed bg-neutral-950 to a subtle glass effect to match the brand */}
+          <aside className={`absolute inset-y-0 left-0 w-[280px] bg-violet-background/95 backdrop-blur-2xl transition-transform duration-300 ease-out shadow-2xl border-r border-white/5 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+             <div className="h-full overflow-y-auto">
+               <Sidebar />
+             </div>
+             <button 
+               onClick={() => setIsMenuOpen(false)} 
+               className="absolute top-6 right-4 p-2 bg-white/5 rounded-bigview text-white/40 active:scale-95 border border-white/5"
+             >
+               <X size={20} />
+             </button>
+          </aside>
+        </div>
 
-          {/* 2. MOBILE SIDEBAR DRAWER */}
-          <div className={`lg:hidden fixed inset-0 z-[150] transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div 
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
-              onClick={() => setIsMenuOpen(false)} 
-            />
-            <aside className={`absolute inset-y-0 left-0 w-[280px] bg-neutral-950 transition-transform duration-300 ease-out shadow-2xl border-r border-white/5 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-               <div className="h-full overflow-y-auto">
-                 <Sidebar />
-               </div>
-               <button 
-                 onClick={() => setIsMenuOpen(false)} 
-                 className="absolute top-6 right-4 p-2 bg-neutral-900 rounded-xl text-neutral-500 active:scale-95 border border-white/5"
-               >
-                 <X size={20} />
-               </button>
-            </aside>
+        <div className="flex min-h-screen">
+          {/* 3. DESKTOP SIDEBAR: Removed neutral-950 for consistent violet depth */}
+          <aside className="hidden lg:block fixed inset-y-0 left-0 w-[260px] border-r border-white/5 bg-black/20 backdrop-blur-sm z-40">
+            <Sidebar />
+          </aside>
+
+          <div className="flex flex-col flex-1 w-full lg:ml-[260px]">
+            
+            {/* 4. MOBILE HEADER: Passing handlers */}
+            <MobileHeader 
+              onMenuClick={() => setIsMenuOpen(true)} 
+              onNotificationClick={() => setIsNotifOpen(true)}
+            /> 
+
+            <main className="flex-grow w-full min-h-screen">
+              {children}
+            </main>
+
+            {/* 5. FOOTER: Updated branding and removed neutral-950 */}
+            <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/20 border-t border-white/5 italic">
+              © 2026 Bigview Treasury-Ledger • v2.0
+            </footer>
           </div>
 
-          <div className="flex min-h-screen">
-            <aside className="hidden lg:block fixed inset-y-0 left-0 w-[260px] border-r border-white/5 bg-neutral-950 z-40">
-              <Sidebar />
-            </aside>
-
-            <div className="flex flex-col flex-1 w-full lg:ml-[260px]">
-              
-              {/* 3. MOBILE HEADER: Now passing BOTH click handlers */}
-              <MobileHeader 
-                onMenuClick={() => setIsMenuOpen(true)} 
-                onNotificationClick={() => setIsNotifOpen(true)} // NOW CONNECTED
-              /> 
-
-              <main className="flex-grow w-full min-h-screen">
-                {children}
-              </main>
-
-              <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-widest text-neutral-600 border-t border-white/5 bg-neutral-950">
-                Â© 2026 Bigview Treasury-Ledger
-              </footer>
-            </div>
-
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-neutral-950/80 backdrop-blur-xl border-t border-white/5">
-              <BottomNav />
-            </div>
+          {/* 6. BOTTOM NAV: Glassmorphism update */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-t border-white/5">
+            <BottomNav />
           </div>
-        </Providers>
-      </body>
-    </html>
-  );
+        </div>
+      </Providers>
+    </body>
+  </html>
+);
 }

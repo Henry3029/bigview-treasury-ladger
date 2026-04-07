@@ -25,18 +25,26 @@ export default function StatusBadge({ label }: StatusBadgeProps) {
   const borderColor = isConnected ? 'border-green-100' : 'border-red-100';
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all
-      ${bgColor} ${textColor} ${borderColor}`}>
-      
-      {/* The Status Dot */}
-      <span className={`h-2 w-2 rounded-full ${isConnected ? 'animate-pulse' : ''} ${activeColor}`}></span>
-      
-      {/* The Label */}
-      <span>
-        {isConnected && address
-          ? `BASE: ${address.slice(0, 6)}...${address.slice(-4)}` 
-          : label || "Disconnected"}
-      </span>
-    </div>
-  );
+  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-bigview text-[10px] font-black uppercase tracking-widest italic border transition-all shadow-sm
+    ${isConnected 
+      ? 'bg-gold-buttons/10 text-gold-buttons border-gold-buttons/20' 
+      : 'bg-violet-glow/5 text-white/30 border-white/5'
+    }`}>
+    
+    {/* The Bigview Status Dot: Using Gold for active connectivity */}
+    <span className={`h-1.5 w-1.5 rounded-full transition-colors 
+      ${isConnected 
+        ? 'bg-gold-buttons animate-pulse shadow-[0_0_8px_rgba(255,215,0,0.5)]' 
+        : 'bg-white/20'
+      }`}>
+    </span>
+    
+    {/* The Label: Applied tracking and italic styling */}
+    <span className="tracking-[0.15em]">
+      {isConnected && address
+        ? `BASE: ${address.slice(0, 6)}...${address.slice(-4)}` 
+        : label || "Disconnected"}
+    </span>
+  </div>
+);
 }

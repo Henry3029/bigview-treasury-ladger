@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React from 'react';
 import SwapInterface from '@/components/SwapInterface';
@@ -6,57 +6,57 @@ import { ArrowLeftRight, Activity, ShieldCheck } from 'lucide-react';
 
 export default function SwapPage() {
   return (
-    <div className="min-h-screen bg-slate-50 relative overflow-hidden flex flex-col items-center justify-center py-20 px-6">
+    /* 1. CLEAN SLATE: Removed bg-neutral-950 to let layout.tsx handle the background */
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start pt-16 pb-20 px-6 font-inter">
       
-      {/* 1. Background Decorative Elements (Modern DeFi Style) */}
-      {/* Soft blue glow top-left */}
-      <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] bg-blue-400/10 rounded-full blur-[120px] pointer-events-none" />
-      {/* Deep indigo glow bottom-right */}
-      <div className="absolute bottom-[-15%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* 1. Background Decorative Elements (Updated to Brand Violet Glow) */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-violet-glow/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-violet-glow/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* 2. Page Header */}
-      <div className="text-center mb-10 relative z-10">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-slate-100 shadow-sm mb-6">
-          <ShieldCheck size={14} className="text-blue-500" />
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Verified Base Protocol</span>
+      <div className="text-center mb-8 relative z-10 w-full">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
+          <ShieldCheck size={12} className="text-gold-buttons" />
+          <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] italic">Verified Base Protocol</span>
         </div>
         
-        <h1 className="text-5xl font-black text-slate-900 tracking-tighter mb-3 italic">
+        <h1 className="text-4xl font-black text-white tracking-tighter mb-2 italic uppercase">
           Exchange Assets
         </h1>
-        <p className="text-slate-500 font-medium max-w-sm mx-auto leading-relaxed">
-          Swap <span className="text-blue-600 font-bold">Base Sepolia</span> tokens instantly with near-zero friction.
+        <p className="text-white/40 font-black text-[10px] max-w-xs mx-auto leading-relaxed uppercase italic tracking-widest">
+          Swap <span className="text-gold-buttons">Base Sepolia</span> tokens with <span className="text-white">Bigview</span> Liquidity.
         </p>
       </div>
 
-      {/* 3. The Swap Component */}
-      <div className="w-full max-w-md relative z-10">
-        <div className="absolute -top-4 -right-4 bg-blue-600 text-white p-3 rounded-2xl shadow-xl rotate-12 z-20">
-          <ArrowLeftRight size={20} />
+      {/* 3. The Swap Component - Unified with Bigview Tokens */}
+      <div className="w-full max-w-md relative z-10 mt-4">
+        {/* Floating Icon - Updated to Gold/Sharp with Bigview Rounding */}
+        <div className="absolute -top-3 -right-3 bg-gold-buttons text-text-color p-2.5 rounded-bigview shadow-2xl rotate-12 z-20 border-4 border-violet-background">
+          <ArrowLeftRight size={18} strokeWidth={3} />
         </div>
         <SwapInterface />
       </div>
 
       {/* 4. Footer Info & Network Status */}
-      <div className="mt-12 flex flex-col items-center gap-6 relative z-10">
-        <div className="flex gap-8 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-          <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-slate-100">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+      <div className="mt-10 flex flex-col items-center gap-4 relative z-10">
+        <div className="flex gap-4 text-[9px] font-black text-white/20 uppercase tracking-[0.15em] italic">
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-bigview border border-white/5">
+            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             Base Sepolia
           </div>
-          <div className="flex items-center gap-2">
-            Slippage: <span className="text-slate-900">0.5%</span>
+          <div className="flex items-center gap-1.5">
+            Slippage: <span className="text-white/40">0.5%</span>
           </div>
-          <div className="flex items-center gap-2">
-            Fee: <span className="text-slate-900">0.3%</span>
+          <div className="flex items-center gap-1.5">
+            Fee: <span className="text-gold-buttons">1.0%</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-slate-300">
-          <Activity size={14} />
-          <span className="text-[9px] font-bold uppercase tracking-widest">Real-time pricing active</span>
+        <div className="flex items-center gap-2 text-white/10">
+          <Activity size={12} />
+          <span className="text-[8px] font-black uppercase tracking-[0.2em]">Live Pricing Engine</span>
         </div>
       </div>
     </div>
   );
-}
+  }

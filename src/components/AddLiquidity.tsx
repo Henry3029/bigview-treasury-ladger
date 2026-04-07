@@ -1,113 +1,170 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseEther, parseUnits } from 'viem';
+import { usePrivy, useWallets } from '@privy-io/react-auth'; // 1. Added useWallets
+import { createWalletClient, custom, parseEther } from 'viem'; // 2. Pure Viem
+import { baseSepolia } from 'viem/chains';
 import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
 
 export default function AddLiquidity() {
   const [amountX, setAmountX] = useState<string>("");
+  const [loading, setLoading] = useState(false); // 3. Local loading state
   const [mounted, setMounted] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
+  const notify = (text: string, type: 'success' | 'error' | 'info') => {
+  setMessage(text);
+  setStatus(type);
+  
+  // This removes the message after 4 seconds
+  setTimeout(() => {
+    setMessage(null);
+    setStatus(null);
+  }, 4000);
+};
 
   const { login, authenticated, ready } = usePrivy();
-  const { data: hash, error, isPending, writeContract } = useWriteContract();
+  const { wallets } = useWallets(); // 4. Get the active wallet
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   const handleAction = async () => {
-    if (!ready) return;
+    if (!ready || !authenticated) return login();
+    if (!amountX || Number(amountX) <= 0) return alert("Enter a valid amount");
 
-    if (!authenticated) {
-      login();
-      return;
-    }
+    const wallet = wallets[0]; // Get the user's connected wallet
+    if (!wallet) return notify("No wallet connected", "info");
 
-    const amountInNumber = Number(amountX);
-    if (!amountInNumber || amountInNumber <= 0) {
-      return alert("Enter a valid amount");
-    }
-
-    const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
-
+    setLoading(true);
     try {
-      // In EVM, we use writeContract. 
-      // If this is a simple ETH deposit to your Treasury:
-      writeContract({
-        address: treasuryAddress as `0x${string}`,
-        abi: treasuryAbi,
-        functionName: 'stakeAndDelegate', // Or your specific liquidity function
-        args: [], 
-        value: parseEther(amountX), 
+      // 5. Create a Viem Wallet Client using Privy's provider
+      const provider = await wallet.getEthereumProvider();
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(provider)
       });
 
+      const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+
+      // 6. Send Transaction
+      const hash = await walletClient.writeContract({
+        address: treasuryAddress,
+        abi: treasuryAbi,
+        functionName: 'stakeAndDelegate',
+        args: [],
+        value: parseEther(amountX),
+      });
+
+      console.log("Transaction Hash:", hash);
+      notify("Success! Assets added to Bigview Treasury.", "success");
+      setAmountX("");
+      
     } catch (err) {
       console.error("Transaction Error:", err);
+      notify("Transaction failed. Check console for details.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (isConfirmed) {
-      alert("Success! Assets added to Bigview Treasury.");
-      setAmountX("");
-    }
-  }, [isConfirmed]);
-
   if (!mounted) return null;
 
-  const loading = isPending || isConfirming;
-
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl border border-slate-50">
-      <h2 className="text-xl font-black text-slate-800 mb-6 italic tracking-tight">Deposit Assets</h2>
-      
-      <div className="space-y-4 mb-8">
-        {/* Input for ETH */}
-        <div className="bg-slate-50 p-5 rounded-3xl border border-transparent focus-within:border-blue-200 transition-all">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amount to Stake</label>
-          <div className="flex items-center justify-between mt-1">
-            <input 
-              type="number"
-              placeholder="0.00"
-              className="bg-transparent text-2xl font-bold outline-none w-full text-slate-800 placeholder:text-slate-200"
-              value={amountX}
-              onChange={(e) => setAmountX(e.target.value)}
-            />
-            <span className="font-black text-blue-600 ml-2">ETH</span>
-          </div>
+  <div className="bg-gold-background rounded-bigview p-6 shadow-2xl border border-white/5 max-w-md mx-auto relative overflow-hidden">
+    
+    {/* 1. HEADER */}
+    <div className="flex items-center justify-between mb-6">
+      <div>
+        <h2 className="text-lg font-black text-text-color italic tracking-tight uppercase leading-none">
+          Deposit Assets
+        </h2>
+        <p className="text-[9px] font-bold text-text-color uppercase tracking-widest mt-1">
+          Bigview Treasury
+        </p>
+      </div>
+      <div className="flex items-center gap-2 bg-black/40 px-2.5 py-1 rounded-bigview border border-white/5">
+        <div className="w-1.5 h-1.5 rounded-bigview bg-emerald-500 animate-pulse" />
+        <span className="text-[8px] font-black text-text-color uppercase italic tracking-tighter">Base Sepolia</span>
+      </div>
+    </div>
+
+    {/* 2. DYNAMIC FEEDBACK (MESSAGE BOX) - RE-ADDED & STYLED SHARP */}
+    {message && (
+      <div className={`mb-4 p-4 rounded-bigview text-[11px] font-black uppercase italic tracking-tighter border animate-in fade-in slide-in-from-top-2 ${
+        status === 'success' 
+          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' 
+          : status === 'error' 
+          ? 'bg-red-500/10 border-red-500/20 text-red-500' 
+          : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+      }`}>
+        <div className="flex items-center gap-2">
+          {status === 'success' && "✓"}
+          {status === 'error' && "⚠"}
+          {message}
         </div>
+      </div>
+    )}
 
-        <div className="text-center text-slate-300 text-xl font-light">+</div>
-
-        {/* Display for USDC (Calculated/Mocked for UI) */}
-        <div className="bg-slate-50 p-5 rounded-3xl opacity-60">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estimated Value</label>
-          <div className="flex items-center justify-between mt-1">
-            <div className="text-2xl font-bold text-slate-400">
-              {amountX ? (Number(amountX) * 3500).toFixed(2) : "0.00"}
-            </div>
-            <span className="font-black text-green-500 ml-2">USDC</span>
+    {/* 3. THE ACTION GRID */}
+    <div className="grid grid-cols-1 gap-2 mb-6">
+      
+      {/* Top Input Card */}
+      <div className="group bg-black/40 p-5 rounded-xl border border-white/5 focus-within:border-amber-500/40 transition-all duration-300">
+        <div className="flex justify-between items-center mb-1.5">
+          <label className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em]">
+            You Send
+          </label>
+        </div>
+        <div className="flex items-center justify-between">
+          <input 
+            type="number"
+            placeholder="0.00"
+            className="bg-transparent text-2xl font-black outline-none w-full text-text-color placeholder:text-text-color font-inter"
+            value={amountX}
+            onChange={(e) => setAmountX(e.target.value)}
+          />
+          <div className="flex items-center gap-2 bg-neutral-800 px-3 py-1.5 rounded-lg border border-white/10">
+            <span className="font-black text-text-color italic text-sm">ETH</span>
           </div>
         </div>
       </div>
 
-      <button 
-        disabled={loading || !amountX}
-        onClick={handleAction}
-        className="w-full py-5 bg-slate-900 text-white rounded-[2rem] font-black text-lg hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 disabled:opacity-30 uppercase tracking-widest"
-      >
-        {loading ? "PROCESSING..." : "ADD LIQUIDITY"}
-      </button>
+      {/* Divider */}
+      <div className="flex justify-center -my-4 z-10">
+        <div className="bg-amber-500 text-black p-2 rounded-bigview border-[4px] border-neutral-900 shadow-xl">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+        </div>
+      </div>
 
-      <p className="text-[10px] text-slate-400 text-center mt-6 leading-relaxed px-4">
-        By depositing into the Bigview Treasury on <b>Base Sepolia</b>, you earn rewards proportional to your share.
-      </p>
+      {/* Bottom Output Card */}
+      <div className="bg-white/[0.02] p-5 rounded-xl border border-white/5">
+        <label className="text-[9px] font-black text-neutral-500 uppercase tracking-[0.2em] block mb-1.5">
+          Estimated Value
+        </label>
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-black text-neutral-400 font-inter opacity-60">
+            {amountX ? (Number(amountX) * 3500).toLocaleString(undefined, {minimumFractionDigits: 2}) : "0.00"}
+          </div>
+          <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+            <span className="font-black text-emerald-500 italic text-xs">USDC</span>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+
+    {/* 4. MAIN ACTION BUTTON */}
+    <button 
+      disabled={loading || !amountX}
+      onClick={handleAction}
+      className="w-full py-4 bg-amber-500 text-black rounded-xl font-black text-base hover:bg-amber-400 transition-all shadow-lg shadow-amber-900/10 disabled:opacity-30 uppercase tracking-widest italic active:scale-[0.98] flex items-center justify-center gap-2"
+    >
+      {loading ? (
+        <div className="w-5 h-5 border-[3px] border-black/20 border-t-black rounded-bigview animate-spin" />
+      ) : (
+        "START EARNING"
+      )}
+    </button>
+  </div>
+);
 }

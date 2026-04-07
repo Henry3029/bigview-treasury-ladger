@@ -1,25 +1,30 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,ts,jsx,tsx,mdx}", 
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       fontFamily: {
-        // This connects your components to the Inter font we imported in CSS
-        inter: ['Inter', 'sans-serif'],
+        // This connects 'font-inter' class to the Google Font variable
+        'inter': ['var(--font-inter)', 'sans-serif'],
       },
       colors: {
-        // Cleaned up the "Bank" colors to match the Bigview brand
-        bigviewGreen: "#00D094",
-        bigviewBlue: "#2563EB",
+        'gold-background': 'var(--gold-background)',
+        'gold-buttons': 'var(--gold-buttons)',
+        'violet-main-background': 'var(--violet-main-background)',
+        
+        // text colors
+        'text-color': 'var(--text-color)',
+        'violet-glow': 'var(--violet-background)',
       },
+      
+      backgroundImage: {
+      'violet-background': 'linear-gradient(to bottom right, var(--violet-background))',
+    },
+    
       borderRadius: {
-        // We can define custom "un-bubble" corners here if you want
-        'bigview': '1.5rem', // A clean 24px radius
+        'bigview': '1rem',
       }
     },
   },

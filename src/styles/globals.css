@@ -5,42 +5,20 @@
 @tailwind utilities;
 
 :root {
-  /* 1. OPay Dark Theme Colors */
-  --bg-main: #060606; /* Near-black background seen in OPay */
-  --accent-gold: #fbbf24; /* Golden color for your primary balance card */
-  --card-dark: #121212; /* Darker grey for the icon grid boxes */
+	--font-inter: "Inter", sans-serif; 
+  --gold-background: #fde68a;
+  --gold-buttons: #fbbf24;
+  --text-color: #000000;
+  --violet-background: #7c3aed;   /* The "Red-ish" glowing edge (Violet-600) */
+  --violet-main-background: #0B011D;
 }
 
 body {
-  /* Applying the deep OPay dark theme */
-  background-color: var(--bg-main);
-  color: #F8FAFC; 
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter); 
+  background-color: var(--violet-main-background);
+color: var(--text-color); 
+  /* This forced font-family ensures Inter is everywhere! */
+  font-family: var(--font-inter), sans-serif !important;
   min-height: 100vh;
   @apply antialiased overflow-x-hidden;
-}
-
-@layer components {
-  /* 2. THE BALANCE CARD: Golden-Orange Gradient like the OPay green box */
-  .opay-gold-card {
-    @apply bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 
-           rounded-[2rem] p-6 shadow-xl shadow-amber-950/20 text-white;
-  }
-
-  /* 3. ICON GRID BUTTONS: Matching the OPay "Action" tiles */
-  .opay-action-tile {
-    @apply bg-[#121212] border border-white/5 rounded-[2rem] p-4 
-           flex flex-col items-center justify-center gap-3 transition-all
-           hover:bg-neutral-800 active:scale-95;
-  }
-
-  /* 4. THE GLASS EFFECT: For the "You May Also Like" style sections */
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-md border border-white/10 rounded-[2rem] p-6;
-  }
-
-  /* High-end Fintech Typography */
-  .heading-heavy {
-    @apply font-black italic tracking-tighter uppercase leading-none;
-  }
 }
