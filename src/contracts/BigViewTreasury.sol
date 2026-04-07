@@ -22,6 +22,10 @@ contract BigViewTreasury is ReentrancyGuard {
     }
 
     mapping(address => Member) public members;
+    
+event Staked(address indexed user, uint256 ethAmount, uint256 bvwEarned);
+event RewardsClaimed(address indexed user, uint256 amount);
+event ExternalYieldClaimed(address indexed user, address token, uint256 amount);
 
     // --- Errors ---
     error NotAuthorized();
@@ -59,6 +63,8 @@ contract BigViewTreasury is ReentrancyGuard {
         uint256 poolShare = (msg.value * 90) / 100;
         (bool success, ) = majorPoolAddress.call{value: poolShare}("");
         if (!success) revert TransferFailed();
+        
+        emit Staked(msg.sender, msg.value, bvwToEarn);
     }
 
     /**
@@ -72,6 +78,8 @@ contract BigViewTreasury is ReentrancyGuard {
         members[msg.sender].unclaimedBVW = 0;
         
         rewardToken.mint(msg.sender, amount);
+        
+        emit RewardsClaimed(msg.sender, amount);
     }
 
     /**

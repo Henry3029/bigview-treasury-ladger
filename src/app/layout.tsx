@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from 'react';
 import '@/styles/globals.css';
 import Sidebar from '@/components/Sidebar';
@@ -14,26 +13,9 @@ import { X } from 'lucide-react';
 const inter = Inter({ 
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter', // 👈 Add this line!
+  variable: '--font-inter',
 });
 
-// Dummy data to show inside the bell when it opens
-const DUMMY_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    title: 'Deposit Successful',
-    description: '0.05 ETH has been added to your treasury vault.',
-    type: 'success',
-    time: '2m ago'
-  },
-  {
-    id: '2',
-    title: 'Protocol Update',
-    description: 'Bigview V2.0 is now live on Base Sepolia.',
-    type: 'pending',
-    time: '1h ago'
-  }
-];
 
 export default function RootLayout({
   children,
@@ -42,6 +24,20 @@ export default function RootLayout({
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false); // NEW STATE FOR BELL
+  
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  
+  useEffect(() => {
+  	asyn function loadNotifications() {
+  	try {
+  	const data = await fetchMyRealNotification();
+  setNotifications(data);
+  	}. catch (error) {
+  	console.log("failed to fetch big view notifications", error);
+  	}
+  }
+  loadNotifications();
+  	}, []);
 
   return (
   <html lang="en">
@@ -54,7 +50,7 @@ export default function RootLayout({
         <NotificationDropdown 
           isOpen={isNotifOpen} 
           onClose={() => setIsNotifOpen(false)} 
-          notifications={DUMMY_NOTIFICATIONS}
+          notifications={notifications}
         />
 
         {/* 2. MOBILE SIDEBAR DRAWER */}
