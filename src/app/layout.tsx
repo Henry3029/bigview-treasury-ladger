@@ -12,8 +12,7 @@ import Providers from './providers';
 import { Inter } from 'next/font/google';
 import { X } from 'lucide-react';
 
-// Using the utility we created
-import { getLiveNotifications } from '@/utils/useNotifications';
+import { getLiveNotifications } from '@/utils/getNotifications';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -36,12 +35,11 @@ export default function RootLayout({
   useEffect(() => {
     async function loadNotifications() {
        if (!authenticated || !userAddress) return;
-      
       try {
         const data = await getLiveNotifications(userAddress);
         setNotifications(data);
       } catch (error) {
-        console.log("failed to fetch big view notifications", error);
+        console.log("Bigview Fetch Error:", error);
       }
     }
     loadNotifications();
@@ -72,7 +70,10 @@ export default function RootLayout({
               <Sidebar />
             </aside>
             <div className="flex flex-col flex-1 w-full lg:ml-[260px]">
-              <MobileHeader onNotificationClick={() => setIsNotifOpen(true)} /> 
+              <MobileHeader 
+                onMenuClick={() => setIsMenuOpen(true)} 
+                onNotificationClick={() => setIsNotifOpen(true)} 
+              /> 
               <main className="flex-grow w-full min-h-screen">{children}</main>
               <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/20 border-t border-white/5 italic">
                 © 2026 Bigview Treasury-Ledger • v2.0
