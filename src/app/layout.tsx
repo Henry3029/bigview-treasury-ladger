@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import '@/styles/globals.css';
 import Sidebar from '@/components/Sidebar';
@@ -7,13 +7,13 @@ import WelcomeBanner from '@/components/WelcomeBanner';
 import MobileHeader from '@/components/MobileHeader'; 
 import BottomNav from '@/components/BottomNav';
 import NotificationDropdown from '@/components/NotificationDropdown';
+import type { Notification } from '@/components/NotificationDropdown';
 import Providers from './providers'; 
 import { Inter } from 'next/font/google';
 import { X } from 'lucide-react';
 
-// IMPORT YOUR NEW UTILITY HERE
+// Using the utility we created
 import { getLiveNotifications } from '@/utils/useNotifications';
-import { useAccount } from 'wagmi'; // To get the real user address
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -30,21 +30,22 @@ export default function RootLayout({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  
   const userAddress = user?.wallet?.address;
   
   useEffect(() => {
-    async function loadNotifications() { // Fixed spelling: async
+    async function loadNotifications() {
        if (!authenticated || !userAddress) return;
       
       try {
-        const data = await getLiveNotifications(userAddress); // Use the real function name
+        const data = await getLiveNotifications(userAddress);
         setNotifications(data);
       } catch (error) {
         console.log("failed to fetch big view notifications", error);
       }
     }
     loadNotifications();
-  }, [authenticated, userAddress]); // Re-run if the user changes wallets
+  }, [authenticated, userAddress]);
 
   return (
     <html lang="en">
@@ -58,7 +59,6 @@ export default function RootLayout({
             notifications={notifications}
           />
 
-          {/* ... rest of your UI code stays exactly the same ... */}
           <div className={`lg:hidden fixed inset-0 z-[150] transition-opacity duration-300 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setIsMenuOpen(false)} />
             <aside className={`absolute inset-y-0 left-0 w-[280px] bg-violet-background/95 backdrop-blur-2xl transition-transform duration-300 ease-out shadow-2xl border-r border-white/5 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
