@@ -6,9 +6,10 @@ import { Bell, User, Copy } from 'lucide-react';
 import ProfileDrawer from './ProfileDrawer'; // Ensure path is correct
 
 export default function MobileHeader({ 
-  onNotificationClick 
+  onNotificationClick, onMenuClick
 }: { 
   onNotificationClick: () => void;
+  onMenuClick?: () => void; 
 }) {
   const { user, authenticated, login } = usePrivy(); 
   const address = user?.wallet?.address;
