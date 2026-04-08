@@ -75,7 +75,7 @@ export default function RootLayout({
               <MobileHeader onMenuClick={() => setIsMenuOpen(true)} onNotificationClick={() => setIsNotifOpen(true)} /> 
               <main className="flex-grow w-full min-h-screen">{children}</main>
               <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/20 border-t border-white/5 italic">
-                © 2026 Bigview Treasury-Ledger • v2.0
+                 2026 Bigview Treasury-Ledger  v2.0
               </footer>
             </div>
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-xl border-t border-white/5">
