@@ -72,7 +72,7 @@ export default function RootLayout({
               <Sidebar />
             </aside>
             <div className="flex flex-col flex-1 w-full lg:ml-[260px]">
-              <MobileHeader onMenuClick={() => setIsMenuOpen(true)} onNotificationClick={() => setIsNotifOpen(true)} /> 
+              <MobileHeader onNotificationClick={() => setIsNotifOpen(true)} /> 
               <main className="flex-grow w-full min-h-screen">{children}</main>
               <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/20 border-t border-white/5 italic">
                 © 2026 Bigview Treasury-Ledger • v2.0
