@@ -14,11 +14,7 @@ export default function MobileHeader({
   const address = user?.wallet?.address;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-<<<<<<< HEAD
-  const googleImage = user?.linkedAccounts?.find((acc) => acc.type === 'google_oauth')?.picture;
-=======
   const googleImage = user?.linkedAccounts?.find((acc): acc is any => acc.type === 'google_oauth')?.picture;
->>>>>>> 06f148317cc5cb610a1eca82580320d54a2c2496
   
   // This is the "Lifted State" that ProfileDrawer will update
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
