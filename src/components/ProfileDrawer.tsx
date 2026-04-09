@@ -7,6 +7,7 @@ import { uploadImageToImgbb } from '@/utils/uploadImage';
 export default function ProfileDrawer({ isOpen, onClose, avatarUrl, 
   setAvatarUrl }: { isOpen: boolean, onClose: () => void, avatarUrl: string | null, // The value
   setAvatarUrl: (url: string | null) => void }) {
+  	const googleImage = user?.linkedAccounts?.find((acc): acc is any => acc.type === 'google_oauth')?.picture;
   const { authenticated, user, logout, ready } = usePrivy();
   const { wallets } = useWallets();
   const [activeAddress, setActiveAddress] = useState<string | null>(null);
@@ -90,19 +91,18 @@ notify('Profile Updated!');
       <div className="relative">
         <div className="w-28 h-28 rounded-bigview border-4 border-white/5 shadow-2xl bg-violet-glow/20 flex items-center justify-center overflow-hidden relative">
            {isUploading ? (
-              <LoaderCircle className="w-12 h-12 text-gold-buttons animate-spin" />
-          // UPDATED CODE
-) : (avatarUrl || user?.google?.picture) ? (
-   <img 
-     src={avatarUrl || user?.google?.picture} 
-     alt="Avatar" 
-     className="w-full h-full object-cover" 
-   />
+  <LoaderCircle className="w-12 h-12 text-gold-buttons animate-spin" />
+) : (avatarUrl || googleImage) ? ( // Use googleImage here
+  <img 
+    src={avatarUrl || googleImage} 
+    alt="Avatar" 
+    className="w-full h-full object-cover" 
+  />
 ) : (
-              <div className="flex flex-col items-center opacity-20">
-                <User size={48} className="text-white" />
-              </div>
-           )}
+  <div className="flex flex-col items-center opacity-20">
+    <User size={48} className="text-white" />
+  </div>
+)}
         </div>
 
         {/* Camera Button: Bigview Gold */}

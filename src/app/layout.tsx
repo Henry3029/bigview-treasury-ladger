@@ -29,7 +29,7 @@ export default function RootLayout({
 
           <div className="flex flex-col min-h-screen">
             {/* The Header now sits at the top of every page */}
-            <MobileHeader /> 
+            <MobileHeader onNotificationClick={() => {}} />
 
             <main className="flex-grow w-full min-h-screen pb-20 lg:pb-0">
               {children}
