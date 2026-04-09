@@ -2,7 +2,6 @@ import React from 'react';
 import DashboardData from '@/components/DashboardData';
 import { formatUnits } from 'viem';
 import { Bell, User, Info, Plus, RefreshCw } from 'lucide-react';
-import MobileHeader from '@/components/MobileHeader';
 
 // Fallback to Base Sepolia defaults if env variables are missing
 const RPC_URL = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || 'https://sepolia.base.org';
@@ -46,9 +45,6 @@ export default async function Dashboard() {
 
   return (
     <main className="min-h-screen w-full pb-32 font-inter">
-      
-      {/* MobileHeader manages the Lifted State internally for the ProfileDrawer */}
-      <MobileHeader onNotificationClick={() => {}} />
       
       <div className="w-full max-w-2xl mx-auto px-4 pt-28 space-y-6">
         
