@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth'; // 1. Added useWallets
 import { createWalletClient, custom, parseEther } from 'viem'; // 2. Pure Viem
 import { baseSepolia } from 'viem/chains';
-import treasuryAbi from '@/constants/abis/BigViewTreasury.json';
+import treasuryAbi from '@/constants/abis/BigViewTreasuryV2.json';
 
 export default function AddLiquidity() {
   const [amountX, setAmountX] = useState<string>("");

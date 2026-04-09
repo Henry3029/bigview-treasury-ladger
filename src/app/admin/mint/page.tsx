@@ -1,147 +1,152 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { createWalletClient, createPublicClient, custom, http, parseUnits, formatUnits } from 'viem';
+import { baseSepolia } from 'viem/chains';
 import { Coins, Flame, ShieldAlert, Activity, Loader2 } from 'lucide-react';
 
-// Import your BVW Token ABI
-import { abi as tokenAbi } from '@/constants/abis/BigViewToken.json';
+// Using your V2 ABI
+import tokenAbi from '@/constants/abis/BigViewTreasuryV2.json';
 
 export default function AdminTokenPage() {
   const [amount, setAmount] = useState('');
-  const [isOwner, setIsOwner] = useState(false);
-  const { address, isConnected } = useAccount();
+  const [totalSupply, setTotalSupply] = useState('0');
+  const [isProcessing, setIsProcessing] = useState(false);
+  
+  const { user, authenticated, login } = usePrivy();
+  const { wallets } = useWallets();
+  const wallet = wallets[0]; 
 
-  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS as `0x${string}`;
+  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
   const deployerAddr = process.env.NEXT_PUBLIC_DEPLOYER_ADDR?.toLowerCase();
+  const isOwner = user?.wallet?.address?.toLowerCase() === deployerAddr;
 
-  // 1. Fetch Total Supply (EVM/Solidity)
-  const { data: totalSupplyRaw, refetch } = useReadContract({
-    address: tokenAddress,
-    abi: tokenAbi,
-    functionName: 'totalSupply',
+  // 1. SETUP PUBLIC CLIENT (For Reading Data)
+  const publicClient = createPublicClient({
+    chain: baseSepolia,
+    transport: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC)
   });
 
-  // 2. Setup Contract Actions
-  const { data: hash, writeContract, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
-
-  useEffect(() => {
-    if (isConnected && address) {
-      setIsOwner(address.toLowerCase() === deployerAddr);
+  const fetchSupply = async () => {
+    try {
+      const data = await publicClient.readContract({
+        address: tokenAddress,
+        abi: tokenAbi,
+        functionName: 'totalSupply',
+      });
+      setTotalSupply(formatUnits(data as bigint, 18));
+    } catch (err) {
+      console.error("Fetch Error:", err);
     }
-  }, [address, isConnected, deployerAddr]);
-
-  useEffect(() => {
-    if (isConfirmed) {
-      alert("Transaction Successful!");
-      setAmount('');
-      refetch();
-    }
-  }, [isConfirmed, refetch]);
-
-  const handleAction = async (action: 'mint' | 'burn') => {
-    if (!isConnected) return alert("Connect Wallet First");
-    if (!amount || Number(amount) <= 0) return alert("Enter a valid amount");
-
-    // Convert to 18 decimals (Wei)
-    const units = parseUnits(amount, 18);
-
-    writeContract({
-      address: tokenAddress,
-      abi: tokenAbi,
-      functionName: action,
-      args: [units],
-    });
   };
 
-  const formattedSupply = totalSupplyRaw 
-    ? Number(formatUnits(totalSupplyRaw as bigint, 18)).toLocaleString() 
-    : "0";
+  useEffect(() => { fetchSupply(); }, []);
 
-  const isProcessing = isPending || isConfirming;
+  // 2. THE ACTION HANDLER (Mint/Burn)
+  const handleAction = async (action: 'mint' | 'burn') => {
+    if (!authenticated) return login();
+    if (!amount || isProcessing || !wallet) return;
 
-  // Access Denied UI
-  if (!isOwner && isConnected) {
+    try {
+      setIsProcessing(true);
+
+      // Get the provider from Privy and wrap it in a Viem Wallet Client
+      const ethereumProvider = await wallet.getEthereumProvider();
+      const walletClient = createWalletClient({
+        account: wallet.address as `0x${string}`,
+        chain: baseSepolia,
+        transport: custom(ethereumProvider)
+      });
+
+      const units = parseUnits(amount, 18);
+
+      // Execute Contract Write
+      const hash = await walletClient.writeContract({
+        address: tokenAddress,
+        abi: tokenAbi,
+        functionName: action,
+        args: [units],
+      });
+
+      // Wait for Transaction
+      await publicClient.waitForTransactionReceipt({ hash });
+
+      alert(`${action.toUpperCase()} Successful!`);
+      setAmount('');
+      fetchSupply();
+    } catch (err: any) {
+      console.error(err);
+      alert("Transaction failed. Check console for details.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // --- UI (Unified Deep Slate & Gold Theme) ---
+  if (!isOwner && authenticated) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-slate-50 p-6">
-        <div className="bg-white p-10 rounded-[3rem] shadow-xl border border-red-100 text-center max-w-sm">
-          <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <ShieldAlert size={32} className="text-red-500" />
-          </div>
-          <h2 className="text-2xl font-black text-slate-900 italic tracking-tighter">Access Denied</h2>
-          <p className="text-sm text-slate-500 mt-3 font-medium leading-relaxed">
-            This terminal is locked. Only the Bigview deployer can access the supply controller.
-          </p>
+      <main className="min-h-screen flex items-center justify-center bg-[#0F172A] p-6">
+        <div className="bg-[#1E293B] p-10 rounded-bigview shadow-2xl border border-red-500/20 text-center max-w-sm">
+           <ShieldAlert size={32} className="text-red-500 mx-auto mb-4" />
+           <h2 className="text-xl font-black text-white uppercase italic">Access Denied</h2>
+           <p className="text-[10px] text-white/40 mt-2 tracking-widest">DEPLOYER ONLY TERMINAL</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen p-6 pb-24 bg-slate-50 flex flex-col items-center gap-8">
-      <div className="w-full max-w-md mt-10 text-center">
-        <h1 className="text-4xl font-black italic text-slate-900 tracking-tighter">Bigview Admin</h1>
-        <p className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em] mt-2">
-          Base Sepolia Supply Controller
-        </p>
+    <main className="min-h-screen p-6 pb-32 bg-[#0F172A] flex flex-col items-center gap-8 font-inter text-white">
+      <div className="text-center mt-10">
+        <h1 className="text-4xl font-black italic tracking-tighter uppercase">Supply Controller</h1>
+        <p className="text-[10px] font-black text-gold-buttons uppercase tracking-[0.3em]">BigView Protocol V2.0</p>
       </div>
 
-      {/* Live Supply Tracker Card */}
-      <div className="w-full max-w-md bg-slate-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-          <Activity size={80} />
-        </div>
-        <div className="relative z-10">
-          <p className="text-[10px] uppercase font-black text-blue-400 tracking-widest mb-2">Total BVW Supply</p>
-          <h3 className="text-3xl font-black tracking-tight">{formattedSupply}</h3>
-        </div>
+      {/* Supply Card */}
+      <div className="w-full max-w-md bg-gradient-to-br from-gold-buttons to-[#B8860B] p-8 rounded-bigview shadow-2xl relative">
+        <Activity size={60} className="absolute right-4 top-4 opacity-10 text-black" />
+        <p className="text-[10px] uppercase font-black text-black/40 italic mb-1">Total BVW in Circulation</p>
+        <h3 className="text-4xl font-black tracking-tighter italic text-black leading-none">
+          {Number(totalSupply).toLocaleString()} <span className="text-sm">BVW</span>
+        </h3>
       </div>
 
-      <div className="w-full max-w-md bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100">
-        <div className="mb-8">
-          <label className="text-[10px] font-black uppercase text-slate-400 ml-4 tracking-[0.2em]">
-            Quantity to Adjust
-          </label>
-          <div className="relative mt-3">
-            <input 
-              type="number" 
-              placeholder="0.00"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full p-7 bg-slate-50 border-2 border-slate-50 rounded-[2rem] focus:border-blue-500 focus:bg-white outline-none font-black text-3xl transition-all placeholder:text-slate-200"
-            />
-            <span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300 text-sm">BVW</span>
-          </div>
-        </div>
+      {/* Input Section */}
+      <div className="w-full max-w-md bg-[#1E293B] rounded-bigview p-8 border border-white/5 shadow-xl">
+        <label className="text-[10px] font-black uppercase text-white/20 ml-2 tracking-widest">Adjustment Quantity</label>
+        <input 
+          type="number" 
+          placeholder="0.00"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="w-full p-6 bg-[#0F172A] border-2 border-white/5 rounded-bigview text-white font-black text-3xl outline-none focus:border-gold-buttons transition-all mt-2 mb-8"
+        />
 
         <div className="flex flex-col gap-4">
           <button 
             onClick={() => handleAction('mint')}
-            disabled={isProcessing || !amount}
-            className="w-full py-6 bg-blue-600 text-white rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
+            disabled={isProcessing}
+            className="w-full py-5 bg-gold-buttons text-black rounded-bigview font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
           >
-            {isProcessing ? <Loader2 className="animate-spin" /> : <Coins size={22} />}
-            Mint New Tokens
+            {isProcessing ? <Loader2 className="animate-spin" /> : <Coins size={18} />}
+            Execute Mint
           </button>
-
-          <div className="flex items-center gap-4 my-4">
-            <div className="h-[1px] bg-slate-100 flex-1" />
-            <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Security Protocol</span>
-            <div className="h-[1px] bg-slate-100 flex-1" />
-          </div>
 
           <button 
             onClick={() => handleAction('burn')}
-            disabled={isProcessing || !amount}
-            className="w-full py-6 bg-white text-red-600 border-2 border-red-50 rounded-[1.5rem] font-black text-lg flex items-center justify-center gap-3 hover:bg-red-50 transition-all active:scale-95 disabled:opacity-50"
+            disabled={isProcessing}
+            className="w-full py-5 bg-transparent border border-red-500/30 text-red-500 rounded-bigview font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-red-500/5 active:scale-95 transition-all disabled:opacity-30"
           >
-            {isProcessing ? <Loader2 className="animate-spin" /> : <Flame size={22} />}
-            Burn Supply
+            {isProcessing ? <Loader2 className="animate-spin" /> : <Flame size={18} />}
+            Execute Burn
           </button>
         </div>
       </div>
+
+      <footer className="opacity-10 text-[8px] font-black uppercase tracking-[0.5em] mt-auto">
+        Secure Terminal • BigView Treasury Ledger
+      </footer>
     </main>
   );
 }
