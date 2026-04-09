@@ -7,8 +7,9 @@ import { uploadImageToImgbb } from '@/utils/uploadImage';
 export default function ProfileDrawer({ isOpen, onClose, avatarUrl, 
   setAvatarUrl }: { isOpen: boolean, onClose: () => void, avatarUrl: string | null, // The value
   setAvatarUrl: (url: string | null) => void }) {
-  	const googleImage = user?.linkedAccounts?.find((acc): acc is any => acc.type === 'google_oauth')?.picture;
+  	
   const { authenticated, user, logout, ready } = usePrivy();
+  const googleImage = user?.linkedAccounts?.find((acc): acc is any => acc.type === 'google_oauth')?.picture;
   const { wallets } = useWallets();
   const [activeAddress, setActiveAddress] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
