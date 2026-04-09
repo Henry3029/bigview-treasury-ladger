@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./BigViewToken.sol";
 
-contract BigViewTreasury is ReentrancyGuard {
+contract BigViewTreasuryV2 is ReentrancyGuard {
     // --- State Variables ---
     BigViewToken public immutable rewardToken;
     address public devWallet;

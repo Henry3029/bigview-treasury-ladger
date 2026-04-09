@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 import "../src/contracts/BigViewToken.sol";
-import "../src/contracts/BigViewTreasury.sol";
+import "../src/contracts/BigViewTreasuryV2.sol";
 
 contract DeployBigView is Script {
     function run() external {
@@ -21,8 +21,8 @@ contract DeployBigView is Script {
         console.log("Using existing Token at:", address(token));
 
         // 4. Deploy BigView Treasury
-        BigViewTreasury treasury = new BigViewTreasury(address(token), majorPool);
-        console.log("BigViewTreasury deployed at:", address(treasury));
+        BigViewTreasuryV2 treasury = new BigViewTreasuryV2(address(token), majorPool);
+        console.log("BigViewTreasuryV2 deployed at:", address(treasury));
 
         // 5. Setup Permissions: Add Treasury as a Minter
         token.addMinter(address(treasury));
