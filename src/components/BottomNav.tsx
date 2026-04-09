@@ -69,6 +69,7 @@ export default function BottomNav() {
     />
   </nav>
 );
+}
 
 // Helper Component (Move this OUTSIDE your main component's return block)
 function NavLink({ href, icon, label, active }: { href: string; icon: React.ReactNode; label: string; active: boolean }) {

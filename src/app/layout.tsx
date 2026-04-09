@@ -26,7 +26,7 @@ export default function RootLayout({
   const { user, authenticated } = usePrivy();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   
   const userAddress = user?.wallet?.address;
   
@@ -70,7 +70,7 @@ export default function RootLayout({
             </main>
 
             <footer className="hidden lg:block p-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/20 border-t border-white/5 italic">
-              © 2026 Bigview Treasury-Ledger • v2.0
+              ï¿½ 2026 Bigview Treasury-Ledger ï¿½ v2.0
             </footer>
 
             {/* Bottom Navigation for Mobile */}
