@@ -3,7 +3,7 @@ import Providers from './providers';
 import { Inter } from 'next/font/google';
 import WelcomeBanner from '@/components/WelcomeBanner';
 import BottomNav from '@/components/BottomNav';
-import MobileHeaderWrapper from '@/components/MobileHeaderWrapper'; 
+import MobileHeader from '@/components/MobileHeader'; 
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -29,7 +29,7 @@ export default function RootLayout({
 
           <div className="flex flex-col min-h-screen">
             {/* The Header now sits at the top of every page */}
-            <MobileHeaderWrapper /> 
+            <MobileHeader /> 
 
             <main className="flex-grow w-full min-h-screen pb-20 lg:pb-0">
               {children}

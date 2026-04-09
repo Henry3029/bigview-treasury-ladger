@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
-import { createPublicClient, createWalletClient, custom, parseEther, formatEther } from 'viem';
+import { createPublicClient, createWalletClient, custom, parseEther, formatEther, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Wallet, Zap, Loader2, Info, ShieldCheck } from 'lucide-react';
 import treasuryAbi from '@/constants/abis/BigViewTreasury.json';

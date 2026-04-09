@@ -14,6 +14,7 @@ export default function MobileHeader({
   const address = user?.wallet?.address;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const googleImage = user?.linkedAccounts?.find((acc) => acc.type === 'google_oauth')?.picture; 
   
   // This is the "Lifted State" that ProfileDrawer will update
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export default function MobileHeader({
   };
 
   // Helper to determine which image to show in the circle
-  const displayImage = avatarUrl || user?.google?.picture;
+  const displayImage = avatarUrl || googleImage
 
   return (
     <>
