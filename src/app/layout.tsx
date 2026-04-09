@@ -1,16 +1,9 @@
-"use client";
-import React, { useState, useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 import '@/styles/globals.css';
+import Providers from './providers'; 
+import { Inter } from 'next/font/google';
 import WelcomeBanner from '@/components/WelcomeBanner';
 import MobileHeader from '@/components/MobileHeader'; 
 import BottomNav from '@/components/BottomNav';
-import NotificationDropdown from '@/components/NotificationDropdown';
-import Providers from './providers'; 
-import { Inter } from 'next/font/google';
-import { X } from 'lucide-react';
-
-import { getLiveNotifications } from '@/utils/useNotifications';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -18,11 +11,17 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+export const metadata = {
+  title: 'Bigview Treasury',
+  description: 'Decentralized Treasury Ledger',
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+<<<<<<< HEAD
   const { user, authenticated } = usePrivy();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -43,28 +42,20 @@ export default function RootLayout({
     loadNotifications();
   }, [authenticated, userAddress]);
 
+=======
+>>>>>>> 77fcb600cfc7b19d97b8b9751ea488a026c34ca9
   return (
     <html lang="en">
       <body className={`${inter.variable} font-inter antialiased text-text-color bg-violet-main-background overflow-x-hidden`}>
         <Providers>
           <WelcomeBanner />
 
-          <NotificationDropdown 
-            isOpen={isNotifOpen} 
-            onClose={() => setIsNotifOpen(false)} 
-            notifications={notifications}
-          />
-
           {/* Main Layout Wrapper */}
           <div className="flex flex-col min-h-screen">
             
-            {/* Mobile Header (Now handles the top UI for everyone) */}
-            <MobileHeader 
-              onMenuClick={() => setIsMenuOpen(true)} 
-              onNotificationClick={() => setIsNotifOpen(true)} 
-            /> 
+            {/* Mobile Header handles its own internal logic for drawers */}
+            <MobileHeader /> 
 
-            {/* Content Area: No longer needs ml-[260px] because Sidebar is gone */}
             <main className="flex-grow w-full min-h-screen pb-20 lg:pb-0">
               {children}
             </main>
