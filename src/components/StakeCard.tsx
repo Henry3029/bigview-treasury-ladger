@@ -5,7 +5,7 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { createPublicClient, createWalletClient, custom, parseEther, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Wallet, Zap, Loader2, Info, ShieldCheck } from 'lucide-react';
-import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
+import treasuryAbi from '@/constants/abis/BigViewTreasury.json';
 
 export default function StakeCard() {
   const [amount, setAmount] = useState('');
@@ -24,7 +24,7 @@ export default function StakeCard() {
     if (!user?.wallet?.address) return;
     const publicClient = createPublicClient({
       chain: baseSepolia,
-      transport: custom(window.ethereum!) // Or use a public RPC URL
+      transport: http()
     });
     const bal = await publicClient.getBalance({ address: user.wallet.address as `0x${string}` });
     setBalance(parseFloat(formatEther(bal)).toFixed(4));

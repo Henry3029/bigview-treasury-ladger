@@ -4,11 +4,12 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { uploadImageToImgbb } from '@/utils/uploadImage';
 
-export default function ProfileDrawer({ isOpen, onClose }: { isOpen: boolean, onClose: () => void }) {
+export default function ProfileDrawer({ isOpen, onClose, avatarUrl, 
+  setAvatarUrl }: { isOpen: boolean, onClose: () => void, avatarUrl: string | null, // The value
+  setAvatarUrl: (url: string | null) => void }) {
   const { authenticated, user, logout, ready } = usePrivy();
   const { wallets } = useWallets();
   const [activeAddress, setActiveAddress] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -35,7 +36,10 @@ export default function ProfileDrawer({ isOpen, onClose }: { isOpen: boolean, on
     setIsUploading(true);
     const uploadedUrl = await uploadImageToImgbb(file);
     setIsUploading(false);
-    if (uploadedUrl) setAvatarUrl(uploadedUrl);
+    if (uploadedUrl) {
+setAvatarUrl(uploadedUrl);
+notify('Profile Updated!');
+}
     event.target.value = '';
   };
 
@@ -87,9 +91,14 @@ export default function ProfileDrawer({ isOpen, onClose }: { isOpen: boolean, on
         <div className="w-28 h-28 rounded-bigview border-4 border-white/5 shadow-2xl bg-violet-glow/20 flex items-center justify-center overflow-hidden relative">
            {isUploading ? (
               <LoaderCircle className="w-12 h-12 text-gold-buttons animate-spin" />
-           ) : avatarUrl ? (
-              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-           ) : (
+          // UPDATED CODE
+) : (avatarUrl || user?.google?.picture) ? (
+   <img 
+     src={avatarUrl || user?.google?.picture} 
+     alt="Avatar" 
+     className="w-full h-full object-cover" 
+   />
+) : (
               <div className="flex flex-col items-center opacity-20">
                 <User size={48} className="text-white" />
               </div>

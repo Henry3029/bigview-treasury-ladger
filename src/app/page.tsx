@@ -1,7 +1,7 @@
 import React from 'react';
 import DashboardData from '@/components/DashboardData';
 import { formatUnits } from 'viem';
-import { Bell, User, Info, Plus } from 'lucide-react';
+import { Bell, User, Info, Plus RefreshCw } from 'lucide-react';
 import MobileHeader from '@/components/MobileHeader';
 
 const RPC_URL = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || 'https://sepolia.base.org';

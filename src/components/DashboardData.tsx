@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Users, TrendingUp, PieChart } from 'lucide-react'; 
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
+import treasuryAbi from '@/constants/abis/BigViewTreasury.json';
 
 export default function DashboardData() {
   const [mounted, setMounted] = useState(false);

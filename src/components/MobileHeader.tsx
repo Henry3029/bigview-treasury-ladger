@@ -15,6 +15,7 @@ export default function MobileHeader({
   const address = user?.wallet?.address;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const notify = (msg: string) => {
     setMessage(msg);
@@ -97,11 +98,18 @@ export default function MobileHeader({
         </div>
       </div>
     </header>
+    
+    {/* Use avatarUrl here for the small button */}
+      <button onClick={() => setIsDrawerOpen(true)}>
+         <UserAvatar customUrl={avatarUrl} />
+      </button>
 
     {/* MODAL LAYER */}
     <ProfileDrawer 
       isOpen={isDrawerOpen} 
       onClose={() => setIsDrawerOpen(false)} 
+      avatarUrl={avatarUrl}
+        setAvatarUrl={setAvatarUrl}
     />
   </>
 );

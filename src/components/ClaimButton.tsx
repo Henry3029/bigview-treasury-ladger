@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { encodeFunctionData, createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { abi as treasuryAbi } from '@/constants/abis/BigViewTreasury.json';
+import treasuryAbi from '@/constants/abis/BigViewTreasury.json';
 
 export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
