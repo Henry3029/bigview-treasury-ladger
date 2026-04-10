@@ -6,7 +6,7 @@ import { createWalletClient, custom, publicActions } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Loader2, CheckCircle2, Zap } from 'lucide-react';
 // Import your Treasury ABI
-import treasuryAbi from '@/constants/abis/BigViewTreasury.json';
+import treasuryAbi from '@/constants/abis/BigViewTreasuryV2.json';
 
 export const RewardHeader = ({ totalEarned, pending }: { totalEarned: string, pending: string }) => {
   const { authenticated, login } = usePrivy();
