@@ -5,10 +5,14 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { 
-  Info,
-  EyeOff,
-  LogOut,
-  Copy
+  Info, 
+  EyeOff, 
+  LogOut, 
+  Copy, 
+  Lock,
+  User,
+  Settings,
+  ShieldCheck 
 } from 'lucide-react';
 
 export default function MePage() {
@@ -18,19 +22,17 @@ export default function MePage() {
   const [mounted, setMounted] = useState(false);
   const [balance, setBalance] = useState("0.0000");
 
-  // Get the address directly from the authenticated user or the first wallet
   const address = user?.wallet?.address || wallets[0]?.address;
 
   useEffect(() => {
     setMounted(true);
     
-    // Fetch balance using only Viem + Public RPC (No Wagmi needed)
     const fetchBalance = async () => {
       if (address) {
         try {
           const publicClient = createPublicClient({
             chain: baseSepolia,
-            transport: http(), // Uses default public RPC
+            transport: http(),
           });
           const rawBalance = await publicClient.getBalance({ address: address as `0x${string}` });
           setBalance(parseFloat(formatEther(rawBalance)).toFixed(4));
@@ -45,36 +47,18 @@ export default function MePage() {
 
   if (!mounted || !ready) return null;
 
-  // 1. LOGIN SCREEN (Matches your Black/Gold theme)
+  // 1. LOGIN SCREEN (If not logged in)
   if (!authenticated) {
     return (
       <main className="min-h-screen bg-[#060606] flex flex-col items-center justify-center p-8">
-        <div className="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(245,158,11,0.2)]">
-          <Lock size={32} className="text-black" />
-        </div>
-        <h2 className="text-white font-black italic uppercase tracking-tighter text-2xl mb-2">Secure Access</h2>
-        <p className="text-neutral-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-8 text-center">Authentication required for Bigview Ledger</p>
-        <button 
-          onClick={login}
-          className="w-full max-w-xs py-4 bg-amber-500 text-black font-black rounded-2xl uppercase tracking-[0.2em] active:scale-95 transition-all shadow-xl"
-        >
-          Sign In
-        </button>
-      </main>
-    );
-  }
-
-  return (
-      /* 1. AUTH STATE: Replaced amber with Gold-Buttons and applied bigview rounding */
-      <main className="min-h-screen flex flex-col items-center justify-center p-8 font-inter">
         <div className="w-20 h-20 bg-gold-buttons rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
-          <Lock size={32} className="text-text-color" />
+          <Lock size={32} className="text-black" />
         </div>
         <h2 className="text-white font-black italic uppercase tracking-tighter text-2xl mb-2">Secure Access</h2>
         <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em] mb-8 text-center italic">Authentication required for Bigview Ledger</p>
         <button 
           onClick={login}
-          className="w-full max-w-xs py-4 bg-gold-buttons text-text-color font-black rounded-bigview uppercase tracking-[0.2em] active:scale-95 transition-all shadow-xl hover:opacity-90"
+          className="w-full max-w-xs py-4 bg-gold-buttons text-black font-black rounded-bigview uppercase tracking-[0.2em] active:scale-95 transition-all shadow-xl hover:opacity-90"
         >
           Sign In
         </button>
@@ -82,11 +66,11 @@ export default function MePage() {
     );
   }
 
+  // 2. PROFILE VIEW (Only shows if authenticated)
   return (
-    /* 2. PROFILE VIEW: Clean background and Brand-Consistent Gold Box */
-    <main className="min-h-screen text-white pb-32 font-inter">
+    <main className="min-h-screen text-white pb-32 font-inter bg-[#060606]">
       
-      {/* THE TOP BRAND BOX: Transition from Gold to your Global Violet-Background */}
+      {/* THE TOP BRAND BOX */}
       <div className="w-full bg-gradient-to-b from-gold-buttons via-[#B8860B] to-transparent px-6 pt-16 pb-12">
         <div className="flex justify-between items-start mb-8">
           <div className="flex items-center gap-4">
@@ -109,8 +93,8 @@ export default function MePage() {
           </button>
         </div>
 
-        {/* 3. THE BALANCE CARD: Glassmorphism over the Gold Gradient */}
-        <div className="bg-violet-background/40 p-6 rounded-bigview border border-white/10 backdrop-blur-xl flex items-center justify-between shadow-2xl">
+        {/* BALANCE CARD */}
+        <div className="bg-[#1A1A1A]/60 p-6 rounded-bigview border border-white/10 backdrop-blur-xl flex items-center justify-between shadow-2xl">
           <div>
             <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2 italic">
               Total Balance <EyeOff size={12} className="opacity-50" />
@@ -126,15 +110,15 @@ export default function MePage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
-            <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center relative z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-4 border-violet-background">
-              <ShieldCheck size={32} className="text-violet-background" strokeWidth={2.5} />
+            <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center relative z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-4 border-black">
+              <ShieldCheck size={32} className="text-black" strokeWidth={2.5} />
             </div>
           </div>
         </div>
       </div>
 
       <div className="px-6 space-y-4">
-        {/* TERMINATE SESSION: Styled as a high-risk action */}
+        {/* TERMINATE SESSION */}
         <button 
           onClick={() => logout()}
           className="w-full flex items-center gap-4 p-5 bg-red-500/5 border border-red-500/10 rounded-bigview group active:scale-[0.98] transition-all hover:bg-red-500/10"
@@ -147,4 +131,4 @@ export default function MePage() {
       </div>
     </main>
   );
-  }
+}
