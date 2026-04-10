@@ -48,7 +48,7 @@ export default function NotificationDropdown({
 
       {/* 3. NOTIFICATION LIST: High-Contrast Dark Theme */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {notifications.length > 0 ? (
+        {notifications?.length > 0 ? (
           notifications.map((n) => (
             <div 
               key={n.id} 
