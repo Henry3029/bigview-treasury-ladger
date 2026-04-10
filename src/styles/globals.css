@@ -6,11 +6,11 @@
 
 :root {
 	--font-inter: "Inter", sans-serif; 
-  --gold-background: #fde68a;
+  --gold-background: #B2BEB5;
   --gold-buttons: #fbbf24;
-  --text-color: #000000;
+  --text-color: #ffffff;
   --violet-background: #7c3aed;   /* The "Red-ish" glowing edge (Violet-600) */
-  --violet-main-background: #0F172A;
+  --violet-main-background: #000000;
 }
 
 body {

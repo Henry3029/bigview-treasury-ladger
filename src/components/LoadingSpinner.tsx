@@ -5,12 +5,7 @@ export default function LoadingSpinner() {
     <div className="flex flex-col items-center gap-6">
       
       {/* Bigview Spinning Ring: Using Violet Glow and Gold accents */}
-      <div className="relative w-16 h-16">
-        {/* Outer Glow Ring */}
-        <div className="absolute inset-0 border-4 border-violet-glow/20 rounded-full"></div>
-        {/* Active Spinning Segment */}
-        <div className="absolute inset-0 border-4 border-t-gold-buttons rounded-full animate-spin"></div>
-      </div>
+      <div className="w-12 h-12 border-4 border-violet-glow/20 border-t-gold-buttons border-r-transparent rounded-full animate-spin"></div>
 
       {/* Loading Text: Using your italicized font-black style */}
       <div className="flex flex-col items-center gap-1">
