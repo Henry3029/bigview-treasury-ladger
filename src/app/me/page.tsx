@@ -23,6 +23,7 @@ export default function MePage() {
   const [balance, setBalance] = useState("0.0000");
 
   const address = user?.wallet?.address || wallets[0]?.address;
+  const googlePicture = user?.linkedAccounts?.find((acc) => acc.type === 'google_oauth')?.picture;
 
   useEffect(() => {
     setMounted(true);
@@ -75,12 +76,12 @@ export default function MePage() {
         <div className="flex justify-between items-start mb-8">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-bigview bg-black/20 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
-              {user?.google?.picture ? (
-                <img src={user.google.picture} alt="Avatar" className="w-full h-full object-cover" />
-              ) : (
-                <User size={32} className="text-white" />
-              )}
-            </div>
+  {googlePicture ? (
+    <img src={googlePicture} alt="Avatar" className="w-full h-full object-cover" />
+  ) : (
+    <User size={32} className="text-white" />
+  )}
+</div>
             <div>
               <h1 className="text-2xl font-black italic tracking-tighter uppercase leading-none text-white">Hi, Henry</h1>
               <div className="flex items-center gap-2 mt-2">
