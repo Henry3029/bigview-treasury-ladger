@@ -15,7 +15,7 @@ export default function BottomNav() {
   const isActive = (path: string) => pathname === path;
 
   return (
-  <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-violet-background backdrop-blur-2xl border-t border-white/5 p-2 pb-8 z-[100] flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+  <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-violet-main-background border-t border-white/5 p-2 py-1 z-[100] flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
     
     {/* 1. Home */}
     <NavLink 
@@ -34,23 +34,12 @@ export default function BottomNav() {
     />
 
     {/* 3. Stake (The Middle "Action" Button) */}
-    <Link 
+    <NavLink
       href="/stake" 
-      className="flex flex-col items-center gap-1 -mt-8 transition-all active:scale-90"
-    >
-      <div className={`p-4 rounded-full shadow-2xl border-4 border-violet-background ${
-        isActive('/stake') 
-          ? 'bg-gold-buttons text-text-color shadow-gold-buttons/40' 
-          : 'bg-violet-glow text-white shadow-black/50'
-      }`}>
-        <Zap size={28} fill={isActive('/stake') ? "currentColor" : "none"} strokeWidth={2.5} />
-      </div>
-      <span className={`text-[10px] font-black uppercase tracking-tighter italic ${
-        isActive('/stake') ? 'text-gold-buttons' : 'text-white/50'
-      }`}>
-        Stake
-      </span>
-    </Link>
+      icon={<Zap size={22}/>}
+      label="Stake"
+      active={isActive('/Stake')}
+      />
 
     {/* 4. Rewards */}
     <NavLink 
@@ -77,14 +66,14 @@ function NavLink({ href, icon, label, active }: { href: string; icon: React.Reac
     <Link 
       href={href} 
       className={`flex flex-col items-center gap-1 transition-all duration-300 active:scale-95 ${
-        active ? 'text-gold-buttons' : 'text-white/40'
+        active ? 'text-vibrant-green' : 'text-color-white'
       }`}
     >
       <div className={active ? 'drop-shadow-[0_0_8px_rgba(253,230,138,0.5)]' : ''}>
         {icon}
       </div>
-      <span className={`text-[10px] font-black uppercase tracking-tighter italic ${
-        active ? 'opacity-100' : 'opacity-60'
+      <span className={`text-[10px] font-black tracking-tighter ${
+        active ? 'text-vibrant-green' : 'text-color-white'
       }`}>
         {label}
       </span>

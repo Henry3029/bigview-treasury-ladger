@@ -11,12 +11,21 @@
   --text-color: #ffffff;
   --violet-background: #7c3aed;   /* The "Red-ish" glowing edge (Violet-600) */
   --violet-main-background: #000000;
+  --light-green: #90EE90;
+  --solid-green: #228B22;
+  --vibrant-green: #32CD32;
+  --color-white: #FFFFFF;
+  --muted-yellow: #FACC15;
+  --electric-yellow: #F7E300;
+  --color-ash: #9CA3AF;
+  --blue: #3b82f6;
+  --light-blue: #bfdbfe;
 }
 
 body {
   font-family: var(--font-inter); 
   background-color: var(--violet-main-background);
-color: var(--text-color); 
+color: var(--color-white); 
   /* This forced font-family ensures Inter is everywhere! */
   font-family: var(--font-inter), sans-serif !important;
   min-height: 100vh;

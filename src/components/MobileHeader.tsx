@@ -51,13 +51,13 @@ export default function MobileHeader({
       )}
 
       {/* 2. HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-24 bg-violet-background z-[90] flex items-center px-4 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
         
         {/* LEFT: Profile Trigger (Now using the Lifted State) */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
           <button 
             onClick={handleProfileClick}
-            className="w-12 h-12 bg-violet-glow/20 backdrop-blur-md rounded-bigview flex items-center justify-center text-white border border-white/20 shadow-xl overflow-hidden active:scale-95 transition-all"
+            className="w-12 h-12 bg-color-ash/20 rounded-bigview flex items-center justify-center text-white border border-white/20 shadow-xl overflow-hidden active:scale-95 transition-all"
           >
             {displayImage ? (
                <img src={displayImage} alt="Profile" className="w-full h-full object-cover" />
@@ -68,13 +68,13 @@ export default function MobileHeader({
         </div>
 
         {/* CENTER: Wallet Pill */}
-        <div className="flex-1 flex justify-center px-2">
+        <div>
           {authenticated && address ? (
             <button 
               onClick={copyAddress}
-              className="flex items-center gap-1.5 px-3 py-2 bg-violet-glow/10 backdrop-blur-md rounded-bigview border border-white/10 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-violet-glow/10  rounded-bigview border border-white/10 active:scale-95 transition-all"
             >
-              <div className="w-1.5 h-1.5 bg-gold-buttons rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
+              <div className="w-1.5 h-1.5 bg-light-green rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
               <span className="text-[10px] font-black text-white tracking-tighter uppercase italic">
                 {address.slice(0, 4)}...{address.slice(-4)}
               </span>
@@ -83,11 +83,12 @@ export default function MobileHeader({
           ) : (
             <button 
               onClick={login}
-              className="text-[10px] font-black text-gold-buttons uppercase tracking-[0.2em] hover:opacity-80 transition-opacity"
+              className="text-[10px] font-black text-gold-buttons tracking-[0.2em] hover:opacity-80 transition-opacity"
             >
               Connect
             </button>
           )}
+        </div>
         </div>
 
         {/* RIGHT: Branding */}
@@ -97,9 +98,9 @@ export default function MobileHeader({
           </button>
           <div className="flex flex-col items-center gap-1 text-center">
             <div className="w-9 h-9 bg-white rounded-bigview flex items-center justify-center shadow-lg">
-              <img src="/bigview-image.png" alt="Logo" className="w-6 h-6 object-contain" />
+              <img src="/images/bigview-image.png" alt="BigView Logo" className="w-6 h-6 object-contain" />
             </div>
-            <span className="text-[7px] font-black uppercase tracking-widest text-white italic">BigView</span>
+            <span className="text-[7px] font-black tracking-widest text-white">BigView</span>
           </div>
         </div>
       </header>

@@ -1,5 +1,6 @@
 import React from 'react';
 import DashboardData from '@/components/DashboardData';
+import BigViewLoGo from '@/components/BigViewLoGo'; 
 import { formatUnits } from 'viem';
 import { Bell, User, Info, Plus, RefreshCw } from 'lucide-react';
 
@@ -111,6 +112,9 @@ export default async function Dashboard() {
               <h2 className="text-[10px] uppercase tracking-[0.2em] font-black text-white/30 italic">Protocol Analytics</h2>
           </div>
           <DashboardData stake={stats.stake} />
+          
+          <BigViewLoGo />
+          
         </section>
         
         <div className="text-center pt-4 opacity-20">

@@ -50,47 +50,47 @@ export default function DashboardData({ stake }: DashboardDataProps) {
     getBlockchainData();
   }, [treasuryAddress, stake]); // Add stake to dependency array
 
-  if (!mounted || loading) return <div className="p-8 bg-gold-background/5 rounded-bigview animate-pulse border border-white/5" />;
+  if (!mounted || loading) return <div className="p-8 bg-color-ash/5 rounded-bigview animate-pulse border border-white/5" />;
 
   return (
     <div className="space-y-3 w-full">
        {/* ... rest of your UI code stays exactly the same ... */}
        <div className="grid grid-cols-2 gap-3">
           {/* Members Card */}
-          <div className="p-4 bg-violet-glow/10 border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
-            <div className="flex items-center gap-2 text-white/40">
+          <div className="p-2 bg-color-ash/10 border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
+            <div className="flex items-center gap-2 text-color-white/40">
               <Users size={12} strokeWidth={3} />
-              <span className="text-[8px] uppercase font-black tracking-[0.2em]">Network Size</span>
+              <span className="text-[8px]  font-black tracking-[0.2em]">Network Size</span>
             </div>
-            <span className="text-xl font-black italic tracking-tighter uppercase text-white">
-              {stats.members} <span className="text-[10px] text-white/20 not-italic">Users</span>
+            <span className="text-xl font-black tracking-tighter text-color-white">
+              {stats.members} <span className="text-[10px] text-color-white/20 not-italic">Users</span>
             </span>
           </div>
           
           {/* APY Card */}
-          <div className="p-4 bg-gold-buttons border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
-            <div className="flex items-center gap-2 text-text-color/60">
+          <div className="p-4 bg-color-ash border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
+            <div className="flex items-center gap-2 text-color-white/60">
               <TrendingUp size={12} strokeWidth={3} />
-              <span className="text-[8px] uppercase font-black tracking-[0.2em]">Yield Rate</span>
+              <span className="text-[8px]  font-black tracking-[0.2em]">Yield Rate</span>
             </div>
-            <span className="text-xl font-black italic tracking-tighter uppercase text-text-color">
-              12.5% <span className="text-[10px] text-text-color/40 not-italic">APY</span>
+            <span className="text-xl font-black tracking-tighter text-color-white">
+              12.5% <span className="text-[10px] text-color-white/40 not-italic">APY</span>
             </span>
           </div>
        </div>
 
        {/* Global Treasury Stat */}
-       <div className="p-5 bg-violet-glow/5 border border-white/5 rounded-bigview flex items-center justify-between shadow-xl relative overflow-hidden">
-         <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-violet-glow/20 blur-3xl rounded-full" />
+       <div className="p-5 bg-color-ash/5 border border-white/5 rounded-bigview flex items-center justify-between shadow-xl relative overflow-hidden">
+         <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-electric-yellow/20 rounded-full" />
          <div className="flex flex-col gap-1 relative z-10">
-           <span className="text-[8px] uppercase font-black tracking-[0.2em] text-white/40">Total Value Locked</span>
-           <span className="text-2xl font-black italic tracking-tighter uppercase text-white">
+           <span className="text-[8px]  font-black tracking-[0.2em] text-color-white/40">Total Value Locked</span>
+           <span className="text-2xl font-black tracking-tighter text-color-white">
              {/* Use the updated stats.staked */}
-             {Number(stats.staked).toLocaleString()} <span className="text-xs text-gold-buttons">ETH</span>
+             {Number(stats.staked).toLocaleString()} <span className="text-xs text-solid-green">ETH</span>
            </span>
          </div>
-         <div className="p-3 bg-violet-background rounded-bigview border border-white/10 shadow-inner group transition-transform hover:scale-105">
-            <PieChart size={20} className="text-gold-buttons" strokeWidth={2.5} />
+         <div className="p-2 bg-color-ash rounded-bigview border border-white/10 shadow-inner group transition-transform hover:scale-105">
+            <PieChart size={20} className="text-vibrant-green" strokeWidth={2.5} />
          </div>
        </div>
     </div>

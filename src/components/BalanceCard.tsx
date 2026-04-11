@@ -8,14 +8,15 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
 
   /* 1. Bigview Gold Gradient using your custom branding */
 return (
-  <div className="w-full p-6 bg-gold-buttons rounded-bigview shadow-2xl shadow-black/20 relative overflow-hidden">
-    {/* Subtle decorative background element for that "Pro" feel */}
+  /* 1. Changed p-6 p4 to px-6 py-4 to make it a sleek rectangle */
+  <div className="w-full px-6 py-4 bg-light-green rounded-bigview relative overflow-hidden">
     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -mr-16 -mt-16" />
     
     <div className="relative z-10">
-      <div className="flex items-center justify-between mb-6">
+      /* 2. Changed mb-6 to mb-2 to close the gap between the rows */
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-text-color/60">
+          <span className="text-[14px] font-medium text-text-color">
             Available Balance
           </span>
           <button 
@@ -28,23 +29,22 @@ return (
         
         <Link 
           href="/history" 
-          className="flex items-center gap-1 text-[10px] font-black uppercase tracking-tight text-text-color/80 hover:opacity-70 transition-opacity"
+          className="flex items-center gap-1 text-[10px] font-bold tracking-tight text-text-color/80 hover:opacity-70 transition-opacity"
         >
-          Transaction History
+          History
           <ChevronRight size={14} />
         </Link>
       </div>
 
       <div className="flex items-center justify-between">
-        {/* Tabular nums makes the balance look like a professional banking app */}
-        <h2 className="text-4xl font-black italic tracking-tighter tabular-nums text-text-color">
+        <h2 className="text-3xl font-bold  tracking-tighter tabular-nums text-text-color">
           {showBalance ? amount : "••••••"}
         </h2>
 
-        {/* Action Button: Swapped to Violet Background for high contrast against the Gold Card */}
-        <button className="flex items-center gap-1.5 px-6 py-3 bg-violet-background text-white rounded-bigview text-[10px] font-black shadow-2xl active:scale-95 transition-all border border-white/5">
+        <button className="flex items-center gap-1.5 px-4 py-2 bg-gold-buttons text-text-color rounded-bigview text-[10px] font-bold shadow-2xl active:scale-95 transition-all border border-white/5">
           <Plus size={16} strokeWidth={3} />
-          ADD MONEY
+          <span className="text-text-color">Add</span>
+          <span className="text-solid-green">Money</span>
         </button>
       </div>
     </div>

@@ -9,12 +9,9 @@ export default function LoadingSpinner() {
 
       {/* Loading Text: Using your italicized font-black style */}
       <div className="flex flex-col items-center gap-1">
-        <p className="text-gold-buttons font-black uppercase italic tracking-[0.2em] animate-pulse">
-          Loading Treasury
+        <p className="text-gold-buttons font-black tracking-[0.2em] animate-pulse">
+          BigView
         </p>
-        <span className="text-[8px] font-bold text-white/30 uppercase tracking-widest">
-          Syncing with Base Sepolia
-        </span>
       </div>
 
     </div>

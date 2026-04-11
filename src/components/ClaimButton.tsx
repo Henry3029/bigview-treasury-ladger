@@ -119,7 +119,7 @@ export const ClaimButton = () => {
       <button 
         onClick={handleClaim}
         disabled={isConfirming || !ready}
-        className={`bg-gold-buttons text-text-color py-3 px-8 rounded-bigview transition-all font-black uppercase text-xs italic tracking-widest shadow-xl ${
+        className={`bg-gold-buttons text-text-color py-3 px-8 rounded-bigview transition-all font-black text-xs tracking-widest shadow-xl ${
           isConfirming ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'
         }`}
       >

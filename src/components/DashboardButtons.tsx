@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { usePrivy } from '@privy-io/react-auth';
-import { ArrowLeftRight, Gift, ChevronRight } from 'lucide-react';
+import { Gift, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function DashboardButtons() {
@@ -22,16 +22,11 @@ export default function DashboardButtons() {
     {/* 1. SWAP BVW BUTTON */}
     <button 
       onClick={handleSwap}
-      className="flex-1 flex items-center gap-3 p-3 bg-violet-glow/10 rounded-bigview border border-white/5 hover:bg-violet-glow/20 active:scale-[0.98] transition-all group"
+      className="flex-1 flex items-center gap-3 p-3 bg-violet-glow/10 rounded-bigview border-t border-b border-white/5 hover:bg-violet-glow/20 active:scale-[0.98] transition-all group"
     >
-      {/* Brand Icon Box - Violet themed to match the "Trust" of Swapping */}
-      <div className="shrink-0 w-12 h-12 bg-violet-background rounded-bigview flex items-center justify-center border border-white/10 shadow-2xl group-hover:border-gold-buttons/50 transition-colors">
-        <ArrowLeftRight size={20} className="text-gold-buttons" strokeWidth={2.5} />
-      </div>
-      
       <div className="text-left overflow-hidden">
-        <span className="block text-[10px] font-black uppercase tracking-widest text-white italic truncate">Swap</span>
-        <span className="block text-[8px] font-bold uppercase tracking-tighter text-white/40 truncate">BVW Token</span>
+        <span className="block text-[10px] font-black  tracking-widest text-color-white truncate">Swap</span>
+        <span className="block text-[8px] font-bold tracking-tighter text-white/40 truncate">BVW Token</span>
       </div>
     </button>
 
@@ -46,8 +41,8 @@ export default function DashboardButtons() {
       </div>
       
       <div className="text-left flex-1 overflow-hidden">
-        <span className="block text-[10px] font-black uppercase tracking-widest text-white italic truncate">Claim</span>
-        <span className="block text-[8px] font-bold uppercase tracking-tighter text-white/40 truncate">Rewards</span>
+        <span className="block text-[10px] font-black uppercase tracking-widest text-white truncate">Claim</span>
+        <span className="block text-[8px] font-bold tracking-tighter text-white/40 truncate">Rewards</span>
       </div>
       
       {/* Chevron styling updated to match Bigview text colors */}
