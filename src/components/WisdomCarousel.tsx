@@ -91,19 +91,19 @@ export default function WisdomCarousel() {
                   <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
                     {quote.icon}
                   </div>
-                  <span className="text-[9px] font-black text-white/40 tracking-[0.3em] uppercase italic">Bigview Insight</span>
+                  <span className="text-[9px] font-black text-gold-buttons tracking-tight">Bigview Insight</span>
                 </div>
                 
-                <blockquote className="text-sm md:text-base font-black leading-tight mb-2 relative z-10 italic tracking-tight uppercase">
+                <blockquote className="text-sm md:text-base font-black leading-tight mb-2 relative z-10 tracking-tight">
                   "{quote.text}"
                 </blockquote>
                 
-                <cite className="text-[10px] font-bold text-white/50 uppercase tracking-widest not-italic relative z-10">
+                <cite className="text-[10px] font-bold text-white/50 tracking-tight not-italic relative z-10">
                   — {quote.sage}
                 </cite>
 
                 {/* Hidden Background Text for depth */}
-                <div className="absolute -right-4 bottom-2 text-white/[0.03] text-6xl font-black italic select-none">
+                <div className="absolute -right-4 bottom-2 text-white/[0.03] text-6xl font-black select-none">
                   WISE
                 </div>
               </div>

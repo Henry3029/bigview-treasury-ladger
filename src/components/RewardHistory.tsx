@@ -79,16 +79,16 @@ export const RewardHistory = () => {
   <div className="space-y-3">
     {/* Header Section */}
     <div className="flex justify-between items-end px-1 mt-6 mb-1">
-      <h3 className="text-white font-black text-lg italic tracking-tight uppercase">History</h3>
-      <div className="flex items-center gap-2 bg-gold-buttons/10 px-2.5 py-1 rounded-bigview border border-gold-buttons/20">
-          <div className="w-1.5 h-1.5 rounded-full bg-gold-buttons animate-pulse" />
+      <h3 className="text-color-white font-black text-lg tracking-tight ">History</h3>
+      <div className="flex items-center gap-2 bg-color-ash/10 px-2.5 py-1 rounded-bigview border border-gold-buttons/20">
+          <div className="w-1.5 h-1.5 rounded-full bg-color-ash animate-pulse" />
           <span className="text-[9px] font-black text-gold-buttons uppercase tracking-widest">Base Sepolia</span>
       </div>
     </div>
 
     {/* List Section */}
     {history.map((item) => (
-      <div key={item.id} className="bg-violet-glow/5 p-4 rounded-bigview flex justify-between items-center shadow-sm border border-white/5 hover:bg-violet-glow/10 transition-all group">
+      <div key={item.id} className="bg-color-ash/5 p-4 rounded-bigview flex justify-between items-center shadow-sm border border-white/5 hover:bg-violet-glow/10 transition-all group">
         <div className="flex items-center gap-3">
           {/* Status Icon Box - Bigview Styled */}
           <div className={`w-10 h-10 rounded-bigview flex items-center justify-center ${
@@ -99,10 +99,10 @@ export const RewardHistory = () => {
 
           {/* Info */}
           <div>
-            <p className="font-black text-white text-md leading-tight uppercase italic">
+            <p className="font-black text-white text-md leading-tight">
               {item.type}
             </p>
-            <p className="text-[10px] text-white/30 font-bold uppercase tracking-tight">{item.date}</p>
+            <p className="text-[10px] text-white/30 font-bold tracking-tight">{item.date}</p>
           </div>
         </div>
 
@@ -112,12 +112,12 @@ export const RewardHistory = () => {
             href={`https://sepolia.basescan.org/tx/${item.id}`} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-bigview transition-colors border border-white/5"
+            className="inline-flex items-center gap-1.5 bg-white/5 hover:bg-color-ash/10 px-3 py-1.5 rounded-bigview transition-colors border border-white/5"
           >
             <span className="text-[10px] font-mono font-bold text-white/40 group-hover:text-gold-buttons transition-colors">
               {item.id.substring(0, 6)}...
             </span>
-            <ExternalLink size={12} className="text-white/20 group-hover:text-gold-buttons transition-colors" />
+            <ExternalLink size={12} className="text-color-white/20 group-hover:text-gold-buttons transition-colors" />
           </a>
         </div>
       </div>

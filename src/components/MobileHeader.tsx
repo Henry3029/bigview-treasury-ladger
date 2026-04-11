@@ -89,7 +89,7 @@ export default function MobileHeader({
             </button>
           )}
         </div>
-        </div>
+        
 
         {/* RIGHT: Branding */}
         <div className="flex items-center gap-3">
