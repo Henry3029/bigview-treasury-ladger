@@ -16,7 +16,7 @@ export default function StakePage() {
 
   return (
     /* 1. CLEAN SLATE: Background now handled globally by layout.tsx */
-    <main className="min-h-screen w-full p-4 pt-20 pb-32 flex flex-col items-center relative overflow-hidden font-inter">
+    <main className="min-h-screen w-full pt-16 pb-16 flex flex-col items-center relative overflow-hidden font-inter">
       
       {/* BACKGROUND DECORATIVE GLOWS: Swapped to Brand Violet Glow */}
       <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-violet-glow/10 rounded-full blur-[120px] pointer-events-none" />
@@ -24,9 +24,9 @@ export default function StakePage() {
 
       {/* 1. HEADER SECTION: Unified with Bigview Gold and spacing */}
       <div className="w-full max-w-lg mb-8 relative z-10 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-color-ash/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
           <Sparkles size={12} className="text-gold-buttons" />
-          <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] italic">Bigview Treasury</span>
+          <span className="text-[9px] font-black text-solid-green/30 tracking-tight">Bigview Treasury</span>
         </div>
         
         {/* The WisdomCarousel will now sit on your clean Violet Background */}
@@ -39,12 +39,12 @@ export default function StakePage() {
       </div>
 
       {/* 3. FOOTER STATS: Cleaned up typography and colors */}
-      <div className="mt-12 flex gap-8 text-[9px] font-black text-white/20 uppercase tracking-[0.2em] italic relative z-10">
+      <div className="mt-12 flex gap-8 text-[9px] font-black text-white/20 tracking-tight relative z-10">
         <div className="flex items-center gap-2">
           Network: <span className="text-white/60">Base Sepolia</span>
         </div>
         <div className="flex items-center gap-2">
-          Reward: <span className="text-gold-buttons">BVW Token</span>
+          Reward: <span className="text-color-white">BVW Token</span>
         </div>
       </div>
     </main>

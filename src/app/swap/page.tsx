@@ -7,23 +7,23 @@ import { ArrowLeftRight, Activity, ShieldCheck } from 'lucide-react';
 export default function SwapPage() {
   return (
     /* 1. CLEAN SLATE: Removed bg-neutral-950 to let layout.tsx handle the background */
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start pt-16 pb-20 px-6 font-inter">
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start pt-16 pb-20 font-inter">
       
       {/* 1. Background Decorative Elements (Updated to Brand Violet Glow) */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-violet-glow/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-violet-glow/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-gold-background/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gold-background/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* 2. Page Header */}
       <div className="text-center mb-8 relative z-10 w-full">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-color-ash/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
           <ShieldCheck size={12} className="text-gold-buttons" />
-          <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] italic">Verified Base Protocol</span>
+          <span className="text-[9px] font-black text-color-white/30 tracking-tight">Verified Base Protocol</span>
         </div>
         
-        <h1 className="text-4xl font-black text-white tracking-tighter mb-2 italic uppercase">
+        <h1 className="text-4xl font-black text-white tracking-tighter mb-2">
           Exchange Assets
         </h1>
-        <p className="text-white/40 font-black text-[10px] max-w-xs mx-auto leading-relaxed uppercase italic tracking-widest">
+        <p className="text-white/40 font-black text-[10px] max-w-xs mx-auto leading-relaxed tracking-tight">
           Swap <span className="text-gold-buttons">Base Sepolia</span> tokens with <span className="text-white">Bigview</span> Liquidity.
         </p>
       </div>
@@ -31,7 +31,7 @@ export default function SwapPage() {
       {/* 3. The Swap Component - Unified with Bigview Tokens */}
       <div className="w-full max-w-md relative z-10 mt-4">
         {/* Floating Icon - Updated to Gold/Sharp with Bigview Rounding */}
-        <div className="absolute -top-3 -right-3 bg-gold-buttons text-text-color p-2.5 rounded-bigview shadow-2xl rotate-12 z-20 border-4 border-violet-background">
+        <div className="absolute -top-3 -right-3 bg-color-white text-text-color p-2.5 rounded-bigview shadow-2xl rotate-12 z-20 border-4 border-violet-background">
           <ArrowLeftRight size={18} strokeWidth={3} />
         </div>
         <SwapInterface />
@@ -39,8 +39,8 @@ export default function SwapPage() {
 
       {/* 4. Footer Info & Network Status */}
       <div className="mt-10 flex flex-col items-center gap-4 relative z-10">
-        <div className="flex gap-4 text-[9px] font-black text-white/20 uppercase tracking-[0.15em] italic">
-          <div className="flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-bigview border border-white/5">
+        <div className="flex gap-4 text-[9px] font-black text-white/20 tracking-tight">
+          <div className="flex items-center gap-1.5 px-2 py-1 bg-color-ash/5 rounded-bigview border border-white/5">
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
             Base Sepolia
           </div>
@@ -48,13 +48,13 @@ export default function SwapPage() {
             Slippage: <span className="text-white/40">0.5%</span>
           </div>
           <div className="flex items-center gap-1.5">
-            Fee: <span className="text-gold-buttons">1.0%</span>
+            Fee: <span className="text-solid-green">1.0%</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-white/10">
+        <div className="flex items-center gap-2 text-color-white/10">
           <Activity size={12} />
-          <span className="text-[8px] font-black uppercase tracking-[0.2em]">Live Pricing Engine</span>
+          <span className="text-[8px] font-black tracking-tight">Live Pricing Engine</span>
         </div>
       </div>
     </div>

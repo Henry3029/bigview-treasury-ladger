@@ -86,48 +86,48 @@ export default function AdminTokenPage() {
   // --- UI (Unified Deep Slate & Gold Theme) ---
   if (!isOwner && authenticated) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-[#0F172A] p-6">
+      <main className="min-h-screen flex items-center justify-center bg-color-ash py-6">
         <div className="bg-[#1E293B] p-10 rounded-bigview shadow-2xl border border-red-500/20 text-center max-w-sm">
            <ShieldAlert size={32} className="text-red-500 mx-auto mb-4" />
-           <h2 className="text-xl font-black text-white uppercase italic">Access Denied</h2>
-           <p className="text-[10px] text-white/40 mt-2 tracking-widest">DEPLOYER ONLY TERMINAL</p>
+           <h2 className="text-xl font-black text-color-white">Access Denied</h2>
+           <p className="text-[10px] text-white/40 mt-2 tracking-tight">DEPLOYER ONLY TERMINAL</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen p-6 pb-32 bg-[#0F172A] flex flex-col items-center gap-8 font-inter text-white">
+    <main className="min-h-screen py-6 pb-16 bg-color-ash flex flex-col items-center gap-8 font-inter text-white">
       <div className="text-center mt-10">
-        <h1 className="text-4xl font-black italic tracking-tighter uppercase">Supply Controller</h1>
-        <p className="text-[10px] font-black text-gold-buttons uppercase tracking-[0.3em]">BigView Protocol V2.0</p>
+        <h1 className="text-4xl font-black tracking-tighter">Supply Controller</h1>
+        <p className="text-[10px] font-black text-color-white tracking-tight">BigView Protocol V2.0</p>
       </div>
 
       {/* Supply Card */}
       <div className="w-full max-w-md bg-gradient-to-br from-gold-buttons to-[#B8860B] p-8 rounded-bigview shadow-2xl relative">
         <Activity size={60} className="absolute right-4 top-4 opacity-10 text-black" />
-        <p className="text-[10px] uppercase font-black text-black/40 italic mb-1">Total BVW in Circulation</p>
-        <h3 className="text-4xl font-black tracking-tighter italic text-black leading-none">
+        <p className="text-[10px] font-black text-black/40 mb-1">Total BVW in Circulation</p>
+        <h3 className="text-4xl font-black tracking-tighter text-black leading-none">
           {Number(totalSupply).toLocaleString()} <span className="text-sm">BVW</span>
         </h3>
       </div>
 
       {/* Input Section */}
-      <div className="w-full max-w-md bg-[#1E293B] rounded-bigview p-8 border border-white/5 shadow-xl">
-        <label className="text-[10px] font-black uppercase text-white/20 ml-2 tracking-widest">Adjustment Quantity</label>
+      <div className="w-full max-w-md bg-color-ash rounded-bigview p-8 border border-white/5 shadow-xl">
+        <label className="text-[10px] font-black text-white/20 ml-2 tracking-tight">Adjustment Quantity</label>
         <input 
           type="number" 
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full p-6 bg-[#0F172A] border-2 border-white/5 rounded-bigview text-white font-black text-3xl outline-none focus:border-gold-buttons transition-all mt-2 mb-8"
+          className="w-full p-6 bg-color-ash border-2 border-white/5 rounded-bigview text-white font-black text-3xl outline-none focus:border-gold-buttons transition-all mt-2 mb-8"
         />
 
         <div className="flex flex-col gap-4">
           <button 
             onClick={() => handleAction('mint')}
             disabled={isProcessing}
-            className="w-full py-5 bg-gold-buttons text-black rounded-bigview font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
+            className="w-full py-5 bg-gold-buttons text-black rounded-bigview font-black text-xs tracking-tight flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-30"
           >
             {isProcessing ? <Loader2 className="animate-spin" /> : <Coins size={18} />}
             Execute Mint
@@ -136,7 +136,7 @@ export default function AdminTokenPage() {
           <button 
             onClick={() => handleAction('burn')}
             disabled={isProcessing}
-            className="w-full py-5 bg-transparent border border-red-500/30 text-red-500 rounded-bigview font-black uppercase text-xs tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-red-500/5 active:scale-95 transition-all disabled:opacity-30"
+            className="w-full py-5 bg-transparent border border-red-500/30 text-red-500 rounded-bigview font-black text-xs tracking-tight flex items-center justify-center gap-2 hover:bg-red-500/5 active:scale-95 transition-all disabled:opacity-30"
           >
             {isProcessing ? <Loader2 className="animate-spin" /> : <Flame size={18} />}
             Execute Burn
@@ -144,7 +144,7 @@ export default function AdminTokenPage() {
         </div>
       </div>
 
-      <footer className="opacity-10 text-[8px] font-black uppercase tracking-[0.5em] mt-auto">
+      <footer className="opacity-10 text-[8px] font-black tracking-tight mt-auto">
         Secure Terminal • BigView Treasury Ledger
       </footer>
     </main>
