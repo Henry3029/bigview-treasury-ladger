@@ -1,5 +1,5 @@
 'use client';
-import { X, Copy, Zap, Camera, User, ExternalLink, LoaderCircle, LogOut, ShieldCheck, Wallet } from 'lucide-react';
+import { X, Zap, Camera, User, ExternalLink, ShieldCheck, Copy, LoaderCircle, LogOut, Wallet } from 'lucide-react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { uploadImageToImgbb } from '@/utils/uploadImage';
@@ -88,7 +88,7 @@ notify('Profile Updated!');
     {/* AVATAR SECTION */}
     <div className="relative z-10 flex flex-col items-center py-12 px-6">
       <div className="relative">
-        <div className="w-28 h-28 rounded-bigview border-4 border-white/5 shadow-2xl bg-color-ash/20 flex items-center justify-center overflow-hidden relative">
+        <div className="w-28 h-28 rounded-bigview border-4 border-white/5 shadow-2xl bg-charcaol/20 flex items-center justify-center overflow-hidden relative">
            {isUploading ? (
   <LoaderCircle className="w-12 h-12 text-gold-buttons animate-spin" />
 ) : (avatarUrl || googleImage) ? ( // Use googleImage here
@@ -108,7 +108,7 @@ notify('Profile Updated!');
         <button 
           onClick={handleCameraClick}
           disabled={isUploading}
-          className="absolute -bottom-2 -right-2 p-3 rounded-bigview bg-color-ash text-color-white shadow-xl border-4 border-violet-background active:scale-90 transition-all"
+          className="absolute bottom-0 left-0 w-full h-1/4 bg-gold-buttons text-text-color font-bold text-xs flex items-center justify-center active:scale-95 transition-all">
         >
           <Camera size={18} />
         </button>
@@ -123,25 +123,24 @@ notify('Profile Updated!');
       {/* Network Badge: Violet and Gold themed */}
       <div className="mt-2 px-4 py-1.5 bg-gold-buttons/10 rounded-bigview border border-gold-buttons/20 flex items-center gap-2">
          <div className="w-1.5 h-1.5 bg-gold-buttons rounded-full animate-pulse shadow-[0_0_8px_#ffd700]"></div>
-         <p className="text-[10px] font-black text-gold-buttons uppercase tracking-widest">Base Sepolia Live</p>
+         <p className="text-[10px] font-black text-color-white tracking-tight">Base Sepolia Live</p>
       </div>
     </div>
 
     {/* INFO CARDS: Transparent Glass style */}
     <div className="relative z-10 flex-1 overflow-y-auto px-6 space-y-4 pb-10">
       
-      <div className="p-5 rounded-bigview border border-white/5 bg-color-ash">
-        <p className="text-[9px] font-black text-color-white/40 tracking-tight mb-3">Wallet Controller</p>
+      <div className="p-4 rounded-bigview border border-color-white/5 bg-light-black">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-violet-glow/10 rounded-bigview">
-              <Wallet size={16} className="text-gold-buttons" />
+              <Wallet size={16} className="text-electric-yellow" />
             </div>
             <p className="text-sm font-bold text-color-white tabular-nums tracking-tight">
               {activeAddress ? `${activeAddress.slice(0, 10)}...${activeAddress.slice(-8)}` : 'Not Connected'}
             </p>
           </div>
-          <button onClick={copyAddress} className="p-2 text-color-white/40 hover:text-white transition-colors">
+          <button onClick={copyAddress} className="p-2 text-color-white/40 hover:text-gold-buttons transition-colors">
             <Copy size={16} />
           </button>
         </div>
@@ -185,7 +184,7 @@ notify('Profile Updated!');
 
     {/* FOOTER */}
     <div className="relative z-10 p-10 border-t border-white/5 text-center">
-       <p className="text-[8px] font-black text-white/20 tracking-tight">
+       <p className="text-[10px] font-black text-white/20 tracking-tight">
          Bigview Treasury Ledger • v2.0
        </p>
     </div>

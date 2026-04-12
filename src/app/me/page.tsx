@@ -69,44 +69,41 @@ export default function MePage() {
 
   // 2. PROFILE VIEW (Only shows if authenticated)
   return (
-    <main className="min-h-screen text-white pb-16 font-inter bg-color-ash">
+    <main className="min-h-screen text-white pb-16 font-inter bg-charcaol">
       
       {/* THE TOP BRAND BOX */}
-      <div className="w-full bg-gradient-to-b from-gold-buttons via-[#B8860B] to-transparent px-6 pt-16 pb-12">
-        <div className="flex justify-between items-start mb-8">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-bigview bg-black/20 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
+      <div className="w-full bg-gold-background px-6 pt-16 pb-8 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"</div>
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-col items-start gap-3">
+            <div className="w-16 h-16 rounded-bigview bg-light-black/40 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
   {googlePicture ? (
     <img src={googlePicture} alt="Avatar" className="w-full h-full object-cover" />
   ) : (
-    <User size={32} className="text-color-white" />
+    <User size={30} className="text-color-white" />
   )}
 </div>
             <div>
-              <h1 className="text-2xl font-black tracking-tighter leading-none text-white">Hi, Henry</h1>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="bg-color-ash/20 backdrop-blur-sm text-white text-[8px] font-black px-2 py-0.5 rounded-bigview border border-white/10 tracking-tight">Tier 3 Verified</span>
+              <h1 className="text-2xl font-black tracking-tighter leading-none text-gold-buttons">Hi</h1>
+              <div className="">
+                <span className="bg-vibrant-green/50 backdrop-blur-sm text-text-color text-[8px] font-black px-2 py-0.5 rounded-bigview border border-black/10 tracking-tight">Upgrade your account</span>
               </div>
             </div>
-          </div>
+   
           <button className="p-3 bg-black/20 rounded-bigview border border-white/10 text-white hover:bg-black/40 transition-colors">
             <Settings size={20} />
           </button>
-        </div>
 
         {/* BALANCE CARD */}
-        <div className="bg-color-ash/60 p-6 rounded-bigview border border-white/10 backdrop-blur-xl flex items-center justify-between shadow-2xl">
+        <div className="">
           <div>
-            <p className="text-color-white/40 text-[10px] font-black tracking-tight mb-1 flex items-center gap-2">
+            <p className="text-color-white/40 text-[10px] font-black tracking-tight mb-1">
               Total Balance <EyeOff size={12} className="opacity-50" />
             </p>
             <h2 className="text-4xl font-black tracking-tighter tabular-nums">
               {balance} 
-              <span className="text-xs ml-2 text-gold-buttons">ETH</span>
+              <span className="text-xs ml-2 text-color-white">ETH</span>
             </h2>
-            <p className="text-blue text-[9px] font-black mt-2 tracking-tight">
-              Secured by Bigview Protocol
-            </p>
           </div>
 
           <div className="relative">
@@ -116,6 +113,8 @@ export default function MePage() {
             </div>
           </div>
         </div>
+      </div>
+      </div>
       </div>
 
       <div className="px-6 space-y-4">
