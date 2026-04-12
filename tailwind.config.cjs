@@ -21,7 +21,9 @@ module.exports = {
   'electric-yellow': 'var(--electric-yellow)',
   'color-ash': 'var(--color-ash)',
   'blue': 'var(--blue)',
-  'light': 'var(--light-blue)',
+  'light-blue': 'var(--light-blue)',
+  'charcoal': 'var(--charcoal-black)',
+  'light-black': 'var(--light-black)',
         
         
         // text colors

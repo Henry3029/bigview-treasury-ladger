@@ -54,10 +54,10 @@ export default function MobileHeader({
       <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
         
         {/* LEFT: Profile Trigger (Now using the Lifted State) */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button 
             onClick={handleProfileClick}
-            className="w-12 h-12 bg-color-ash/20 rounded-bigview flex items-center justify-center text-white border border-white/20 shadow-xl overflow-hidden active:scale-95 transition-all"
+            className="w-12 h-12 bg-charcaol/40 rounded-bigview flex items-center justify-center text-white border border-gold-buttons/60 shadow-xl overflow-hidden active:scale-95 transition-all"
           >
             {displayImage ? (
                <img src={displayImage} alt="Profile" className="w-full h-full object-cover" />
@@ -72,18 +72,18 @@ export default function MobileHeader({
           {authenticated && address ? (
             <button 
               onClick={copyAddress}
-              className="flex items-center gap-1.5 px-3 py-2 bg-violet-glow/10  rounded-bigview border border-white/10 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-muted-yellow/60  rounded-bigview border border-white/40 active:scale-95 transition-all"
             >
               <div className="w-1.5 h-1.5 bg-light-green rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
-              <span className="text-[10px] font-black text-white tracking-tighter uppercase italic">
+              <span className="text-[10px] font-black text-text-color tracking-tighter uppercase">
                 {address.slice(0, 4)}...{address.slice(-4)}
               </span>
-              <Copy size={10} className="text-white/40" />
+              <Copy size={10} className="text-text-color/50" />
             </button>
           ) : (
             <button 
               onClick={login}
-              className="text-[10px] font-black text-gold-buttons tracking-[0.2em] hover:opacity-80 transition-opacity"
+              className="text-[10px] font-black text-text-color tracking-tight hover:opacity-80 transition-opacity"
             >
               Connect
             </button>
@@ -93,14 +93,16 @@ export default function MobileHeader({
 
         {/* RIGHT: Branding */}
         <div className="flex items-center gap-3">
-          <button onClick={onNotificationClick} className="p-2 text-white/60 hover:text-gold-buttons transition-colors">
+          <button onClick={onNotificationClick} className="p-2 text-gold-buttons/70 hover:text-gold-buttons transition-colors">
             <Bell size={20} />
           </button>
           <div className="flex flex-col items-center gap-1 text-center">
             <div className="w-9 h-9 bg-white rounded-bigview flex items-center justify-center shadow-lg">
               <img src="/images/bigview-image.png" alt="BigView Logo" className="w-6 h-6 object-contain" />
             </div>
-            <span className="text-[7px] font-black tracking-widest text-white">BigView</span>
+           <span className="text-[9px] font-black tracking-tight text-white uppercase">
+  Bi<span className="text-gold-buttons">g</span>Vi<span className="text-gold-buttons">ew</span>
+</span>
           </div>
         </div>
       </header>

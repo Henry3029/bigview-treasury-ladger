@@ -55,8 +55,9 @@ notify('Profile Updated!');
   if (!isOpen) return null;
 
   return (
+  <>
   /* 1. FULL-SCREEN TAKEOVER: Using Bigview Violet background */
-  <div className="fixed inset-0 z-[300] bg-color-ash flex flex-col animate-in slide-in-from-right duration-500 font-inter overflow-hidden">
+  <div className="fixed inset-0 z-[300] bg-charcaol flex flex-col animate-in slide-in-from-right duration-500 font-inter overflow-hidden">
     
     {/* TOAST NOTIFICATION: Gold and Violet styled */}
     {message && (
@@ -68,22 +69,19 @@ notify('Profile Updated!');
     )}
       
     {/* Brand Decorative Background Glows */}
-    <div className="absolute top-0 right-0 w-64 h-64 bg-color-ash/10 rounded-full blur-[100px] -mr-32 -mt-32" />
-    <div className="absolute bottom-0 left-0 w-64 h-64 bg-color-ash/5 rounded-full blur-[100px] -ml-32 -mb-32" />
+    <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/10 rounded-full blur-[100px] -mr-32 -mt-32" />
+    <div className="absolute bottom-0 left-0 w-64 h-64 bg-color-white/5 rounded-full blur-[100px] -ml-32 -mb-32" />
 
     {/* HEADER */}
-    <div className="relative z-10 p-6 flex items-center justify-between border-b border-white/5 bg-black/20 backdrop-blur-xl">
+    <div className="relative z-10 p-4 flex items-center justify-between border-b border-white/5 bg-black/20 backdrop-blur-xl">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-color-ash/5 rounded-bigview">
-          <User size={20} className="text-color-white/60" />
-        </div>
-        <h2 className="text-xl font-black text-color-white tracking-tighter ">Account</h2>
+        <h2 className="text-xl font-black text-color-white tracking-tighter ">Profile</h2>
       </div>
       <button 
         onClick={onClose} 
-        className="p-3 bg-color-ash/5 hover:bg-color-ash/10 rounded-bigview text-color-white transition-all active:scale-90"
+        className="p-3 bg-charcaol/5 hover:bg-gold-background/50 rounded-bigview text-color-white transition-all active:scale-90"
       >
-        <X size={24} />
+        <X size={22} />
       </button>
     </div>
       
@@ -192,5 +190,6 @@ notify('Profile Updated!');
        </p>
     </div>
   </div>
+  </>
 );
 }
