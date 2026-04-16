@@ -59,7 +59,7 @@ export default function MePage() {
         <p className="text-white/30 text-[10px] font-black tracking-[0.2em] mb-8 text-center">Authentication Required for Bigview Ledger</p>
         <button 
           onClick={login}
-          className="w-full max-w-xs py-4 bg-gold-buttons text-black font-black rounded-bigview tracking-[0.2em] active:scale-95 transition-all shadow-xl hover:opacity-90"
+          className="w-full max-w-xs py-4 bg-gold-buttons text-black font-black rounded-bigview tracking-tight active:scale-95 transition-all shadow-xl hover:opacity-90"
         >
           Sign In
         </button>
@@ -74,8 +74,9 @@ export default function MePage() {
       {/* THE TOP BRAND BOX */}
       <div className="w-full bg-gold-background px-6 pt-16 pb-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"</div>
-        <div className="flex justify-between items-start mb-6">
-          <div className="flex flex-col items-start gap-3">
+        <div className="flex justify-between items-end relative z-10">
+          <div className="flex flex-col items-start justify-center gap-3">
+          <div className="flex justify-between items center gap-2">
             <div className="w-16 h-16 rounded-bigview bg-light-black/40 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
   {googlePicture ? (
     <img src={googlePicture} alt="Avatar" className="w-full h-full object-cover" />
@@ -83,7 +84,7 @@ export default function MePage() {
     <User size={30} className="text-color-white" />
   )}
 </div>
-            <div>
+            <div className="flex flex-col gap-2">
               <h1 className="text-2xl font-black tracking-tighter leading-none text-gold-buttons">Hi</h1>
               <div className="">
                 <span className="bg-vibrant-green/50 backdrop-blur-sm text-text-color text-[8px] font-black px-2 py-0.5 rounded-bigview border border-black/10 tracking-tight">Upgrade your account</span>
@@ -97,7 +98,7 @@ export default function MePage() {
         {/* BALANCE CARD */}
         <div className="">
           <div>
-            <p className="text-color-white/40 text-[10px] font-black tracking-tight mb-1">
+            <p className="text-color-white/40 text-[10px] font-black tracking-tight">
               Total Balance <EyeOff size={12} className="opacity-50" />
             </p>
             <h2 className="text-4xl font-black tracking-tighter tabular-nums">
@@ -108,8 +109,8 @@ export default function MePage() {
 
           <div className="relative">
             <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
-            <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center relative z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-4 border-black">
-              <ShieldCheck size={32} className="text-black" strokeWidth={2.5} />
+            <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center self-end relative z-10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-4 border-black">
+              <ShieldCheck size={32} className="text-vibrant-green" strokeWidth={2.5} />
             </div>
           </div>
         </div>

@@ -80,7 +80,7 @@ export default function WisdomCarousel() {
         >
           {quotes.map((quote, index) => (
             <div key={index} className="min-w-full snap-center px-2">
-              <div className={`bg-gradient-to-br ${quote.color} p-6 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[160px] relative overflow-hidden group`}>
+              <div className={`bg-gradient-to-br ${quote.color} p-4 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[160px] relative overflow-hidden group`}>
                 
                 {/* Decorative Shine Elements (OPay Aesthetic) */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />

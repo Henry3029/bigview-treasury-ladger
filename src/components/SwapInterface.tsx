@@ -89,50 +89,50 @@ export default function SwapInterface() {
 
   return (
   /* 1. Main Container: Using Bigview Violet and rounded-bigview */
-  <div className="w-full bg-color-ash rounded-bigview p-6 shadow-2xl border border-white/5 max-w-md mx-auto font-inter">
+  <div className="w-full bg-charcaol  p-4 shadow-2xl border-t border-b border-gold-buttons/40 max-w-md mx-auto font-inter">
     <div className="flex justify-between items-center mb-6">
-      <h2 className="text-lg font-black text-white tracking-tight">Bigview Swap</h2>
-      <div className="px-2 py-1 bg-color-ash/10 text-gold-buttons text-[8px] font-black rounded-bigview border border-gold-buttons/20 tracking-tight">
-        Base Sepolia Live
+      <h2 className="text-lg font-black text-white tracking-tight">Swap Tokens</h2>
+      <div className="px-2 py-1 bg-light-black/20 text-color-white text-[8px] font-black rounded-bigview border border-blue/50 tracking-tight">
+        Base Sepolia
       </div>
     </div>
 
     {/* INPUT BOX (ETH) */}
-    <div className="group bg-black/40 p-5 rounded-bigview mb-1.5 border border-white/5 focus-within:border-gold-buttons/40 transition-all">
-      <div className="flex justify-between items-center mb-2 text-[9px] font-black text-white/30 tracking-tight">
+    <div className="group bg-charcaol/40 p-5 rounded-bigview mb-1.5 border border-gold-background/20 focus-within:border-gold-buttons/40 transition-all">
+      <div className="flex justify-between items-center mb-2 text-[9px] font-black text-white/80 tracking-tight">
         <span>You Pay</span>
       </div>
       <div className="flex items-center justify-between gap-4">
         <input 
           type="number"
           placeholder="0.00"
-          className="bg-transparent text-2xl font-black outline-none w-full text-white placeholder:text-white/10 font-inter"
+          className="bg-transparent text-2xl font-black outline-none w-full text-white placeholder:text-white/50 font-inter"
           value={amountIn}
           onChange={(e) => setAmountIn(e.target.value)}
         />
-        <div className="flex items-center bg-color-ash/10 border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
-          <span className="font-black text-xs text-color-white">ETH</span>
+        <div className="flex items-center bg-light-black/10 border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
+          <span className="font-black text-xs text-solid-green">ETH</span>
         </div>
       </div>
     </div>
 
     {/* REVERSE ICON - Bigview Gold Style */}
     <div className="flex justify-center -my-4 relative z-10">
-      <div className="bg-color-ash text-color-white p-2 rounded-bigview border-[4px] border-violet-background shadow-xl transition-transform hover:scale-110">
+      <div className="bg-charcaol text-gold-buttons p-2 rounded-bigview border-[3px] border-gold-background shadow-xl transition-transform hover:scale-110">
         <ArrowDown size={14} strokeWidth={4} />
       </div>
     </div>
 
     {/* OUTPUT BOX (USDC) */}
-    <div className="bg-white/[0.02] p-5 rounded-bigview mb-6 border border-white/5">
-      <div className="flex justify-between items-center mb-2 text-[9px] font-black text-white/30 tracking-tight">
-        <span>You Receive (After 1% Bigview Fee)</span>
+    <div className="bg-charcaol/40 p-5 rounded-bigview mb-6 border border-white/5">
+      <div className="flex justify-between items-center mb-2 text-[10px] font-black text-solid-green/80 tracking-tight">
+        <span>You Receive</span>
       </div>
       <div className="flex items-center justify-between gap-4">
-        <div className="text-2xl font-black text-color-white/40 font-inter">
+        <div className="text-2xl font-black text-color-white/50 font-inter">
           {isCalculating ? <RefreshCw className="animate-spin text-white/20" size={20} /> : amountOut}
         </div>
-        <div className="flex items-center bg-white/5 border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
+        <div className="flex items-center border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
           <span className="font-black text-xs text-color-white">USDC</span>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function SwapInterface() {
       onClick={handleSwap}
       className="w-full py-4 bg-gold-buttons text-text-color rounded-bigview font-black text-base shadow-xl shadow-gold-buttons/10 hover:opacity-90 transition-all disabled:opacity-20 tracking-tight"
     >
-      {isCalculating ? "Fetching Best Price..." : "Execute Swap"}
+      {isCalculating ? "Fetching Price..." : "Execute Swap"}
     </button>
 
     <p className="text-[8px] text-gold-buttons text-center mt-4 font-bold tracking-tighter">

@@ -19,12 +19,12 @@ export default function StakePage() {
     <main className="min-h-screen w-full pt-16 pb-16 flex flex-col items-center relative overflow-hidden font-inter">
       
       {/* BACKGROUND DECORATIVE GLOWS: Swapped to Brand Violet Glow */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-violet-glow/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-violet-glow/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-charcaol/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-charcaol/5 rounded-full blur-[120px] pointer-events-none" />
 
       {/* 1. HEADER SECTION: Unified with Bigview Gold and spacing */}
       <div className="w-full max-w-lg mb-8 relative z-10 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-color-ash/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-charcaol/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
           <Sparkles size={12} className="text-gold-buttons" />
           <span className="text-[9px] font-black text-solid-green/30 tracking-tight">Bigview Treasury</span>
         </div>

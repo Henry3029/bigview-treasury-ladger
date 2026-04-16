@@ -7,33 +7,21 @@ import { ArrowLeftRight, Activity, ShieldCheck } from 'lucide-react';
 export default function SwapPage() {
   return (
     /* 1. CLEAN SLATE: Removed bg-neutral-950 to let layout.tsx handle the background */
-    <div className="min-h-screen relative overflow-hidden flex flex-col items-center justify-start pt-16 pb-20 font-inter">
-      
-      {/* 1. Background Decorative Elements (Updated to Brand Violet Glow) */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[40%] bg-gold-background/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gold-background/5 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-start justify-center pt-16 pb-20 font-inter">
 
       {/* 2. Page Header */}
       <div className="text-center mb-8 relative z-10 w-full">
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-color-ash/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
-          <ShieldCheck size={12} className="text-gold-buttons" />
-          <span className="text-[9px] font-black text-color-white/30 tracking-tight">Verified Base Protocol</span>
-        </div>
         
-        <h1 className="text-4xl font-black text-white tracking-tighter mb-2">
+        <h1 className="text-2xl font-black text-white tracking-tighter mb-2">
           Exchange Assets
         </h1>
-        <p className="text-white/40 font-black text-[10px] max-w-xs mx-auto leading-relaxed tracking-tight">
-          Swap <span className="text-gold-buttons">Base Sepolia</span> tokens with <span className="text-white">Bigview</span> Liquidity.
+        <p className="text-blue/80 font-black text-[10px] max-w-xs mx-auto leading-relaxed tracking-tight">
+          Swap Base Sepolia tokens with <span className="text-gold-buttons">Bigview</span> Liquidity.
         </p>
       </div>
 
       {/* 3. The Swap Component - Unified with Bigview Tokens */}
       <div className="w-full max-w-md relative z-10 mt-4">
-        {/* Floating Icon - Updated to Gold/Sharp with Bigview Rounding */}
-        <div className="absolute -top-3 -right-3 bg-color-white text-text-color p-2.5 rounded-bigview shadow-2xl rotate-12 z-20 border-4 border-violet-background">
-          <ArrowLeftRight size={18} strokeWidth={3} />
-        </div>
         <SwapInterface />
       </div>
 

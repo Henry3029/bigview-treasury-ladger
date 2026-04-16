@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
-import { PartyPopper, X, Sparkles, ShieldCheck, Zap } from 'lucide-react';
+import { X, Sparkles, Zap } from 'lucide-react';
 
 export default function WelcomeBanner() {
   const { authenticated, ready } = usePrivy();
@@ -27,12 +27,12 @@ export default function WelcomeBanner() {
 
   return (
   /* THE OVERLAY: Dims the rest of the app using Bigview Violet-Background */
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-electric-yellow/80 animate-in fade-in duration-500">
+  <div className="fixed inset-0 z-[100] flex items-center justify-center px-2 py-4 bg-gradient-to-b from-slate-900 via-slate-800 to-black animate-pulse duration-500">
     
     <div className="relative w-full max-w-sm flex flex-col items-center">
       
       {/* MAIN CARD: Swapped rounded-3xl for your official rounded-bigview */}
-      <div className="w-full bg-gradient-to-b from-violet-background via-violet-background to-black text-white p-8 rounded-bigview relative overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
+      <div className="w-full bg-gradient-to-b from-slate-900 via-slate-800 to-black text-white px-4 py-6 rounded-bigview relative overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
         
         {/* Decorative Brand Glows (Bigview Aesthetic) */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold-background/20 rounded-full blur-[60px] -mr-10 -mt-10" />
@@ -42,10 +42,6 @@ export default function WelcomeBanner() {
           {/* Bigview Icon Branding */}
           <div className="mb-6 relative">
             <div className="w-20 h-20 bg-gold-buttons rounded-bigview rotate-12 flex items-center justify-center shadow-2xl shadow-gold-buttons/40 border border-white/20">
-              <PartyPopper size={40} className="text-text-color -rotate-12 animate-bounce" />
-            </div>
-            <div className="absolute -bottom-2 -right-2 bg-emerald-500 p-2 rounded-bigview border-4 border-violet-background shadow-lg">
-              <ShieldCheck size={18} className="text-white" />
             </div>
           </div>
           
@@ -58,10 +54,10 @@ export default function WelcomeBanner() {
             </div>
             
             <p className="text-white/40 text-[11px] font-black uppercase tracking-[0.2em]">
-              Account Secured via <span className="text-solid-green">Privy</span>
+              Account Secured
             </p>
 
-            <div className="h-px w-12 bg-color-ash/10 mx-auto my-4" />
+            <div className="h-px w-12 bg-charcaol/20 mx-auto my-4" />
 
             <p className="text-white/70 text-sm font-medium leading-relaxed opacity-90 tracking-tight">
               You're now live on <span className="text-white font-black">Base Sepolia</span>. Start staking to accumulate <span className="text-color-white font-black">BVW</span> governance rewards automatically.

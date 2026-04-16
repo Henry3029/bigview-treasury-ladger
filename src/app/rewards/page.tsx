@@ -59,7 +59,7 @@ export default function RewardsPage() {
   }, [address, authenticated]);
 
   return (
-    <main className="min-h-screen w-full pb-32 font-inter bg-color-ash text-white">
+    <main className="min-h-screen w-full pb-22 font-inter bg-charcaol text-white mx-auto">
       
       {/* REWARDS HEADER: Deep Slate & Gold Accents */}
       <div className="w-full bg-gradient-to-b from-gold-buttons/10 via-transparent to-transparent pt-12 pb-10">
@@ -81,7 +81,7 @@ export default function RewardsPage() {
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 bg-gold-buttons rounded-full flex items-center justify-center text-black font-black text-[9px] shadow-lg shadow-gold-buttons/20">BVW</div>
               <span className="text-3xl font-black tracking-tighter">{pending}</span>
-              <ChevronRight size={18} className="text-white/20" />
+              <ChevronRight size={18} className="text-white/40" />
             </div>
           </div>
 
@@ -129,8 +129,8 @@ export default function RewardsPage() {
               <div key={v} className="min-w-[200px] bg-[#1E293B] border border-white/5 rounded-bigview p-5 relative overflow-hidden backdrop-blur-md">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gold-buttons" />
                 <p className="text-color-white text-2xl font-black tracking-tighter mb-1">+5% APY</p>
-                <p className="text-[10px] font-black text-white/20 mb-6 uppercase tracking-widest italic">Stake Booster v.{v}</p>
-                <button className="w-full py-2.5 bg-color-ash text-black rounded-full text-[10px] font-black tracking-tight active:scale-95 transition-all shadow-lg shadow-gold-buttons/10">
+                <p className="text-[10px] font-black text-white/20 mb-6 tracking-tight">Stake Booster v.{v}</p>
+                <button className="w-full py-2.5 bg-charcaol text-color-white rounded-full text-[10px] font-black tracking-tight active:scale-95 transition-all shadow-lg shadow-gold-buttons/10">
                   Claim
                 </button>
               </div>
@@ -144,7 +144,7 @@ export default function RewardsPage() {
            <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 items-center">
-                  <div className="w-12 h-12 bg-color-ash rounded-bigview flex items-center justify-center text-gold-buttons border border-white/5">
+                  <div className="w-12 h-12 bg-charcaol rounded-bigview flex items-center justify-center text-color-white border border-white/5">
                     <TrendingUp size={24} />
                   </div>
                   <div>
@@ -152,7 +152,7 @@ export default function RewardsPage() {
                     <p className="text-[10px] text-emerald-400 font-black mt-1">+Up to 6.5%</p>
                   </div>
                 </div>
-                <button className="px-6 py-2 bg-color-ash border border-white/10 text-white rounded-full text-[10px] font-black tracking-tight hover:bg-gold-buttons hover:text-black transition-all">Go</button>
+                <button className="px-6 py-2 bg-charcaol border border-white/10 text-white rounded-full text-[10px] font-black tracking-tight hover:bg-gold-buttons hover:text-black transition-all">Go</button>
               </div>
            </div>
         </section>
