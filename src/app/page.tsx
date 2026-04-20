@@ -54,8 +54,7 @@ export default async function Dashboard() {
           <DashboardData stake={stats.stake} />
           
           <BigViewLoGo />
-          
-        </section>
+        
         
         <div className="text-center pt-4 opacity-20">
           <p className="text-[8px] font-black text-white tracking-tight">Bigview Treasury Ledger • v2.0</p>
