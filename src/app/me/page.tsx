@@ -51,7 +51,7 @@ export default function MePage() {
   // 1. LOGIN SCREEN (If not logged in)
   if (!authenticated) {
     return (
-      <main className="min-h-screen bg-color-ash flex flex-col items-center justify-center pt-8 pb-8">
+      <main className="min-h-screen bg-charcoal flex flex-col items-center justify-center pt-8 pb-8">
         <div className="w-20 h-20 bg-gold-buttons rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
           <Lock size={32} className="text-black" />
         </div>
@@ -72,7 +72,7 @@ export default function MePage() {
     <main className="min-h-screen text-white pb-16 font-inter bg-charcaol">
       
       {/* THE TOP BRAND BOX */}
-      <div className="w-full bg-gold-background px-6 pt-16 pb-8 relative overflow-hidden">
+      <div className="w-full bg-charcaol px-6 pt-16 pb-8 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"</div>
         <div className="flex justify-between items-end relative z-10">
           <div className="flex flex-col items-start justify-center gap-3">
