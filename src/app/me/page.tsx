@@ -69,16 +69,12 @@ export default function MePage() {
 
   // 2. PROFILE VIEW (Only shows if authenticated)
   return (
-    <main className="min-h-screen text-white pb-16 font-inter bg-charcaol">
+    <main className="min-h-screen text-white pb-16 font-inter bg-charcoal">
       
       {/* THE TOP BRAND BOX */}
-<<<<<<< HEAD
-      <div className="w-full bg-charcaol px-6 pt-16 pb-8 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"</div>
-=======
       <div className="w-full bg-gold-background px-6 pt-16 pb-8 relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
->>>>>>> 0676ed6873e26b2deb6b4202adf9353ab5547831
+        <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
+        
         <div className="flex justify-between items-end relative z-10">
           <div className="flex flex-col items-start justify-center gap-3">
           <div className="flex justify-between items center gap-2">
