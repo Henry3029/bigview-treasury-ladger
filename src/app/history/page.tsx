@@ -19,7 +19,7 @@ export default function HistoryPage() {
   // Avoid hydration mismatch
   if (!isMounted) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-color-ash>
+      <div className="flex items-center justify-center min-h-screen bg-color-ash">
         <div className="p-8 text-center text-gold-buttons/20 animate-pulse font-black tracking-[0.4em] text-[10px]">
           Loading...
         </div>

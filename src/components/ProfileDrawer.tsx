@@ -109,7 +109,7 @@ notify('Profile Updated!');
           onClick={handleCameraClick}
           disabled={isUploading}
           className="absolute bottom-0 left-0 w-full h-1/4 bg-gold-buttons text-text-color font-bold text-xs flex items-center justify-center active:scale-95 transition-all">
-        >
+        
           <Camera size={18} />
         </button>
 
