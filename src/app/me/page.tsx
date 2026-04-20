@@ -47,7 +47,7 @@ export default function MePage() {
   }, [address, authenticated]);
 
   if (!mounted || !ready) return null;
-
+ 
   // 1. LOGIN SCREEN (If not logged in)
   if (!authenticated) {
     return (
@@ -68,7 +68,7 @@ export default function MePage() {
   }
 
   // 2. PROFILE VIEW (Only shows if authenticated)
-  return (
+  return (  
     <main className="min-h-screen text-white pb-16 font-inter bg-charcoal">
       
       {/* THE TOP BRAND BOX */}
@@ -134,4 +134,4 @@ export default function MePage() {
     </main>
     </div>
   );
-}
+}   n yy
