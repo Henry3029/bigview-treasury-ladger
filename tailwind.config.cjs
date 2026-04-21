@@ -22,7 +22,7 @@ module.exports = {
   'color-ash': 'var(--color-ash)',
   'blue': 'var(--blue)',
   'light-blue': 'var(--light-blue)',
-  'charcoal': 'var(--charcoal-black)',
+  'charcaol': 'var(--medium-black)',
   'light-black': 'var(--light-black)',
         
         

@@ -56,7 +56,7 @@ notify('Profile Updated!');
 
   return (
   <>
-  /* 1. FULL-SCREEN TAKEOVER: Using Bigview Violet background */
+{  /* 1. FULL-SCREEN TAKEOVER: Using Bigview Violet background */}
   <div className="fixed inset-0 z-[300] bg-charcaol flex flex-col animate-in slide-in-from-right duration-500 font-inter overflow-hidden">
     
     {/* TOAST NOTIFICATION: Gold and Violet styled */}
