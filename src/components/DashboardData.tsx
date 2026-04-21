@@ -53,7 +53,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
   if (!mounted || loading) return <div className="p-8 bg-color-ash/5 rounded-bigview animate-pulse border border-white/5" />;
 
   return (
-    <div className="space-y-3 w-full">
+    <div className="space-y-3 mx-2">
        {/* ... rest of your UI code stays exactly the same ... */}
        <div className="grid grid-cols-2 gap-3">
           {/* Members Card */}
