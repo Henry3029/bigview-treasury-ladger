@@ -74,10 +74,8 @@ export default function StakeCard() {
   return (
   <>
   {/* 1. Main Container: Using Bigview Violet and rounded-bigview */}
-  <div className="mx-2 max-w-md bg-charcaol p-6 shadow-2xl border-t-2 border-b-2 border-gold-buttons/60 relative overflow-hidden font-inter">
+  <div className="mx-2 max-w-md bg-white/20 p-6 shadow-2xl border-t-2 border-b-2 border-white/10 relative overflow-hidden font-inter">
     
-    {/* Brand Background Glow: Using Violet-Glow for depth */}
-    <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-[60px] -mr-16 -mt-16 rounded-full" />
     
     <div className="mb-8 text-center relative z-10">
      
@@ -102,7 +100,7 @@ export default function StakeCard() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full p-6 bg-black/40 border-2 border-white/5 rounded-bigview focus:border-gold-buttons/40 outline-none transition-all font-black text-2xl text-white placeholder:text-white/30"
+            className="w-full p-6 bg-black/40 border-2 border-white/5 rounded-bigview focus:border-white/15 outline-none transition-all font-bold text-2xl text-white placeholder:text-white/40"
           />
         </div>
       </div>
@@ -111,14 +109,14 @@ export default function StakeCard() {
       <button 
         onClick={handleStake}
         disabled={loading || !ready || !amount}
-        className="w-full py-4 bg-gold-buttons text-text-color rounded-bigview font-black text-lg shadow-xl shadow-gold-buttons/10 transition-all active:scale-95 flex items-center justify-center gap-3 tracking-tight hover:opacity-90 disabled:opacity-50 disabled:bg-white/5 disabled:text-white/20"
+        className="w-full py-4 bg-gold-buttons/70 text-black rounded-bigview font-bold text-lg shadow-xl shadow-gold-buttons/10 transition-all active:scale-95 flex items-center justify-center gap-3 tracking-tight hover:opacity-90 disabled:opacity-50 disabled:bg-gold-buttons/20 disabled:text-black/20"
       >
         {loading ? <Loader2 className="animate-spin" size={20} /> : <Wallet size={20} />}
         <span>{loading ? 'Confirming...' : 'Start Earning'}</span>
       </button>
 
       {txHash && (
-        <p className="text-[9px] text-emerald-500 font-black text-center animate-pulse">
+        <p className="text-[10px] text-emerald-500 font-thin text-center animate-pulse">
           Success! View on Explorer
         </p>
       )}
@@ -126,7 +124,7 @@ export default function StakeCard() {
       {/* Footer Info: Using brand-aligned opacity for text */}
       <div className="pt-6 border-t border-white/5 flex items-start gap-3 text-color-white/20">
         <Info size={14} className="mt-0.5 text-light-blue" />
-        <p className="text-[10px] font-bold leading-relaxed tracking-tight">
+        <p className="text-[10px] font-medium leading-relaxed tracking-tight">
           Automated Staking Powered By BigView Ledger
         </p>
       </div>

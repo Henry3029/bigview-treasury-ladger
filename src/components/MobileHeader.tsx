@@ -51,14 +51,14 @@ export default function MobileHeader({
       )}
 
       {/* 2. HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 py-2 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
       
         <div className="flex items-center gap-4">
         {/* LEFT: Profile Trigger (Now using the Lifted State) */}
         <div className="flex items-center gap-2">
           <button 
             onClick={handleProfileClick}
-            className="w-12 h-12 bg-solid-blue rounded-bigview flex items-center justify-center text-black border border-gold-white/80 shadow-xl overflow-hidden active:scale-95 transition-all"
+            className="w-12 h-12 bg-solid-blue rounded-bigview flex items-center justify-center text-white shadow-xl overflow-hidden active:scale-95 transition-all"
           >
             {displayImage ? (
                <img src={displayImage} alt="Profile" className="w-full h-full object-cover" />
@@ -73,18 +73,18 @@ export default function MobileHeader({
           {authenticated && address ? (
             <button 
               onClick={copyAddress}
-              className="flex items-center gap-1.5 px-3 py-2 bg-muted-yellow/80  rounded-bigview border border-white/60 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-gold-background/60  rounded-bigview border border-white/30 active:scale-95 transition-all"
             >
-              <div className="w-1.5 h-1.5 bg-light-green rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
+              <div className="w-1.5 h-1.5 bg-light-green/60 rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
               <span className="text-[10px] font-black text-text-color tracking-tighter uppercase">
                 {address.slice(0, 4)}...{address.slice(-4)}
               </span>
-              <Copy size={10} className="text-text-color/50" />
+              <Copy size={10} className="text-white/60" />
             </button>
           ) : (
             <button 
               onClick={login}
-              className="bg-gold-buttons/80 p-1 rounded-bigview text-[13px] font-black text-black tracking-tight hover:opacity-80 transition-opacity"
+              className="bg-gold-buttons/70 p-1 rounded-bigview text-[13px] font-black text-white tracking-tight hover:opacity-80 transition-opacity"
             >
               Connect
             </button>
