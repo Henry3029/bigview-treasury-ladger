@@ -52,7 +52,8 @@ export default function MobileHeader({
 
       {/* 2. HEADER */}
       <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
-        
+      
+        <div className="flex items-center gap-4">
         {/* LEFT: Profile Trigger (Now using the Lifted State) */}
         <div className="flex items-center gap-2">
           <button 
@@ -83,11 +84,12 @@ export default function MobileHeader({
           ) : (
             <button 
               onClick={login}
-              className="text-[10px] font-black text-text-color tracking-tight hover:opacity-80 transition-opacity"
+              className="bg-gold-buttons p-2 rounded-full text-[10px] font-black text-text-color tracking-tight hover:opacity-80 transition-opacity"
             >
               Connect
             </button>
           )}
+        </div>
         </div>
         
 

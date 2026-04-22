@@ -51,9 +51,10 @@ export default async function Dashboard() {
       
       <BalanceCard />
       
+         <BigViewLoGo />
+      
           <DashboardData stake={stats.stake} />
           
-          <BigViewLoGo />
         
         
         <div className="text-center pt-4 opacity-20">

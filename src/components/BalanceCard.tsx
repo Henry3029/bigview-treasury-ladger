@@ -10,7 +10,7 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
 return (
 <>
   {/* 1. Changed p-6 p4 to px-6 py-4 to make it a sleek rectangle */}
-  <div className="w-full px-6 py-4 mx-3 bg-light-green rounded-bigview relative overflow-hidden">
+  <div className="px-6 py-4 mx-3 bg-light-green rounded-bigview relative overflow-hidden">
     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full -mr-16 -mt-16" />
     
     <div className="relative z-10">
