@@ -88,6 +88,7 @@ export default function SwapInterface() {
   if (!mounted) return null;
 
   return (
+  <>
 { /* 1. Main Container: Using Bigview Violet and rounded-bigview */}
   <div className="mx-2 bg-charcaol  p-4 shadow-2xl border-t border-b border-gold-buttons/40 max-w-md mx-auto font-inter">
     <div className="flex justify-between items-center mb-6">
@@ -165,5 +166,6 @@ export default function SwapInterface() {
       BigView Protocol, The Future Of Decentralized Finance!
     </p>
   </div>
+  </>
 );
 }

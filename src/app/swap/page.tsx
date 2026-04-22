@@ -6,6 +6,7 @@ import { ArrowLeftRight, Activity, ShieldCheck } from 'lucide-react';
 
 export default function SwapPage() {
   return (
+  <>
     {/* 1. CLEAN SLATE: Removed bg-neutral-950 to let layout.tsx handle the background */}
     <div className="min-h-screen relative overflow-hidden flex flex-col items-start justify-center pt-16 pb-20 font-inter">
 
@@ -46,5 +47,6 @@ export default function SwapPage() {
         </div>
       </div>
     </div>
+    </>
   );
   }
