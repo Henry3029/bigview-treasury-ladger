@@ -80,7 +80,7 @@ export default function WisdomCarousel() {
         >
           {quotes.map((quote, index) => (
             <div key={index} className="min-w-full snap-center px-2">
-              <div className={`bg-gradient-to-br ${quote.color} p-4 rounded-3xl text-white shadow-xl flex flex-col justify-center min-h-[160px] relative overflow-hidden group`}>
+              <div className={`bg-gradient-to-br ${quote.color} p-2 rounded-2xl text-white shadow-xl flex flex-col justify-center min-h-[110px] relative overflow-hidden group`}>
                 
                 {/* Decorative Shine Elements (OPay Aesthetic) */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors" />
@@ -88,17 +88,17 @@ export default function WisdomCarousel() {
                 
                 {/* Icon Header */}
                 <div className="flex items-center gap-3 mb-4 relative z-10">
-                  <div className="p-2 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
+                  <div className="p-1.5 bg-white/10 rounded-xl backdrop-blur-md border border-white/10">
                     {quote.icon}
                   </div>
                   <span className="text-[9px] font-black text-gold-buttons tracking-tight">Bigview Insight</span>
                 </div>
                 
-                <blockquote className="text-sm md:text-base font-black leading-tight mb-2 relative z-10 tracking-tight">
+                <blockquote className="text-sm md:text-sm font-bold leading-snug mb-2 relative z-10 tracking-tight">
                   "{quote.text}"
                 </blockquote>
                 
-                <cite className="text-[10px] font-bold text-white/50 tracking-tight not-italic relative z-10">
+                <cite className="text-[9px] font-medium text-white/50 tracking-tight not-italic relative z-10">
                   — {quote.sage}
                 </cite>
 

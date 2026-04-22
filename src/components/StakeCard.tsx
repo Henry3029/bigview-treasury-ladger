@@ -73,8 +73,8 @@ export default function StakeCard() {
 
   return (
   <>
-  /* 1. Main Container: Using Bigview Violet and rounded-bigview */
-  <div className="w-full max-w-md bg-charcaol p-8 rounded-bigview mx-2 shadow-2xl border border-gold-buttons/50 relative overflow-hidden font-inter">
+  {/* 1. Main Container: Using Bigview Violet and rounded-bigview */}
+  <div className="mx-2 max-w-md bg-charcaol p-6 shadow-2xl border-t-2 border-b-2 border-gold-buttons/60 relative overflow-hidden font-inter">
     
     {/* Brand Background Glow: Using Violet-Glow for depth */}
     <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-[60px] -mr-16 -mt-16 rounded-full" />
@@ -126,7 +126,7 @@ export default function StakeCard() {
       {/* Footer Info: Using brand-aligned opacity for text */}
       <div className="pt-6 border-t border-white/5 flex items-start gap-3 text-color-white/20">
         <Info size={14} className="mt-0.5 text-light-blue" />
-        <p className="text-[9px] font-bold leading-relaxed tracking-tight">
+        <p className="text-[10px] font-bold leading-relaxed tracking-tight">
           Automated Staking Powered By BigView Ledger
         </p>
       </div>

@@ -72,7 +72,7 @@ function NavLink({ href, icon, label, active }: { href: string; icon: React.Reac
       <div className={active ? 'drop-shadow-[0_0_8px_rgba(253,230,138,0.5)]' : ''}>
         {icon}
       </div>
-      <span className={`text-[10px] font-black tracking-tighter ${
+      <span className={`text-[10px] font-bold tracking-tighter ${
         active ? 'text-vibrant-green' : 'text-color-white'
       }`}>
         {label}

@@ -15,7 +15,8 @@ export default function StakePage() {
   if (!mounted) return null;
 
   return (
-    /* 1. CLEAN SLATE: Background now handled globally by layout.tsx */
+  <>
+   { /* 1. CLEAN SLATE: Background now handled globally by layout.tsx */}
     <main className="min-h-screen w-full pt-16 pb-16 flex flex-col items-center relative overflow-hidden font-inter">
       
       {/* BACKGROUND DECORATIVE GLOWS: Swapped to Brand Violet Glow */}
@@ -26,7 +27,7 @@ export default function StakePage() {
       <div className="w-full max-w-lg mb-8 relative z-10 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 bg-charcaol/5 rounded-bigview border border-white/5 mb-6 backdrop-blur-md">
           <Sparkles size={12} className="text-gold-buttons" />
-          <span className="text-[9px] font-black text-solid-green/30 tracking-tight">Bigview Treasury</span>
+          <span className="text-[10px] font-black text-solid-green/80 tracking-tight">Bigview Treasury</span>
         </div>
         
         {/* The WisdomCarousel will now sit on your clean Violet Background */}
@@ -48,5 +49,6 @@ export default function StakePage() {
         </div>
       </div>
     </main>
+    </>
   );
 }
