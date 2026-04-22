@@ -54,14 +54,14 @@ export default function MePage() {
   if (!authenticated) {
     return (
       <main className="min-h-screen bg-charcoal flex flex-col items-center justify-center pt-8 pb-8">
-        <div className="w-20 h-20 bg-gold-buttons rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
+        <div className="w-16 h-16 bg-light-blue rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
           <Lock size={32} className="text-black" />
         </div>
         <h2 className="text-white font-black tracking-tighter text-2xl mb-2">Secure Access</h2>
-        <p className="text-white/30 text-[10px] font-black tracking-[0.2em] mb-8 text-center">Authentication Required for Bigview Ledger</p>
+        <p className="text-solid-green/80 text-[10px] font-bold tracking-tight mb-8 text-center">Authentication Required for Bigview Ledger</p>
         <button 
           onClick={login}
-          className="w-full max-w-xs py-4 bg-gold-buttons text-black font-black rounded-bigview tracking-tight active:scale-95 transition-all shadow-xl hover:opacity-90"
+          className="w-full max-w-xs py-3 bg-gold-buttons text-black font-semibold rounded-full tracking-tight active:scale-95 transition-all shadow-xl hover:opacity-90"
         >
           Sign In
         </button>

@@ -26,13 +26,14 @@ export default function WelcomeBanner() {
   if (!showWelcome) return null;
 
   return (
-  /* THE OVERLAY: Dims the rest of the app using Bigview Violet-Background */
-  <div className="fixed inset-0 z-[100] flex items-center justify-center px-2 py-4 bg-gradient-to-b from-slate-900 via-slate-800 to-black animate-pulse duration-500">
+  <>
+ { /* THE OVERLAY: Dims the rest of the app using Bigview Violet-Background */}
+  <div className="fixed inset-0 z-[100] flex items-center justify-center px-2 py-4 bg-slate-950/95 backdrop-blur-md animate-in fade-in duration-500">
     
     <div className="relative w-full max-w-sm flex flex-col items-center">
       
       {/* MAIN CARD: Swapped rounded-3xl for your official rounded-bigview */}
-      <div className="w-full bg-gradient-to-b from-slate-900 via-slate-800 to-black text-white px-4 py-6 rounded-bigview relative overflow-hidden shadow-[0_0_50px_rgba(139,92,246,0.2)] border border-white/10 animate-in zoom-in-95 duration-300">
+      <div className="w-full bg-gradient-to-b from-slate-900 via-slate-800 to-black text-white px-4 py-6 rounded-bigview relative overflow-hidden shadow-2xl border border-white/10 animate-in slide-in-from-bottom-4 duration-500">
         
         {/* Decorative Brand Glows (Bigview Aesthetic) */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gold-background/20 rounded-full blur-[60px] -mr-10 -mt-10" />
@@ -85,5 +86,6 @@ export default function WelcomeBanner() {
       </button>
     </div>
   </div>
+  </>
 );
 }

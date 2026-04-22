@@ -58,12 +58,12 @@ export default function MobileHeader({
         <div className="flex items-center gap-2">
           <button 
             onClick={handleProfileClick}
-            className="w-12 h-12 bg-charcaol/40 rounded-bigview flex items-center justify-center text-white border border-gold-buttons/60 shadow-xl overflow-hidden active:scale-95 transition-all"
+            className="w-12 h-12 bg-solid-blue rounded-bigview flex items-center justify-center text-black border border-gold-white/80 shadow-xl overflow-hidden active:scale-95 transition-all"
           >
             {displayImage ? (
                <img src={displayImage} alt="Profile" className="w-full h-full object-cover" />
             ) : (
-              <User size={24} strokeWidth={2.5} />
+              <User size={22} strokeWidth={2.5} />
             )}
           </button>
         </div>
@@ -73,7 +73,7 @@ export default function MobileHeader({
           {authenticated && address ? (
             <button 
               onClick={copyAddress}
-              className="flex items-center gap-1.5 px-3 py-2 bg-muted-yellow/60  rounded-bigview border border-white/40 active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-muted-yellow/80  rounded-bigview border border-white/60 active:scale-95 transition-all"
             >
               <div className="w-1.5 h-1.5 bg-light-green rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
               <span className="text-[10px] font-black text-text-color tracking-tighter uppercase">
@@ -84,7 +84,7 @@ export default function MobileHeader({
           ) : (
             <button 
               onClick={login}
-              className="bg-gold-buttons p-2 rounded-full text-[10px] font-black text-text-color tracking-tight hover:opacity-80 transition-opacity"
+              className="bg-gold-buttons/80 p-1 rounded-bigview text-[13px] font-black text-black tracking-tight hover:opacity-80 transition-opacity"
             >
               Connect
             </button>
