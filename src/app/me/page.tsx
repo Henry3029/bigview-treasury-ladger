@@ -14,6 +14,8 @@ import {
   Settings,
   ShieldCheck 
 } from 'lucide-react';
+import { publicActionsL2 } from 'viem/zksync';
+import { publicClient } from '@/utils/viemClient';
 
 export default function MePage() {
   const { login, logout, authenticated, ready, user } = usePrivy();
