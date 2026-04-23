@@ -28,6 +28,7 @@ export default function HistoryPage() {
   }
 
   return (
+  <>
    { /* MAIN LAYOUT: Deep Slate Background */}
     <div className="pt-16 md:p-10 pb-24 min-h-screen font-inter">
       
@@ -88,5 +89,6 @@ export default function HistoryPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
