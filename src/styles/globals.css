@@ -10,7 +10,7 @@
   --gold-buttons: #fbbf24;
   --text-color: #ffffff;
   --violet-background: #7c3aed;   /* The "Red-ish" glowing edge (Violet-600) */
-  --violet-main-background: #0D0D0D;
+  --violet-main-background: #121212;
   --light-green: #90EE90;
   --solid-green: #228B22;
   --vibrant-green: #32CD32;
@@ -21,7 +21,9 @@
   --blue: #3b82f6;
   --light-blue: #bfdbfe;
   --medium-black: #121212;
-  --light-black: #1C1C1C;
+  --light-black: #212121;
+  --gold-primary: #FFD700;
+  --gold-secondary: #E6B800;
 }
 
 body {

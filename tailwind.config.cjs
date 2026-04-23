@@ -24,6 +24,8 @@ module.exports = {
   'light-blue': 'var(--light-blue)',
   'charcaol': 'var(--medium-black)',
   'light-black': 'var(--light-black)',
+  'bigview-gold': 'var(--gold-primary)',
+  'bigview-gold-dim': 'var(--gold-secondary)',
         
         
         // text colors

@@ -15,7 +15,7 @@ export default function BottomNav() {
   const isActive = (path: string) => pathname === path;
 
   return (
-  <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-violet-main-background border-t border-white/5 p-2 py-1 z-[100] flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+  <nav className="fixed bottom-0 left-0 right-0 lg:hidden bg-violet-main-background p-2 py-1 z-[100] flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
     
     {/* 1. Home */}
     <NavLink 
@@ -66,14 +66,14 @@ function NavLink({ href, icon, label, active }: { href: string; icon: React.Reac
     <Link 
       href={href} 
       className={`flex flex-col items-center gap-1 transition-all duration-300 active:scale-95 ${
-        active ? 'text-vibrant-green' : 'text-color-white'
+        active ? 'text-blue' : 'text-color-white'
       }`}
     >
       <div className={active ? 'drop-shadow-[0_0_8px_rgba(253,230,138,0.5)]' : ''}>
         {icon}
       </div>
-      <span className={`text-[10px] font-bold tracking-tighter ${
-        active ? 'text-vibrant-green' : 'text-color-white'
+      <span className={`text-[10px] font-normal tracking-tighter ${
+        active ? 'text-blue' : 'text-color-white'
       }`}>
         {label}
       </span>

@@ -27,11 +27,11 @@ export default function RootLayout({
         <Providers>
           <WelcomeBanner />
 
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col h-dvh overflow-hidden">
             {/* The Header now sits at the top of every page */}
             <MobileHeaderWrapper />
 
-            <main className="flex-grow w-full min-h-screen pb-20 lg:pb-0">
+            <main className="flex-grow w-full pb-20 lg:pb-0">
               {children}
             </main>
 

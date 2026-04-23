@@ -57,7 +57,7 @@ export default function DashboardData({ stake }: DashboardDataProps) {
        {/* ... rest of your UI code stays exactly the same ... */}
        <div className="grid grid-cols-2 gap-3">
           {/* Members Card */}
-          <div className="p-2 bg-color-ash/10 border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
+          <div className="p-2 border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
             <div className="flex items-center gap-2 text-color-white/40">
               <Users size={12} strokeWidth={3} />
               <span className="text-[8px]  font-black tracking-[0.2em]">Network Size</span>
@@ -68,19 +68,19 @@ export default function DashboardData({ stake }: DashboardDataProps) {
           </div>
           
           {/* APY Card */}
-          <div className="p-4 bg-color-ash border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
+          <div className="p-4 border border-white/5 rounded-bigview flex flex-col gap-1 shadow-sm">
             <div className="flex items-center gap-2 text-color-white/60">
               <TrendingUp size={12} strokeWidth={3} />
-              <span className="text-[8px]  font-black tracking-[0.2em]">Yield Rate</span>
+              <span className="text-[8px]  font-bold tracking-[0.2em]">Yield Rate</span>
             </div>
-            <span className="text-xl font-black tracking-tighter text-color-white">
+            <span className="text-xl font-bold tracking-tighter text-color-white">
               12.5% <span className="text-[10px] text-color-white/40 not-italic">APY</span>
             </span>
           </div>
        </div>
 
        {/* Global Treasury Stat */}
-       <div className="p-5 bg-color-ash/5 border border-white/5 rounded-bigview flex items-center justify-between shadow-xl relative overflow-hidden">
+       <div className="p-5 border border-white/5 rounded-bigview flex items-center justify-between shadow-xl relative overflow-hidden">
          <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-electric-yellow/20 rounded-full" />
          <div className="flex flex-col gap-1 relative z-10">
            <span className="text-[8px]  font-black tracking-[0.2em] text-color-white/40">Total Value Locked</span>
@@ -89,8 +89,8 @@ export default function DashboardData({ stake }: DashboardDataProps) {
              {Number(stats.staked).toLocaleString()} <span className="text-xs text-solid-green">ETH</span>
            </span>
          </div>
-         <div className="p-2 bg-color-ash rounded-bigview border border-white/10 shadow-inner group transition-transform hover:scale-105">
-            <PieChart size={20} className="text-vibrant-green" strokeWidth={2.5} />
+         <div className="p-2 rounded-bigview border border-white/10 shadow-inner group transition-transform hover:scale-105">
+            <PieChart size={20} className="text-blue" strokeWidth={2.5} />
          </div>
        </div>
     </div>
