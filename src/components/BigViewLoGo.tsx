@@ -33,6 +33,7 @@ export default function BigViewLoGo() {
 
       </div>
     </div>
+  </div>
     </>
   );
 };
