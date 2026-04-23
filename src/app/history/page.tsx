@@ -61,12 +61,10 @@ export default function HistoryPage() {
       {/* Table Container: Glassmorphism look */}
       <div className="bg-white/5 rounded-bigview shadow-2xl border border-white/5 overflow-hidden p-2 backdrop-blur-xl">
         {authenticated ? (
-          {/* We pass the Privy address to your table */}
           <TreasuryTable address={address || null} />
         ) : (
-          {/* Empty/Disconnected State */}
           <div className="p-24 text-center flex flex-col items-center">
-            <div className="w-20 h-20 bg-black rounded-bigview flex items-center justify-center mb-6 text-color-white/ border border-white/5 shadow-inner">
+            <div className="w-20 h-20 bg-black rounded-bigview flex items-center justify-center mb-6 text-color-white border border-white/5 shadow-inner">
               <Wallet size={40} />
             </div>
             <p className="text-white font-bold tracking-tight text-[10px]">
