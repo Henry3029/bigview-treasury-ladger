@@ -63,7 +63,7 @@ export default function TreasuryTable({ address }: TreasuryTableProps) {
   <div className="space-y-6 font-inter">
     {/* Dynamic Notification Toast: Bigview Styled */}
     {message && (
-      <div className={`p-4 rounded-bigview text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-2 border ${
+      <div className={`p-4 rounded-bigview text-[10px] font-bold tracking-tight flex items-center gap-3 shadow-2xl transition-all duration-300 animate-in fade-in slide-in-from-top-2 border ${
         status === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 
         status === 'error' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 
         'bg-gold-buttons/10 text-gold-buttons border-gold-buttons/20'
@@ -71,7 +71,7 @@ export default function TreasuryTable({ address }: TreasuryTableProps) {
         {status === 'success' && <CheckCircle2 size={16} />}
         {status === 'error' && <AlertCircle size={16} />}
         {status === 'info' && <Info size={16} />}
-        <span className="italic">{message}</span>
+        <span className="">{message}</span>
       </div>
     )}
 
@@ -79,7 +79,7 @@ export default function TreasuryTable({ address }: TreasuryTableProps) {
     <div className="bg-white/[0.02] rounded-bigview border border-white/5 overflow-hidden shadow-2xl backdrop-blur-md">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-white/[0.03] text-left text-white/30 text-[9px] font-black uppercase tracking-[0.3em]">
+          <tr className="bg-white/[0.03] text-left text-white/30 text-[9px] font-black uppercase tracking-tight">
             <th className="py-5 px-6 italic">Tx Hash</th>
             <th className="py-5 px-6 italic">Status</th>
             <th className="py-5 px-6 text-right italic">Method</th>

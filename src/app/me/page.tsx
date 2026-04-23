@@ -53,15 +53,15 @@ export default function MePage() {
   // 1. LOGIN SCREEN (If not logged in)
   if (!authenticated) {
     return (
-      <main className="min-h-screen bg-charcoal flex flex-col items-center justify-center pt-8 pb-8">
-        <div className="w-16 h-16 bg-light-blue rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
-          <Lock size={32} className="text-black" />
+      <main className="min-h-screen  flex flex-col items-center justify-center pt-16 pb-16">
+        <div className="w-16 h-16 bg-gold-buttons rounded-bigview flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(255,215,0,0.2)] border border-white/20">
+          <Lock size={32} className="text-vibrant-green" />
         </div>
         <h2 className="text-white font-black tracking-tighter text-2xl mb-2">Secure Access</h2>
         <p className="text-solid-green/80 text-[10px] font-bold tracking-tight mb-8 text-center">Authentication Required for Bigview Ledger</p>
         <button 
           onClick={login}
-          className="w-full max-w-xs py-3 bg-gold-buttons text-black font-semibold rounded-full tracking-tight active:scale-95 transition-all shadow-xl hover:opacity-90"
+          className="w-full max-w-xs py-3 bg-gold-buttons text-white font-semibold rounded-full tracking-tight active:scale-95 transition-all shadow-xl hover:opacity-90"
         >
           Sign In
         </button>
@@ -71,16 +71,16 @@ export default function MePage() {
 
   // 2. PROFILE VIEW (Only shows if authenticated)
   return (
-    <main className="min-h-screen text-white pb-16 font-inter bg-charcoal">
+    <main className="min-h-screen text-white py-16 font-inter">
       
       {/* THE TOP BRAND BOX */}
-      <div className="w-full bg-gold-background px-6 pt-16 pb-8 relative overflow-hidden">
+      <div className="w-full bg-solid-green px-6 pt-16 pb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-color-white/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none"></div>
         
         <div className="flex justify-between items-end relative z-10">
           <div className="flex flex-col items-start justify-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-16 h-16 rounded-bigview bg-light-black/40 backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
+              <div className="w-16 h-16 rounded-bigview bg-black backdrop-blur-md border border-white/20 overflow-hidden flex items-center justify-center shadow-2xl">
                 {googlePicture ? (
                   <img src={googlePicture} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
@@ -91,13 +91,13 @@ export default function MePage() {
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-black tracking-tighter leading-none text-gold-buttons">Hi</h1>
                 <div>
-                  <span className="bg-vibrant-green/50 backdrop-blur-sm text-text-color text-[8px] font-black px-2 py-0.5 rounded-bigview border border-black/10 tracking-tight">Upgrade your account</span>
+                  <span className="bg-vibrant-green/50 backdrop-blur-sm text-black text-[8px] font-bold px-2 py-0.5 rounded-bigview border border-black/10 tracking-tight">Upgrade your account</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <button className="p-3 bg-black/20 rounded-bigview border border-white/10 text-white hover:bg-black/40 transition-colors">
+          <button className="p-3 bg-black/20 rounded-bigview border border-white/10 text-white hover:bg-white/30 transition-colors">
             <Settings size={20} />
           </button>
         </div>
@@ -105,10 +105,10 @@ export default function MePage() {
         {/* BALANCE CARD */}
         <div className="mt-8 flex justify-between items-end">
           <div>
-            <p className="text-color-white/40 text-[10px] font-black tracking-tight flex items-center gap-1">
+            <p className="text-color-white text-[10px] font-medium tracking-tight flex items-center gap-1">
               Total Balance <EyeOff size={12} className="opacity-50" />
             </p>
-            <h2 className="text-4xl font-black tracking-tighter tabular-nums">
+            <h2 className="text-4xl font-bold tracking-tighter tabular-nums">
               {balance} 
               <span className="text-xs ml-2 text-color-white">ETH</span>
             </h2>

@@ -130,7 +130,7 @@ export default function RewardsPage() {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gold-buttons" />
                 <p className="text-color-white text-2xl font-black tracking-tighter mb-1">+5% APY</p>
                 <p className="text-[10px] font-black text-white/20 mb-6 tracking-tight">Stake Booster v.{v}</p>
-                <button className="w-full py-2.5 bg-charcaol text-color-white rounded-full text-[10px] font-black tracking-tight active:scale-95 transition-all shadow-lg shadow-gold-buttons/10">
+                <button className="w-full py-2.5 bg-gold-buttons text-color-white rounded-full text-[10px] font-bold tracking-tight active:scale-95 transition-all shadow-lg shadow-gold-buttons/10">
                   Claim
                 </button>
               </div>
@@ -140,19 +140,19 @@ export default function RewardsPage() {
 
         {/* DAILY QUESTS */}
         <section className="bg-[#1E293B] rounded-bigview p-6 border border-white/5 backdrop-blur-sm">
-           <h3 className="text-[10px] font-black tracking-tight text-white/20 mb-6">Daily Quests</h3>
+           <h3 className="text-[10px] font-black tracking-tight text-white mb-6">Daily Quests</h3>
            <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex gap-4 items-center">
-                  <div className="w-12 h-12 bg-charcaol rounded-bigview flex items-center justify-center text-color-white border border-white/5">
+                  <div className="w-12 h-12 bg-black rounded-bigview flex items-center justify-center text-color-white border border-white/5">
                     <TrendingUp size={24} />
                   </div>
                   <div>
-                    <h4 className="text-sm font-black tracking-tight leading-none text-white">Yield Multiplier</h4>
+                    <h4 className="text-sm font-bold tracking-tight leading-none text-white">Yield Multiplier</h4>
                     <p className="text-[10px] text-emerald-400 font-black mt-1">+Up to 6.5%</p>
                   </div>
                 </div>
-                <button className="px-6 py-2 bg-charcaol border border-white/10 text-white rounded-full text-[10px] font-black tracking-tight hover:bg-gold-buttons hover:text-black transition-all">Go</button>
+                <button className="px-6 py-2 bg-black border border-white/10 text-white rounded-full text-[10px] font-black tracking-tight hover:bg-gold-buttons/10 hover:text-black transition-all">Go</button>
               </div>
            </div>
         </section>

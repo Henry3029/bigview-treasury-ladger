@@ -74,10 +74,10 @@ export default function StakeCard() {
   return (
   <>
   {/* 1. Main Container: Using Bigview Violet and rounded-bigview */}
-  <div className="mx-2 max-w-md bg-white/20 p-6 shadow-2xl border-t-2 border-b-2 border-white/10 relative overflow-hidden font-inter">
+  <div className="mx-2 max-w-md p-6 border-t-2 border-b-2 border-white/5 relative overflow-hidden font-inter">
     
     
-    <div className="mb-8 text-center relative z-10">
+    <div className="mb-8 text-start relative z-10">
      
       <h2 className="text-2xl font-bold text-white mb-1 tracking-tighter">Stake</h2>
       <p className="text-[10px] text-light-green/40 font-bold tracking-tight">
@@ -88,8 +88,8 @@ export default function StakeCard() {
     <div className="space-y-6 relative z-10">
       <div className="space-y-3">
         <div className="flex justify-between items-end px-1">
-          <label className="text-[10px] font-black text-color-white/50">Amount</label>
-          <span className="text-[10px] font-black text-vibrant-green bg-muted-yellow/40 px-2.5 py-1 rounded-bigview  border border-gold-buttons/30">
+          <label className="text-[10px] font-medium text-color-white">Amount</label>
+          <span className="text-[10px] font-bold text-vibrant-green">
             Bal: {balance} ETH
           </span>
         </div>
@@ -100,7 +100,7 @@ export default function StakeCard() {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full p-6 bg-black/40 border-2 border-white/5 rounded-bigview focus:border-white/15 outline-none transition-all font-bold text-2xl text-white placeholder:text-white/40"
+            className="w-full border-b border-white/5 p-4 outline-none transition-all font-bold text-2xl text-white placeholder:text-white/40"
           />
         </div>
       </div>
