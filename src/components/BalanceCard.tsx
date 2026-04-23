@@ -10,13 +10,13 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
 return (
 <>
   {/* 1. Changed p-6 p4 to px-6 py-4 to make it a sleek rectangle */}
-  <div className="px-6 py-4 mx-3 bg-gradient-to-br from-bigview-gold to-bigview-gold-dim rounded-bigview relative overflow-hidden">
+  <div className="px-6 py-3 mx-3 bg-gradient-to-br from-bigview-gold to-bigview-gold-dim rounded-bigview relative overflow-hidden">
     
     <div className="relative z-10">
      { /* 2. Changed mb-6 to mb-2 to close the gap between the rows */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-[14px] font-normal text-black">
+          <span className="text-[13px] font-normal text-black">
             Available Balance
           </span>
           <button 
@@ -29,7 +29,7 @@ return (
         
         <Link 
           href="/history" 
-          className="flex items-center gap-1 text-[22px] font-normal tracking-tight text-black hover:opacity-70 transition-opacity"
+          className="flex items-center gap-1 text-[13px] font-normal tracking-tight text-black hover:opacity-70 transition-opacity"
         >
           Transaction History
           <ChevronRight size={14} />

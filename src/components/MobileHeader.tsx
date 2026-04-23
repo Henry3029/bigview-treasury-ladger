@@ -84,7 +84,7 @@ export default function MobileHeader({
           ) : (
             <button 
               onClick={login}
-              className="bg-gold-buttons/70 p-1 rounded-bigview text-[13px] font-black text-white tracking-tight hover:opacity-80 transition-opacity"
+              className="bg-gradient-to-br from-bigview-gold to-bigview-gold-dim p-1 rounded-bigview text-[13px] font-black text-white tracking-tight hover:opacity-80 transition-opacity"
             >
               Connect
             </button>

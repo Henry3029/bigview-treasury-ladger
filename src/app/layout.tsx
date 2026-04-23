@@ -31,7 +31,7 @@ export default function RootLayout({
             {/* The Header now sits at the top of every page */}
             <MobileHeaderWrapper />
 
-            <main className="flex-grow w-full pb-20 lg:pb-0">
+            <main className="flex-grow w-full overflow-y-auto pb-20 lg:pb-0">
               {children}
             </main>
 
