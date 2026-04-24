@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { createWalletClient, custom, parseEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { ArrowDown, RefreshCw } from 'lucide-react';
+import { ArrowUpDown, RefreshCw } from 'lucide-react';
 
 export default function SwapInterface() {
   const [amountIn, setAmountIn] = useState("");
@@ -90,51 +90,52 @@ export default function SwapInterface() {
   return (
   <>
 { /* 1. Main Container: Using Bigview Violet and rounded-bigview */}
-  <div className="mx-2 bg-charcaol  p-4 shadow-2xl border-t border-b border-gold-buttons/40 max-w-md mx-auto font-inter">
-    <div className="flex justify-between items-center mb-6">
-      <h2 className="text-lg font-black text-white tracking-tight">Swap Tokens</h2>
-      <div className="px-2 py-1 bg-light-black text-color-white text-[8px] font-black rounded-bigview border border-blue tracking-tight">
-        Base Sepolia
-      </div>
+  <div className="mx-3 p-4 font-inter">
+    <div className="relative flex justify-center items-center mb-6">
+      <h1 className="text-lg font-bold text-white">Swap</h1>
+      <button className="absolute right-0 hover:opacity-70 transition-opacity text-color-white text-xl">
+        X
+      </button>
     </div>
+    
+    <div className="relative space-y-2">{/*the wrapper for both inputs*/}
 
     {/* INPUT BOX (ETH) */}
-    <div className="group bg-charcaol p-5 rounded-bigview mb-1.5 border border-gold-background/70 focus-within:border-light-green/70 transition-all">
-      <div className="flex justify-between items-center mb-2 text-[10px] font-semibold text-white/80 tracking-tight">
-        <span>You Pay</span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
+    <div className="relative flex justify-between items-center">
+    
         <input 
           type="number"
-          placeholder="0.00"
-          className="bg-transparent text-2xl font-semibold outline-none w-full text-white placeholder:text-white/60 font-inter"
+          placeholder="0"
+          className="bg-transparent text-6xl font-light w-full outline-none text-white placeholder:text-gray-500 font-inter"
           value={amountIn}
           onChange={(e) => setAmountIn(e.target.value)}
         />
-        <div className="flex items-center px-3 py-1.5 rounded-bigview gap-2 shrink-0">
-          <span className="font-medium text-xs text-solid-green/60">ETH</span>
+        <div className="flex items-center justify-center px-3 py-1.5 rounded-bigview shrink-0 bg-blue">
+          <span className="font-medium text-xs text-black">ETH</span>
         </div>
-      </div>
-    </div>
+        </div>
 
-    {/* REVERSE ICON - Bigview Gold Style */}
-    <div className="flex justify-center -my-4 relative z-10">
-      <div className="bg-gold-background text-solid-green p-2 rounded-bigview border-[2px] border-light-green shadow-xl transition-transform hover:scale-110">
-        <ArrowDown size={14} strokeWidth={4} />
-      </div>
+    {/* the stretching line and the upDown arrow*/}
+    <div className="relative h-2 flex items-center justify-center">
+    {/*the streching line*/}
+    <div className="absolute w-full h-[1px] bg-white/10">
     </div>
-
-    {/* OUTPUT BOX (USDC) */}
-    <div className="bg-charcaol p-5 rounded-bigview mb-6">
-      <div className="flex justify-between items-center mb-2 text-[10px] font-semibold text-solid-green/80 tracking-tight">
-        <span>You Receive</span>
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <div className="text-2xl font-bold text-color-white/50 font-inter">
+    {/*the arrow button*/}
+    <div className="z-10">
+          <button className="bg-white/20 border-4 border-white/5 p-2 rounded-full hover:bg-white/10 transition-colors">
+          <ArrowUpDown size={16}
+          className="text-gray-400"/>
+          </button>
+          </div>
+          </div>
+          
+          {/*Bottom input (to) */}
+          <div className="flex justify-between items-center">
+        <div className="text-6xl font-light text-color-white placeholder:text-gray-500 font-inter">
           {isCalculating ? <RefreshCw className="animate-spin text-white/20" size={20} /> : amountOut}
         </div>
-        <div className="flex items-center border border-white/10 px-3 py-1.5 rounded-bigview gap-2 shrink-0">
-          <span className="font-medium text-xs text-solid-green/60">USDC</span>
+        <div className="flex items-center bg-blue px-3 py-1.5 rounded-bigview shrink-0">
+          <span className="font-medium text-xs text-black">USDC</span>
         </div>
       </div>
     </div>
@@ -147,8 +148,8 @@ export default function SwapInterface() {
           <span className="text-white/40">Auto (0.5%)</span>
         </div>
         <div className="flex justify-between text-[9px] font-black">
-          <span className="text-white/20">Provider</span>
-          <span className="text-muted-yellow/80">0x Aggregator</span>
+          <span className="text-white">Provider</span>
+          <span className="text-muted-yellow">0x Aggregator</span>
         </div>
       </div>
     )}
@@ -157,12 +158,12 @@ export default function SwapInterface() {
     <button 
       disabled={!amountIn || isCalculating}
       onClick={handleSwap}
-      className="w-full py-2 bg-gold-buttons text-text-color rounded-full font-bold text-base shadow-xl shadow-gold-buttons hover:opacity-90 transition-all disabled:opacity-20 tracking-tight"
+      className="w-full py-2 bg-gradient-to-br from-bigview-gold to-bigview-gold-dim text-black rounded-full font-bold text-base shadow-md shadow-bigview-gold/20 hover:opacity-90 transition-all disabled:opacity-20 tracking-tight"
     >
       {isCalculating ? "Fetching Price..." : "Execute Swap"}
     </button>
 
-    <p className="text-[10px] text-gold-buttons bg-vibrant-green-60 text-center mt-4 font-bold tracking-tighter">
+    <p className="text-[10px] text-gold-buttons bg-solid-green/60 text-center mt-4 font-bold tracking-tighter">
       BigView Protocol, The Future Of Decentralized Finance!
     </p>
   </div>

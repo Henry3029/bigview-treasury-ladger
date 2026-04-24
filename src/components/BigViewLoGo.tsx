@@ -9,7 +9,7 @@ export default function BigViewLoGo() {
    <div className="bg-white/60 mx-3 flex justify-center items-center border-y border-grey-200 py-2 my-4">
    
    {/*inner div the white card logo sits on*/}
-   <div className="bg-violet-main-background p-6  flex flex-col items-center justify-center">
+   <div className="bg-violet-main-background w-full p-6  flex flex-col items-center justify-center">
    
    {/*logo wrapper*/}
    <div className="flex font-black relative items-baseline italic tracking-tighter">
