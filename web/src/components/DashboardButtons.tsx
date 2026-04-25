@@ -16,7 +16,8 @@ export default function DashboardButtons() {
   };
 
   return (
-  /* 1. Container: Spanning full width for the dashboard */
+  <>
+  {/* 1. Container: Spanning full width for the dashboard */}
   <div className="flex gap-3 w-full px-1">
     
     {/* 1. SWAP BVW BUTTON */}
@@ -50,5 +51,6 @@ export default function DashboardButtons() {
     </button>
 
   </div>
+  </>
 );
 }

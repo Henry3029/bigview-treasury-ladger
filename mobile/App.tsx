@@ -18,6 +18,7 @@ import EarnScreen from './src/screens/EarnScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import AboutScreen from './src/screens/AboutScreen';
 import AdminMintScreen from './src/screens/AdminMintScreen';
+import RewardsScreen from './src/screens/RewardsScreen';
 
 // Component Imports
 import LoadingSpinner from './src/components/LoadingSpinner';
@@ -55,6 +56,7 @@ function AppContent() {
           tabBarIcon: ({ color, size }) => {
             if (route.name === 'Home') return <LayoutDashboard size={size} color={color} />;
             if (route.name === 'Swap') return <Repeat size={size} color={color} />;
+            if (route.name === 'Rewards') return <Gift size={size} color={color} />;
             if (route.name === 'Earn') return <TrendingUp size={size} color={color} />;
             if (route.name === 'History') return <History size={size} color={color} />;
             if (route.name === 'About') return <Info size={size} color={color} />;
@@ -66,6 +68,7 @@ function AppContent() {
         <Tab.Screen name="Swap" component={SwapScreen} />
         <Tab.Screen name="Earn" component={EarnScreen} />
         <Tab.Screen name="History" component={HistoryScreen} />
+        <Tab.Screen name="Rewards" component={RewardsScreen} />
         <Tab.Screen name="About" component={AboutScreen} />
         
         {/* Only show Admin tab if the connected user is the deployer */}
