@@ -6,6 +6,7 @@ import { TrendingUp, ShieldCheck, Zap, ArrowUpRight } from 'lucide-react';
 
 export default function EarnPage() {
   return (
+  <>
   /* 1. CLEAN SLATE: Removed bg-neutral-950 to let layout.tsx handle the background */
   <div className="min-h-screen text-white pt-16 pb-16 font-inter">
     <div className="max-w-6xl mx-auto">
@@ -104,5 +105,6 @@ export default function EarnPage() {
       </div>
     </div>
   </div>
+  </>
 );
 }

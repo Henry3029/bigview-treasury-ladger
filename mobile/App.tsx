@@ -1,46 +1,82 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView, Platform } from 'react-native';
-import { PrivyProvider, usePrivy } from '@privy-io/expo'; // Added usePrivy
+import { StyleSheet, View, Platform } from 'react-native';
+import { PrivyProvider, usePrivy } from '@privy-io/expo';
 import { baseSepolia } from 'viem/chains';
 import { StatusBar } from 'expo-status-bar';
 
-// Your Components
-import WelcomeBanner from './src/components/WelcomeBanner';
-import BottomNav from './src/components/BottomNav';
-import MobileHeaderWrapper from './src/components/MobileHeaderWrapper';
+// Navigation Imports
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+// Lucide Icons for the Tab Bar
+import { LayoutDashboard, Repeat, TrendingUp, History, Info, Settings } from 'lucide-react-native';
+
+// Screen Imports
 import Dashboard from './src/screens/Dashboard';
-import LoadingSpinner from './src/components/LoadingSpinner'; // Import the spinner
+import SwapScreen from './src/screens/SwapScreen';
+import EarnScreen from './src/screens/EarnScreen';
+import HistoryScreen from './src/screens/HistoryScreen';
+import AboutScreen from './src/screens/AboutScreen';
+import AdminMintScreen from './src/screens/AdminMintScreen';
 
-// 1. Create a "Content" component to handle the loading logic
+// Component Imports
+import LoadingSpinner from './src/components/LoadingSpinner';
+import WelcomeBanner from './src/components/WelcomeBanner';
+import MobileHeaderWrapper from './src/components/MobileHeaderWrapper';
+
+const Tab = createBottomTabNavigator();
+
 function AppContent() {
-  const { ready } = usePrivy();
+  const { ready, user } = usePrivy();
 
-  // If Privy is still initializing, show the spinner instead of the app
-  if (!ready) {
-    return <LoadingSpinner />;
-  }
+  // Show spinner while Privy initializes
+  if (!ready) return <LoadingSpinner />;
+
+  // Admin Check for the Tab Bar
+  const deployerAddr = process.env.EXPO_PUBLIC_DEPLOYER_ADDR?.toLowerCase();
+  const isOwner = user?.wallet?.address?.toLowerCase() === deployerAddr;
 
   return (
-    <SafeAreaView style={styles.root}>
+    <NavigationContainer>
       <StatusBar style="light" />
-      
-      <View style={styles.layoutWrapper}>
-        <WelcomeBanner />
-        <MobileHeaderWrapper />
+      {/* Note: We keep the Header/Banner outside the Navigator 
+          if you want them visible on EVERY screen. 
+      */}
+      <WelcomeBanner />
+      <MobileHeaderWrapper />
 
-        <View style={styles.mainContent}>
-          <Dashboard />
-        </View>
-
-        <View style={styles.bottomNavContainer}>
-          <BottomNav />
-        </View>
-      </View>
-    </SafeAreaView>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
+          tabBarActiveTintColor: '#FFD700',
+          tabBarInactiveTintColor: 'rgba(255,255,255,0.4)',
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabBarLabel,
+          tabBarIcon: ({ color, size }) => {
+            if (route.name === 'Home') return <LayoutDashboard size={size} color={color} />;
+            if (route.name === 'Swap') return <Repeat size={size} color={color} />;
+            if (route.name === 'Earn') return <TrendingUp size={size} color={color} />;
+            if (route.name === 'History') return <History size={size} color={color} />;
+            if (route.name === 'About') return <Info size={size} color={color} />;
+            if (route.name === 'Admin') return <Settings size={size} color={color} />;
+          },
+        })}
+      >
+        <Tab.Screen name="Home" component={Dashboard} />
+        <Tab.Screen name="Swap" component={SwapScreen} />
+        <Tab.Screen name="Earn" component={EarnScreen} />
+        <Tab.Screen name="History" component={HistoryScreen} />
+        <Tab.Screen name="About" component={AboutScreen} />
+        
+        {/* Only show Admin tab if the connected user is the deployer */}
+        {isOwner && (
+          <Tab.Screen name="Admin" component={AdminMintScreen} />
+        )}
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
 
-// 2. Your main App export stays simple and provides the context
 export default function App() {
   return (
     <PrivyProvider
@@ -58,33 +94,33 @@ export default function App() {
         supportedChains: [baseSepolia],
       }}
     >
-      <AppContent />
+      <View style={styles.container}>
+        <AppContent />
+      </View>
     </PrivyProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
+  container: {
     flex: 1,
     backgroundColor: '#1A0B2E',
   },
-  layoutWrapper: {
-    flex: 1,
-    flexDirection: 'column',
-  },
-  mainContent: {
-    flex: 1,
-    width: '100%',
-    paddingBottom: Platform.OS === 'ios' ? 90 : 70, 
-  },
-  bottomNavContainer: {
+  tabBar: {
+    backgroundColor: '#0F051D', // Deepest slate for the bar
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.05)',
+    height: Platform.OS === 'ios' ? 88 : 70,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 10,
+    paddingTop: 10,
     position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 50,
-    backgroundColor: 'rgba(28, 28, 30, 0.4)',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    elevation: 0,
+  },
+  tabBarLabel: {
+    fontSize: 10,
+    fontWeight: '900',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });
