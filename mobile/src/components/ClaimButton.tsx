@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { usePrivy, useWallets } from '@privy-io/expo';
-import { encodeFunctionData, createPublicClient, http, createWalletClient, custom, Address } from 'viem';
+import { encodeFunctionData, createPublicClient, http, createWalletClient, custom, type Address } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import treasuryAbi from '../constants/abis/BigViewTreasuryV2.json';
 
@@ -10,10 +10,11 @@ export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
 
-  // FIXED: Removed 'ready', mobile relies on 'authenticated' check
   const { login, authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const wallet = wallets.length > 0 ? wallets[0] : null; 
+  
+  // Safely get the first wallet
+  const wallet = wallets && wallets.length > 0 ? wallets[0] : null; 
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
@@ -39,6 +40,7 @@ export const ClaimButton = () => {
     setIsConfirming(true);
 
     try {
+      // Ensure we are on Base Sepolia
       if (wallet.chainId !== 'eip155:84532') {
         await wallet.switchChain(84532);
       }
@@ -50,14 +52,15 @@ export const ClaimButton = () => {
       });
 
       const [address] = await walletClient.getAddresses();
+      
       const data = encodeFunctionData({
         abi: treasuryAbi,
         functionName: 'claimGovernanceRewards',
         args: [],
       });
 
-      // FIXED: Cast to Address type for Viem
-      const treasuryAddress = process.env.EXPO_PUBLIC_TREASURY_ADDRESS as Address;
+      // FIXED: Strict casting and fallback for env variable
+      const treasuryAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x0000000000000000000000000000000000000000') as Address;
       
       const txHash = await walletClient.sendTransaction({
         account: address,
@@ -82,7 +85,8 @@ export const ClaimButton = () => {
 
     } catch (err: any) {
       console.error("Claim failed:", err);
-      notify(err.message?.includes("User rejected") ? "Transaction rejected." : "Claim failed.", "error");
+      const isUserRejected = err.message?.includes("User rejected") || err.code === 4001;
+      notify(isUserRejected ? "Transaction rejected." : "Claim failed.", "error");
     } finally {
       setIsConfirming(false);
     }
@@ -92,7 +96,7 @@ export const ClaimButton = () => {
     <View style={styles.container}>
       {message && (
         <View style={[styles.notification, status === 'success' ? styles.bgSuccess : status === 'error' ? styles.bgError : styles.bgInfo]}>
-          <View style={[styles.dot, status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : styles.dotInfo]} />
+          <View style={[styles.dot, status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : status === 'dotInfo']} />
           <Text style={[styles.notifyText, status === 'success' ? styles.textSuccess : status === 'error' ? styles.textError : styles.textInfo]}>
             {message}
           </Text>
@@ -105,7 +109,13 @@ export const ClaimButton = () => {
         style={[styles.button, isConfirming && styles.disabled]}
         activeOpacity={0.8}
       >
-        {isConfirming ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{!authenticated ? 'Connect to Claim' : 'Claim Now'}</Text>}
+        {isConfirming ? (
+          <ActivityIndicator color="#000" />
+        ) : (
+          <Text style={styles.buttonText}>
+            {!authenticated ? 'Connect to Claim' : 'Claim Now'}
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );

@@ -12,6 +12,7 @@ export default function MobileHeaderWrapper() {
       <NotificationDropdown 
         isOpen={isNotifOpen} 
         onClose={() => setIsNotifOpen(false)} 
+        notifications={[]} // FIXED: Added empty array to satisfy props
       />
     </>
   );

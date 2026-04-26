@@ -1,32 +1,37 @@
-"use client";
-
 import React, { useState } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
-import { Bell, User, Copy } from 'lucide-react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { usePrivy } from '@privy-io/expo';
+import { Bell, User, Copy } from 'lucide-react-native';
+import * as Clipboard from 'expo-clipboard';
 import ProfileDrawer from './ProfileDrawer';
 
-export default function MobileHeader({ 
-  onNotificationClick, 
-}: { 
+interface MobileHeaderProps {
   onNotificationClick: () => void;
-}) {
-  const { user, authenticated, login } = usePrivy(); 
-  const address = user?.wallet?.address;
+}
+
+export default function MobileHeader({ onNotificationClick }: MobileHeaderProps) {
+  const { user, authenticated, login } = usePrivy();
+  
+  // FIXED: Reliable way to get the primary wallet address in Expo SDK
+  const address = user?.linkedAccounts?.find((acc) => acc.type === 'wallet')?.address;
+  
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const googleImage = user?.linkedAccounts?.find((acc): acc is any => acc.type === 'google_oauth')?.picture;
-  
-  // This is the "Lifted State" that ProfileDrawer will update
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  // FIXED: Explicitly casting to access picture safely
+  const googleImage = user?.linkedAccounts?.find(
+    (acc: any) => acc.type === 'google_oauth'
+  )?.picture;
 
   const notify = (msg: string) => {
     setMessage(msg);
     setTimeout(() => setMessage(null), 3000);
   };
 
-  const copyAddress = () => {
+  const copyAddress = async () => {
     if (address) {
-      navigator.clipboard.writeText(address);
+      await Clipboard.setStringAsync(address);
       notify("Address Copied!");
     }
   };
@@ -36,80 +41,64 @@ export default function MobileHeader({
     setIsDrawerOpen(true);
   };
 
-  // Helper to determine which image to show in the circle
-  const displayImage = avatarUrl || googleImage
+  const displayImage = avatarUrl || googleImage;
 
   return (
     <>
-      {/* 1. TOAST NOTIFICATION */}
       {message && (
-        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[400] animate-in fade-in slide-in-from-top-4">
-          <div className="bg-gold-buttons text-text-color text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-bigview shadow-2xl italic border border-white/20">
-            {message}
-          </div>
-        </div>
+        <View style={styles.toastContainer}>
+          <View style={styles.toast}>
+            <Text style={styles.toastText}>{message}</Text>
+          </View>
+        </View>
       )}
 
-      {/* 2. HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-24 bg-violet-main-background z-[90] flex items-center px-4 py-2 justify-between font-inter shadow-[0_4px_30px_rgba(0,0,0,0.5)] border-b border-white/5">
-      
-        <div className="flex items-center gap-4">
-        {/* LEFT: Profile Trigger (Now using the Lifted State) */}
-        <div className="flex items-center gap-2">
-          <button 
-            onClick={handleProfileClick}
-            className="w-12 h-12 bg-solid-blue rounded-bigview flex items-center justify-center text-white shadow-xl overflow-hidden active:scale-95 transition-all"
-          >
+      <View style={styles.header}>
+        <View style={styles.leftSection}>
+          <TouchableOpacity onPress={handleProfileClick} style={styles.profileBtn}>
             {displayImage ? (
-               <img src={displayImage} alt="Profile" className="w-full h-full object-cover" />
+              <Image source={{ uri: displayImage }} style={styles.avatar} />
             ) : (
-              <User size={22} strokeWidth={2.5} />
+              <User size={22} strokeWidth={2.5} color="#FFF" />
             )}
-          </button>
-        </div>
+          </TouchableOpacity>
 
-        {/* CENTER: Wallet Pill */}
-        <div>
-          {authenticated && address ? (
-            <button 
-              onClick={copyAddress}
-              className="flex items-center gap-1.5 px-3 py-2 bg-gold-background/60  rounded-bigview border border-white/30 active:scale-95 transition-all"
-            >
-              <div className="w-1.5 h-1.5 bg-light-green/60 rounded-full animate-pulse shadow-[0_0_8px_#ffd700]" />
-              <span className="text-[10px] font-black text-text-color tracking-tighter uppercase">
-                {address.slice(0, 4)}...{address.slice(-4)}
-              </span>
-              <Copy size={10} className="text-white/60" />
-            </button>
-          ) : (
-            <button 
-              onClick={login}
-              className="bg-gradient-to-br from-bigview-gold to-bigview-gold-dim p-1 rounded-bigview text-[13px] font-black text-black tracking-tight hover:opacity-80 transition-opacity"
-            >
-              Connect
-            </button>
-          )}
-        </div>
-        </div>
-        
+          <View>
+            {authenticated && address ? (
+              <TouchableOpacity onPress={copyAddress} style={styles.walletPill}>
+                <View style={styles.statusDot} />
+                <Text style={styles.addressText}>
+                  {address.slice(0, 4)}...{address.slice(-4)}
+                </Text>
+                <Copy size={10} color="rgba(255,255,255,0.6)" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity onPress={login} style={styles.connectBtn}>
+                <Text style={styles.connectText}>Connect</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
 
-        {/* RIGHT: Branding */}
-        <div className="flex items-center gap-3">
-          <button onClick={onNotificationClick} className="p-2 text-gold-buttons/70 hover:text-gold-buttons transition-colors">
-            <Bell size={20} />
-          </button>
-          <div className="flex flex-col items-center gap-1 text-center">
-            <div className="w-9 h-9 bg-white rounded-bigview flex items-center justify-center shadow-lg">
-              <img src="/images/bigview-image.png" alt="BigView Logo" className="w-6 h-6 object-contain" />
-            </div>
-           <span className="text-[9px] font-black tracking-tight text-white uppercase">
-  Bi<span className="text-gold-buttons">g</span>Vi<span className="text-gold-buttons">ew</span>
-</span>
-          </div>
-        </div>
-      </header>
+        <View style={styles.rightSection}>
+          <TouchableOpacity onPress={onNotificationClick} style={styles.notifBtn}>
+            <Bell size={20} color="rgba(255, 215, 0, 0.7)" />
+          </TouchableOpacity>
+          
+          <View style={styles.branding}>
+            <View style={styles.logoSquare}>
+              <Image 
+                source={require('../../assets/images/bigview-image.png')} 
+                style={styles.logoImg} 
+              />
+            </View>
+            <Text style={styles.brandText}>
+              BI<Text style={styles.gold}>G</Text>VI<Text style={styles.gold}>EW</Text>
+            </Text>
+          </View>
+        </View>
+      </View>
 
-      {/* 3. MODAL LAYER (The Drawer now receives the state and the setter) */}
       <ProfileDrawer 
         isOpen={isDrawerOpen} 
         onClose={() => setIsDrawerOpen(false)} 
@@ -119,3 +108,25 @@ export default function MobileHeader({
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  toastContainer: { position: 'absolute', top: 110, left: 0, right: 0, alignItems: 'center', zIndex: 400 },
+  toast: { backgroundColor: '#FFD700', paddingHorizontal: 24, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+  toastText: { color: '#000', fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+  header: { height: 96, backgroundColor: '#1A0B2E', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', zIndex: 90 },
+  leftSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  profileBtn: { width: 48, height: 48, backgroundColor: '#3B82F6', borderRadius: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  avatar: { width: '100%', height: '100%' },
+  walletPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.3)' },
+  statusDot: { width: 6, height: 6, backgroundColor: '#4ADE80', borderRadius: 3 },
+  addressText: { fontSize: 10, fontWeight: '900', color: '#FFF' },
+  connectBtn: { backgroundColor: '#FFD700', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
+  connectText: { color: '#000', fontSize: 13, fontWeight: '900' },
+  rightSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  notifBtn: { padding: 8 },
+  branding: { alignItems: 'center', gap: 4 },
+  logoSquare: { width: 36, height: 36, backgroundColor: '#FFF', borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  logoImg: { width: 24, height: 24, resizeMode: 'contain' },
+  brandText: { fontSize: 9, fontWeight: '900', color: '#FFF' },
+  gold: { color: '#FFD700' }
+});

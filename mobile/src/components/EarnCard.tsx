@@ -4,7 +4,7 @@ import { TrendingUp, ShieldCheck } from 'lucide-react-native';
 import { usePrivy } from '@privy-io/expo';
 
 const DEV_FEE_PERCENT = 10;
-// FIXED: Added fallback to prevent crash if env is missing
+// Fallback to prevent app crash if environment variable is not yet loaded
 const TREASURY_ADDRESS = process.env.EXPO_PUBLIC_PROFIT_WALLET || "";
 
 export default function EarnCard() {
@@ -32,7 +32,9 @@ export default function EarnCard() {
   const handleEarn = async () => {
     if (!authenticated) return login();
     setLoading(true);
-    // Future: Add Viem logic here
+    
+    // Future implementation: Blockchain logic via Viem 
+    // This is where you'll call your deposit functions
     setTimeout(() => setLoading(false), 2000);
   };
 
@@ -88,7 +90,6 @@ export default function EarnCard() {
         )}
       </TouchableOpacity>
 
-      {/* FIXED: Safe rendering of address */}
       <Text style={styles.footerText}>
         Treasury: {TREASURY_ADDRESS ? `${TREASURY_ADDRESS.slice(0, 6)}...${TREASURY_ADDRESS.slice(-4)}` : "Not Configured"}
       </Text>
@@ -97,24 +98,126 @@ export default function EarnCard() {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#1E293B', borderRadius: 32, padding: 20, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', width: '100%' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 },
-  title: { fontSize: 20, fontWeight: '900', color: '#FFF' },
-  statusRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
-  pulseDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#EAB308' },
-  statusText: { fontSize: 8, fontWeight: '900', color: 'rgba(234, 179, 8, 0.4)', textTransform: 'uppercase' },
-  aprBadge: { backgroundColor: '#10B981', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
-  aprLabel: { fontSize: 7, fontWeight: '900', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' },
-  aprValue: { fontSize: 14, fontWeight: '900', color: '#FFF' },
-  feeBox: { backgroundColor: 'rgba(255,255,255,0.02)', padding: 12, borderRadius: 16, flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
-  feeLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  feeLabel: { fontSize: 9, fontWeight: '900', color: 'rgba(255,255,255,0.4)' },
-  feeValue: { fontSize: 10, fontWeight: '900', color: '#60A5FA' },
-  inputContainer: { backgroundColor: 'rgba(0,0,0,0.2)', padding: 20, borderRadius: 24, marginBottom: 24 },
-  inputLabel: { fontSize: 9, fontWeight: '900', color: 'rgba(255,255,255,0.3)', marginBottom: 8 },
-  input: { fontSize: 32, fontWeight: '900', color: '#FFF' },
-  mainBtn: { backgroundColor: '#FFD700', paddingVertical: 18, borderRadius: 20, alignItems: 'center' },
-  btnContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  btnText: { color: '#000', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
-  disabledBtn: { opacity: 0.5 },
-  footerText: { textAlign: 'center', marginTop: 16, fontSize: 8, color:
+  card: { 
+    backgroundColor: '#1E293B', 
+    borderRadius: 32, 
+    padding: 20, 
+    borderWidth: 1, 
+    borderColor: 'rgba(255,255,255,0.05)', 
+    width: '100%' 
+  },
+  header: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'flex-start', 
+    marginBottom: 24 
+  },
+  title: { 
+    fontSize: 20, 
+    fontWeight: '900', 
+    color: '#FFF' 
+  },
+  statusRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 6, 
+    marginTop: 4 
+  },
+  pulseDot: { 
+    width: 6, 
+    height: 6, 
+    borderRadius: 3, 
+    backgroundColor: '#EAB308' 
+  },
+  statusText: { 
+    fontSize: 8, 
+    fontWeight: '900', 
+    color: 'rgba(234, 179, 8, 0.4)', 
+    textTransform: 'uppercase' 
+  },
+  aprBadge: { 
+    backgroundColor: '#10B981', 
+    paddingHorizontal: 12, 
+    paddingVertical: 6, 
+    borderRadius: 16 
+  },
+  aprLabel: { 
+    fontSize: 7, 
+    fontWeight: '900', 
+    color: 'rgba(255,255,255,0.7)', 
+    textTransform: 'uppercase' 
+  },
+  aprValue: { 
+    fontSize: 14, 
+    fontWeight: '900', 
+    color: '#FFF' 
+  },
+  feeBox: { 
+    backgroundColor: 'rgba(255,255,255,0.02)', 
+    padding: 12, 
+    borderRadius: 16, 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 24 
+  },
+  feeLeft: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 8 
+  },
+  feeLabel: { 
+    fontSize: 9, 
+    fontWeight: '900', 
+    color: 'rgba(255,255,255,0.4)' 
+  },
+  feeValue: { 
+    fontSize: 10, 
+    fontWeight: '900', 
+    color: '#60A5FA' 
+  },
+  inputContainer: { 
+    backgroundColor: 'rgba(0,0,0,0.2)', 
+    padding: 20, 
+    borderRadius: 24, 
+    marginBottom: 24 
+  },
+  inputLabel: { 
+    fontSize: 9, 
+    fontWeight: '900', 
+    color: 'rgba(255,255,255,0.3)', 
+    marginBottom: 8 
+  },
+  input: { 
+    fontSize: 32, 
+    fontWeight: '900', 
+    color: '#FFF' 
+  },
+  mainBtn: { 
+    backgroundColor: '#FFD700', 
+    paddingVertical: 18, 
+    borderRadius: 20, 
+    alignItems: 'center' 
+  },
+  btnContent: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    gap: 10 
+  },
+  btnText: { 
+    color: '#000', 
+    fontSize: 16, 
+    fontWeight: '900', 
+    textTransform: 'uppercase', 
+    letterSpacing: 1 
+  },
+  disabledBtn: { 
+    opacity: 0.5 
+  },
+  footerText: { 
+    textAlign: 'center', 
+    marginTop: 16, 
+    fontSize: 8, 
+    color: 'rgba(255,255,255,0.2)', 
+    fontWeight: '700' 
+  }
+});
