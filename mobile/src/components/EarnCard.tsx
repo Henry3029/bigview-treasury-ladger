@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { TrendingUp, ShieldCheck, RefreshCw } from 'lucide-react-native';
+import { TrendingUp, ShieldCheck } from 'lucide-react-native';
 import { usePrivy } from '@privy-io/expo';
 
 const DEV_FEE_PERCENT = 10;
-const TREASURY_ADDRESS = process.env.EXPO_PUBLIC_PROFIT_WALLET;
+// FIXED: Added fallback to prevent crash if env is missing
+const TREASURY_ADDRESS = process.env.EXPO_PUBLIC_PROFIT_WALLET || "";
 
 export default function EarnCard() {
   const [amount, setAmount] = useState("");
@@ -14,12 +15,16 @@ export default function EarnCard() {
 
   useEffect(() => {
     const fetchAeroData = async () => {
-      // Note: Update this to your deployed Web API URL
       try {
-        const res = await fetch(`${process.env.EXPO_PUBLIC_WEB_URL}/api/earn`);
+        const baseUrl = process.env.EXPO_PUBLIC_WEB_URL;
+        if (!baseUrl) return;
+
+        const res = await fetch(`${baseUrl}/api/earn`);
         const data = await res.json();
-        setPool({ apy: data.apy, tvl: data.tvl });
-      } catch (e) { console.log("Fetch error", e); }
+        setPool({ apy: data.apy || "0", tvl: data.tvl || "0" });
+      } catch (e) { 
+        console.log("Earn fetch error:", e); 
+      }
     };
     fetchAeroData();
   }, []);
@@ -27,7 +32,7 @@ export default function EarnCard() {
   const handleEarn = async () => {
     if (!authenticated) return login();
     setLoading(true);
-    // Blockchain logic would go here via Viem
+    // Future: Add Viem logic here
     setTimeout(() => setLoading(false), 2000);
   };
 
@@ -83,8 +88,9 @@ export default function EarnCard() {
         )}
       </TouchableOpacity>
 
+      {/* FIXED: Safe rendering of address */}
       <Text style={styles.footerText}>
-        Treasury: {TREASURY_ADDRESS?.slice(0, 6)}...{TREASURY_ADDRESS?.slice(-4)}
+        Treasury: {TREASURY_ADDRESS ? `${TREASURY_ADDRESS.slice(0, 6)}...${TREASURY_ADDRESS.slice(-4)}` : "Not Configured"}
       </Text>
     </View>
   );
@@ -111,5 +117,4 @@ const styles = StyleSheet.create({
   btnContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   btnText: { color: '#000', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
   disabledBtn: { opacity: 0.5 },
-  footerText: { textAlign: 'center', marginTop: 16, fontSize: 8, color: 'rgba(255,255,255,0.2)', fontWeight: '700' }
-});
+  footerText: { textAlign: 'center', marginTop: 16, fontSize: 8, color:

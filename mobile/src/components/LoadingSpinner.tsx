@@ -5,15 +5,16 @@ export default function LoadingSpinner() {
   const spinValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Starts the infinite rotation
-    Animated.loop(
+    const animation = Animated.loop(
       Animated.timing(spinValue, {
         toValue: 1,
         duration: 1000,
         easing: Easing.linear,
         useNativeDriver: true,
       })
-    ).start();
+    );
+    animation.start();
+    return () => animation.stop(); // Cleanup on unmount
   }, [spinValue]);
 
   const spin = spinValue.interpolate({
@@ -24,20 +25,15 @@ export default function LoadingSpinner() {
   return (
     <View style={styles.backdrop}>
       <View style={styles.container}>
-        
-        {/* Bigview Spinning Ring */}
         <Animated.View 
           style={[
             styles.spinner, 
             { transform: [{ rotate: spin }] }
           ]} 
         />
-
-        {/* Loading Text */}
         <View style={styles.textWrapper}>
           <Text style={styles.loadingText}>BIGVIEW</Text>
         </View>
-        
       </View>
     </View>
   );
@@ -46,7 +42,7 @@ export default function LoadingSpinner() {
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(26, 11, 46, 0.8)', // Your violet-background/80
+    backgroundColor: 'rgba(26, 11, 46, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
@@ -60,14 +56,14 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 4,
-    borderColor: 'rgba(139, 92, 246, 0.2)', // violet-glow/20
-    borderTopColor: '#FFD700', // gold-buttons
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderTopColor: '#FFD700',
   },
   textWrapper: {
     alignItems: 'center',
   },
   loadingText: {
-    color: '#FFD700', // gold-buttons
+    color: '#FFD700',
     fontWeight: '900',
     letterSpacing: 4,
     fontSize: 12,

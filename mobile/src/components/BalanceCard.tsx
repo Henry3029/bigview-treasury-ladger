@@ -8,7 +8,7 @@ export default function BalanceCard({ amount = "0.00 ETH" }: { amount?: string }
 
   return (
     <LinearGradient
-      colors={['#FFD700', '#B8860B']} // bigview-gold to bigview-gold-dim
+      colors={['#FFD700', '#B8860B']} 
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.card}
@@ -50,7 +50,8 @@ const styles = StyleSheet.create({
   historyBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   historyText: { fontSize: 13, color: '#000' },
   amount: { fontSize: 22, fontWeight: 'bold', color: '#000', letterSpacing: -1 },
-  addBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingHorizontal: 8, backgroundColor: '#FFD700', borderRadius: 8, borderWeight: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  // FIXED: changed borderWeight to borderWidth
+  addBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4, paddingHorizontal: 8, backgroundColor: '#FFD700', borderRadius: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   addText: { fontSize: 15, fontWeight: '600', color: '#000' },
   greenText: { color: '#15803D' }
 });

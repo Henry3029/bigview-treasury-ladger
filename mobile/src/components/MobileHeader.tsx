@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { usePrivy } from '@privy-io/expo';
 import { Bell, User, Copy } from 'lucide-react-native';
 import * as Clipboard from 'expo-clipboard';
@@ -11,12 +11,18 @@ interface MobileHeaderProps {
 
 export default function MobileHeader({ onNotificationClick }: MobileHeaderProps) {
   const { user, authenticated, login } = usePrivy();
+  
+  // Mobile SDK change: Direct access to the primary wallet address
   const address = user?.wallet?.address;
+  
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  const googleImage = user?.linkedAccounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
+  // Safely find the Google image if it exists
+  const googleImage = user?.linkedAccounts?.find(
+    (acc: any) => acc.type === 'google_oauth'
+  )?.picture;
 
   const notify = (msg: string) => {
     setMessage(msg);
@@ -39,7 +45,6 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
 
   return (
     <>
-      {/* TOAST NOTIFICATION */}
       {message && (
         <View style={styles.toastContainer}>
           <View style={styles.toast}>
@@ -48,10 +53,8 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
         </View>
       )}
 
-      {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.leftSection}>
-          {/* Profile Trigger */}
           <TouchableOpacity onPress={handleProfileClick} style={styles.profileBtn}>
             {displayImage ? (
               <Image source={{ uri: displayImage }} style={styles.avatar} />
@@ -60,7 +63,6 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
             )}
           </TouchableOpacity>
 
-          {/* Wallet Pill */}
           <View>
             {authenticated && address ? (
               <TouchableOpacity onPress={copyAddress} style={styles.walletPill}>
@@ -78,7 +80,6 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
           </View>
         </View>
 
-        {/* RIGHT: Branding */}
         <View style={styles.rightSection}>
           <TouchableOpacity onPress={onNotificationClick} style={styles.notifBtn}>
             <Bell size={20} color="rgba(255, 215, 0, 0.7)" />
@@ -86,7 +87,10 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
           
           <View style={styles.branding}>
             <View style={styles.logoSquare}>
-              <Image source={require('../../assets/images/bigview-image.png')} style={styles.logoImg} />
+              <Image 
+                source={require('../../assets/images/bigview-image.png')} 
+                style={styles.logoImg} 
+              />
             </View>
             <Text style={styles.brandText}>
               BI<Text style={styles.gold}>G</Text>VI<Text style={styles.gold}>EW</Text>
@@ -108,13 +112,14 @@ export default function MobileHeader({ onNotificationClick }: MobileHeaderProps)
 const styles = StyleSheet.create({
   toastContainer: { position: 'absolute', top: 110, left: 0, right: 0, alignItems: 'center', zIndex: 400 },
   toast: { backgroundColor: '#FFD700', paddingHorizontal: 24, paddingVertical: 8, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
-  toastText: { color: '#000', fontSize: 10, fontWeight: '900', letterSpacing: 1, fontStyle: 'italic' },
-  header: { position: 'absolute', top: 0, left: 0, right: 0, height: 96, backgroundColor: '#1A0B2E', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', zIndex: 90 },
+  toastText: { color: '#000', fontSize: 10, fontWeight: '900', letterSpacing: 1 },
+  header: { height: 96, backgroundColor: '#1A0B2E', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)', zIndex: 90 },
   leftSection: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   profileBtn: { width: 48, height: 48, backgroundColor: '#3B82F6', borderRadius: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   avatar: { width: '100%', height: '100%' },
-  walletPill: { flexDirection: 'row', alignItems: 'center', gap: 6, px: 12, py: 8, backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.3)' },
-  statusDot: { width: 6, height: 6, backgroundColor: '#4ADE80', borderRadius: 3, shadowColor: '#FFD700', shadowRadius: 8, shadowOpacity: 0.6 },
+  // FIXED: Removed 'px' and 'py' shorthands
+  walletPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.3)' },
+  statusDot: { width: 6, height: 6, backgroundColor: '#4ADE80', borderRadius: 3 },
   addressText: { fontSize: 10, fontWeight: '900', color: '#FFF' },
   connectBtn: { backgroundColor: '#FFD700', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
   connectText: { color: '#000', fontSize: 13, fontWeight: '900' },

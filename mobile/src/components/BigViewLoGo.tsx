@@ -9,8 +9,6 @@ export default function BigViewLoGo() {
           <Text style={styles.textBlue}>BIG</Text>
           <Text style={styles.textGold}>VI</Text>
           <Text style={styles.textBlue}>EW</Text>
-          
-          {/* Red Underline Swoosh */}
           <View style={styles.swoosh} />
         </View>
       </View>
@@ -22,13 +20,15 @@ const styles = StyleSheet.create({
   band: {
     backgroundColor: 'rgba(255,255,255,0.6)',
     marginHorizontal: 12,
-    borderVerticalWidth: 1,
+    // FIXED: Split borderVerticalWidth into Top and Bottom
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
     borderColor: '#E5E7EB',
     paddingVertical: 8,
     marginVertical: 16,
   },
   card: {
-    backgroundColor: '#0D0D0D', // Your background color
+    backgroundColor: '#0D0D0D',
     width: '100%',
     padding: 24,
     alignItems: 'center',

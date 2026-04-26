@@ -1,14 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  StyleSheet, 
-  ActivityIndicator, 
-  Alert 
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { usePrivy, useWallets } from '@privy-io/expo';
-import { encodeFunctionData, createPublicClient, http, createWalletClient, custom } from 'viem';
+import { encodeFunctionData, createPublicClient, http, createWalletClient, custom, Address } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import treasuryAbi from '../constants/abis/BigViewTreasuryV2.json';
 
@@ -17,14 +10,14 @@ export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
 
-  const { login, ready, authenticated } = usePrivy();
+  // FIXED: Removed 'ready', mobile relies on 'authenticated' check
+  const { login, authenticated } = usePrivy();
   const { wallets } = useWallets();
-  const wallet = wallets[0]; 
+  const wallet = wallets.length > 0 ? wallets[0] : null; 
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
     setStatus(type);
-    // On mobile, alerts are often better for critical success/error
     if (type === 'error' || type === 'success') {
       Alert.alert(type.toUpperCase(), text);
     }
@@ -35,27 +28,21 @@ export const ClaimButton = () => {
   };
 
   const handleClaim = async () => {
-    if (!ready) return;
-
     if (!authenticated) {
       notify("Redirecting to login...", "info");
       login();
       return;
     }
 
-    if (!wallet) {
-      return notify("No wallet connected!", "error");
-    }
+    if (!wallet) return notify("No wallet connected!", "error");
 
     setIsConfirming(true);
 
     try {
-      // 1. Ensure correct chain (Base Sepolia)
       if (wallet.chainId !== 'eip155:84532') {
         await wallet.switchChain(84532);
       }
 
-      // 2. Setup Wallet Client
       const provider = await wallet.getEthereumProvider();
       const walletClient = createWalletClient({
         chain: baseSepolia,
@@ -63,16 +50,14 @@ export const ClaimButton = () => {
       });
 
       const [address] = await walletClient.getAddresses();
-
-      // 3. Encode the call
       const data = encodeFunctionData({
         abi: treasuryAbi,
         functionName: 'claimGovernanceRewards',
         args: [],
       });
 
-      // 4. Send Transaction
-      const treasuryAddress = process.env.EXPO_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+      // FIXED: Cast to Address type for Viem
+      const treasuryAddress = process.env.EXPO_PUBLIC_TREASURY_ADDRESS as Address;
       
       const txHash = await walletClient.sendTransaction({
         account: address,
@@ -82,7 +67,6 @@ export const ClaimButton = () => {
 
       notify("Transaction sent! Waiting...", "info");
 
-      // 5. Wait for Receipt
       const publicClient = createPublicClient({
         chain: baseSepolia,
         transport: http(process.env.EXPO_PUBLIC_BASE_SEPOLIA_RPC),
@@ -98,10 +82,7 @@ export const ClaimButton = () => {
 
     } catch (err: any) {
       console.error("Claim failed:", err);
-      const errorMsg = err.message?.includes("User rejected") 
-        ? "Transaction rejected." 
-        : "Claim failed.";
-      notify(errorMsg, "error");
+      notify(err.message?.includes("User rejected") ? "Transaction rejected." : "Claim failed.", "error");
     } finally {
       setIsConfirming(false);
     }
@@ -110,18 +91,9 @@ export const ClaimButton = () => {
   return (
     <View style={styles.container}>
       {message && (
-        <View style={[
-          styles.notification,
-          status === 'success' ? styles.bgSuccess : status === 'error' ? styles.bgError : styles.bgInfo
-        ]}>
-          <View style={[
-            styles.dot,
-            status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : styles.dotInfo
-          ]} />
-          <Text style={[
-            styles.notifyText,
-            status === 'success' ? styles.textSuccess : status === 'error' ? styles.textError : styles.textInfo
-          ]}>
+        <View style={[styles.notification, status === 'success' ? styles.bgSuccess : status === 'error' ? styles.bgError : styles.bgInfo]}>
+          <View style={[styles.dot, status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : styles.dotInfo]} />
+          <Text style={[styles.notifyText, status === 'success' ? styles.textSuccess : status === 'error' ? styles.textError : styles.textInfo]}>
             {message}
           </Text>
         </View>
@@ -129,17 +101,11 @@ export const ClaimButton = () => {
 
       <TouchableOpacity 
         onPress={handleClaim}
-        disabled={isConfirming || !ready}
+        disabled={isConfirming}
         style={[styles.button, isConfirming && styles.disabled]}
         activeOpacity={0.8}
       >
-        {isConfirming ? (
-          <ActivityIndicator color="#000" />
-        ) : (
-          <Text style={styles.buttonText}>
-            {!authenticated ? 'Connect to Claim' : 'Claim Now'}
-          </Text>
-        )}
+        {isConfirming ? <ActivityIndicator color="#000" /> : <Text style={styles.buttonText}>{!authenticated ? 'Connect to Claim' : 'Claim Now'}</Text>}
       </TouchableOpacity>
     </View>
   );
@@ -147,45 +113,19 @@ export const ClaimButton = () => {
 
 const styles = StyleSheet.create({
   container: { width: '100%', alignItems: 'center' },
-  notification: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 16,
-    marginBottom: 16,
-    borderWidth: 1,
-    gap: 8,
-    width: '100%'
-  },
+  notification: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 16, marginBottom: 16, borderWidth: 1, gap: 8, width: '100%' },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  notifyText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', fontStyle: 'italic' },
-  
-  // Dynamic Colors
+  notifyText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase' },
   bgSuccess: { backgroundColor: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.2)' },
   textSuccess: { color: '#10B981' },
   dotSuccess: { backgroundColor: '#10B981' },
-  
   bgError: { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' },
   textError: { color: '#EF4444' },
   dotError: { backgroundColor: '#EF4444' },
-  
   bgInfo: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: 'rgba(255, 215, 0, 0.2)' },
   textInfo: { color: '#FFD700' },
   dotInfo: { backgroundColor: '#FFD700' },
-
-  button: {
-    backgroundColor: '#FFD700',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 20,
-    width: '100%',
-    alignItems: 'center',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8
-  },
+  button: { backgroundColor: '#FFD700', paddingVertical: 16, paddingHorizontal: 32, borderRadius: 20, width: '100%', alignItems: 'center', elevation: 8 },
   buttonText: { color: '#000', fontWeight: '900', fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase' },
   disabled: { opacity: 0.5 }
 });
