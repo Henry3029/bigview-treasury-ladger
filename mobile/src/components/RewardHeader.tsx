@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
-import { createWalletClient, custom, publicActions } from 'viem';
+import { usePrivy } from '@privy-io/expo'; // Removed useWallets
+import { createWalletClient, custom, publicActions, type Address } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { Loader2, CheckCircle2, Zap } from 'lucide-react-native';
+import { CheckCircle2, Zap } from 'lucide-react-native';
 import treasuryAbi from '../constants/abis/BigViewTreasuryV2.json';
 
 interface Props {
@@ -12,23 +12,23 @@ interface Props {
 }
 
 export const RewardHeader = ({ totalEarned, pending }: Props) => {
-  const { authenticated, login } = usePrivy();
-  const { wallets } = useWallets();
+  // FIXED: Pull wallets directly from usePrivy
+  const { authenticated, login, wallets } = usePrivy();
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
-  const contractAddress = process.env.EXPO_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+  const contractAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x000...') as Address;
 
   const handleClaim = async () => {
     if (!authenticated) return login();
-    const wallet = wallets[0];
+    const wallet = wallets?.[0]; // Safer access
     if (!wallet) return;
 
     try {
       setIsProcessing(true);
       const provider = await wallet.getEthereumProvider();
       const client = createWalletClient({
-        account: wallet.address as `0x${string}`,
+        account: wallet.address as Address,
         chain: baseSepolia,
         transport: custom(provider)
       }).extend(publicActions);
@@ -37,7 +37,7 @@ export const RewardHeader = ({ totalEarned, pending }: Props) => {
         address: contractAddress,
         abi: treasuryAbi,
         functionName: 'claimGovernanceRewards',
-        account: wallet.address as `0x${string}`,
+        account: wallet.address as Address,
       });
 
       await client.waitForTransactionReceipt({ hash });
@@ -79,9 +79,9 @@ export const RewardHeader = ({ totalEarned, pending }: Props) => {
           style={[styles.claimBtn, !canClaim && styles.disabledBtn]}
         >
           {isProcessing ? (
-            <ActivityIndicator size="small" color="#FFF" />
+            <ActivityIndicator size="small" color="#000" />
           ) : isConfirmed ? (
-            <CheckCircle2 size={16} color="#FFF" />
+            <CheckCircle2 size={16} color="#000" />
           ) : (
             <Zap size={16} color={canClaim ? "#000" : "rgba(255,255,255,0.2)"} fill={canClaim ? "#000" : "transparent"} />
           )}
@@ -108,6 +108,6 @@ const styles = StyleSheet.create({
   availValue: { fontSize: 20, fontWeight: '900', color: '#FFD700' },
   availSymbol: { fontSize: 10, fontWeight: '900', color: 'rgba(255,255,255,0.2)' },
   claimBtn: { flex: 1, height: 48, backgroundColor: '#FFD700', borderRadius: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
-  333332e2222(33: { color: '#000', fontWeight: '900', fontSize: 10 },
-  disabledBtn: { backgroundColor: 'rfgba(255,255,255,0.05)' },
+  claimBtnText: { color: '#000', fontWeight: '900', fontSize: 10 }, // FIXED TYPO HERE
+  disabledBtn: { backgroundColor: 'rgba(255,255,255,0.05)' }, // FIXED RFGBA TYPO HERE
 });

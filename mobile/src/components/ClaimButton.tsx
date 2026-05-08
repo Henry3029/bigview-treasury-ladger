@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
-import { encodeFunctionData, createPublicClient, http, createWalletClient, custom, type Address } from 'viem';
+import { usePrivy } from '@privy-io/expo'; // useWallets is usually inside usePrivy in recent Expo versions
+import { encodeFunctionData, createWalletClient, custom, type Address, createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import treasuryAbi from '../constants/abis/BigViewTreasuryV2.json';
 
@@ -10,22 +10,15 @@ export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
 
-  const { login, authenticated } = usePrivy();
-  const { wallets } = useWallets();
-  
-  // Safely get the first wallet
-  const wallet = wallets && wallets.length > 0 ? wallets[0] : null; 
+  // Get everything from one hook to ensure Type safety
+  const { login, authenticated, wallets } = usePrivy();
+  const wallet = wallets && wallets.length > 0 ? wallets[0] : null;
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {
     setMessage(text);
     setStatus(type);
-    if (type === 'error' || type === 'success') {
-      Alert.alert(type.toUpperCase(), text);
-    }
-    setTimeout(() => {
-      setMessage(null);
-      setStatus(null);
-    }, 4000);
+    if (type === 'error' || type === 'success') Alert.alert(type.toUpperCase(), text);
+    setTimeout(() => { setMessage(null); setStatus(null); }, 4000);
   };
 
   const handleClaim = async () => {
@@ -34,16 +27,11 @@ export const ClaimButton = () => {
       login();
       return;
     }
-
     if (!wallet) return notify("No wallet connected!", "error");
 
     setIsConfirming(true);
-
     try {
-      // Ensure we are on Base Sepolia
-      if (wallet.chainId !== 'eip155:84532') {
-        await wallet.switchChain(84532);
-      }
+      if (wallet.chainId !== 'eip155:84532') await wallet.switchChain(84532);
 
       const provider = await wallet.getEthereumProvider();
       const walletClient = createWalletClient({
@@ -52,15 +40,13 @@ export const ClaimButton = () => {
       });
 
       const [address] = await walletClient.getAddresses();
-      
       const data = encodeFunctionData({
         abi: treasuryAbi,
         functionName: 'claimGovernanceRewards',
         args: [],
       });
 
-      // FIXED: Strict casting and fallback for env variable
-      const treasuryAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x0000000000000000000000000000000000000000') as Address;
+      const treasuryAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x000...') as Address;
       
       const txHash = await walletClient.sendTransaction({
         account: address,
@@ -76,15 +62,9 @@ export const ClaimButton = () => {
       });
 
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-
-      if (receipt.status === 'success') {
-        notify('Claim Successful!', 'success');
-      } else {
-        notify('Transaction reverted.', 'error');
-      }
+      notify(receipt.status === 'success' ? 'Claim Successful!' : 'Transaction reverted.', receipt.status === 'success' ? 'success' : 'error');
 
     } catch (err: any) {
-      console.error("Claim failed:", err);
       const isUserRejected = err.message?.includes("User rejected") || err.code === 4001;
       notify(isUserRejected ? "Transaction rejected." : "Claim failed.", "error");
     } finally {
@@ -96,7 +76,7 @@ export const ClaimButton = () => {
     <View style={styles.container}>
       {message && (
         <View style={[styles.notification, status === 'success' ? styles.bgSuccess : status === 'error' ? styles.bgError : styles.bgInfo]}>
-          <View style={[styles.dot, status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : status === 'dotInfo']} />
+          <View style={[styles.dot, status === 'success' ? styles.dotSuccess : status === 'error' ? styles.dotError : styles.dotInfo]} />
           <Text style={[styles.notifyText, status === 'success' ? styles.textSuccess : status === 'error' ? styles.textError : styles.textInfo]}>
             {message}
           </Text>
@@ -104,17 +84,12 @@ export const ClaimButton = () => {
       )}
 
       <TouchableOpacity 
-        onPress={handleClaim}
-        disabled={isConfirming}
+        onPress={handleClaim} 
+        disabled={isConfirming} 
         style={[styles.button, isConfirming && styles.disabled]}
-        activeOpacity={0.8}
       >
-        {isConfirming ? (
-          <ActivityIndicator color="#000" />
-        ) : (
-          <Text style={styles.buttonText}>
-            {!authenticated ? 'Connect to Claim' : 'Claim Now'}
-          </Text>
+        {isConfirming ? <ActivityIndicator color="#000" /> : (
+          <Text style={styles.buttonText}>{!authenticated ? 'Connect to Claim' : 'Claim Now'}</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -135,7 +110,7 @@ const styles = StyleSheet.create({
   bgInfo: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: 'rgba(255, 215, 0, 0.2)' },
   textInfo: { color: '#FFD700' },
   dotInfo: { backgroundColor: '#FFD700' },
-  button: { backgroundColor: '#FFD700', paddingVertical: 16, paddingHorizontal: 32, borderRadius: 20, width: '100%', alignItems: 'center', elevation: 8 },
-  buttonText: { color: '#000', fontWeight: '900', fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase' },
+  button: { backgroundColor: '#FFD700', paddingVertical: 16, borderRadius: 20, width: '100%', alignItems: 'center' },
+  buttonText: { color: '#000', fontWeight: '900', fontSize: 12 },
   disabled: { opacity: 0.5 }
 });

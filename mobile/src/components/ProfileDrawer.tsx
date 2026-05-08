@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Image, ScrollView, ActivityIndicator } from 'react-native';
 import { X, Zap, Camera, User, ExternalLink, ShieldCheck, Copy, LogOut, Wallet } from 'lucide-react-native';
 import { usePrivy } from '@privy-io/expo';
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
-import { uploadImageToImgbb } from '../utils/uploadImage'; // Ensure this utility is updated for mobile
+import { uploadImageToImgbb } from '../utils/uploadImage';
 
 export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl }: { 
   isOpen: boolean, 
@@ -16,8 +16,11 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const googleImage = user?.linkedAccounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
-  const activeAddress = user?.wallet?.address;
+  // FIXED: Changed linkedAccounts to linked_accounts (snake_case)
+  const googleImage = user?.linked_accounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
+  
+  // FIXED: Correct address path for the Expo SDK
+  const activeAddress = user?.linked_accounts?.find((acc: any) => acc.type === 'wallet')?.address;
 
   const notify = (msg: string) => {
     setMessage(msg);
@@ -33,7 +36,6 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
 
   const handleCameraClick = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
     if (permissionResult.granted === false) {
       notify("Permission Required");
       return;
@@ -48,7 +50,6 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
 
     if (!result.canceled) {
       setIsUploading(true);
-      // Create form data for the mobile upload
       const localUri = result.assets[0].uri;
       const filename = localUri.split('/').pop();
       const type = `image/${filename?.split('.').pop()}`;
@@ -57,7 +58,7 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
       formData.append('image', { uri: localUri, name: filename, type } as any);
 
       try {
-        const uploadedUrl = await uploadImageToImgbb(formData); // Update your util to handle FormData
+        const uploadedUrl = await uploadImageToImgbb(formData);
         if (uploadedUrl) {
           setAvatarUrl(uploadedUrl);
           notify('Profile Updated!');
@@ -73,16 +74,12 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
   return (
     <Modal visible={isOpen} animationType="slide" transparent={false}>
       <View style={styles.container}>
-        {/* TOAST */}
         {message && (
           <View style={styles.toastContainer}>
-            <View style={styles.toast}>
-              <Text style={styles.toastText}>{message}</Text>
-            </View>
+            <View style={styles.toast}><Text style={styles.toastText}>{message}</Text></View>
           </View>
         )}
 
-        {/* HEADER */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Profile</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -91,7 +88,6 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* AVATAR SECTION */}
           <View style={styles.avatarSection}>
             <View style={styles.avatarWrapper}>
               <View style={styles.avatarCircle}>
@@ -115,13 +111,10 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
             </View>
           </View>
 
-          {/* INFO CARDS */}
           <View style={styles.cardList}>
             <View style={styles.infoCard}>
               <View style={styles.row}>
-                <View style={styles.iconBox}>
-                  <Wallet size={16} color="#FFD700" />
-                </View>
+                <View style={styles.iconBox}><Wallet size={16} color="#FFD700" /></View>
                 <Text style={styles.addressText}>
                   {activeAddress ? `${activeAddress.slice(0, 10)}...${activeAddress.slice(-8)}` : 'Not Connected'}
                 </Text>
