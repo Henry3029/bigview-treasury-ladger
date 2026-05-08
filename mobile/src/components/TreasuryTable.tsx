@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, fontSize: 10, fontWeight: '900', color: 'rgba(255,255,255,0.4)', letterSpacing: 2 },
   emptyText: { color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', fontSize: 12, textAlign: 'center' },
   
-  notification: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 16, marginBottom: 16, borderSize: 1 },
+  notification: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 16, marginBottom: 16, borderWidth: 1 },
   notifySuccess: { backgroundColor: 'rgba(16,185,129,0.1)', borderColor: 'rgba(16,185,129,0.2)' },
   notifyError: { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' },
   notifyInfo: { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: 'rgba(255, 215, 0, 0.2)' },

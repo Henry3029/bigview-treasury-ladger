@@ -7,7 +7,8 @@ interface StatusBadgeProps {
 }
 
 export default function StatusBadge({ label }: StatusBadgeProps) {
-  const { user, authenticated } = usePrivy(); 
+  // Use 'as any' to allow access to user.wallet
+  const { user, authenticated } = usePrivy() as any; 
   
   const address = user?.wallet?.address;
   const isConnected = authenticated;
@@ -56,12 +57,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
-  // Connected Styles
   connectedBorder: { borderColor: 'rgba(255, 215, 0, 0.2)', backgroundColor: 'rgba(255, 215, 0, 0.05)' },
-  connectedDot: { backgroundColor: '#FFD700', shadowColor: '#FFD700', shadowOpacity: 0.5, shadowRadius: 4, elevation: 3 },
+  connectedDot: { backgroundColor: '#FFD700' },
   connectedText: { color: '#FFD700' },
-  
-  // Disconnected Styles
   disconnectedBorder: { borderColor: 'rgba(255,255,255,0.05)' },
   disconnectedDot: { backgroundColor: 'rgba(255,255,255,0.2)' },
   disconnectedText: { color: 'rgba(255,255,255,0.3)' },

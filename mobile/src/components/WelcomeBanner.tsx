@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function WelcomeBanner() {
-  const { user, authenticated } = usePrivy();
+  const { user, authenticated } = usePrivy() as any; 
   const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   title: { fontSize: 24, fontWeight: '900', color: '#FFF', letterSpacing: -1 },
   sublabel: { fontSize: 11, fontWeight: '900', color: 'rgba(255,255,255,0.4)', letterSpacing: 2 },
-  divider: { h: 1, width: 48, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 16 },
+  divider: { height: 1, width: 48, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 16 },
   description: { fontSize: 14, color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: 20 },
   boldWhite: { color: '#FFF', fontWeight: '900' },
   getStartedBtn: { width: '100%', marginTop: 24, paddingVertical: 16, backgroundColor: '#FFD700', borderRadius: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
