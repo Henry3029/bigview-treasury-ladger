@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
+import { usePrivy } from '@privy-io/expo';
 import { createPublicClient, createWalletClient, custom, parseEther, formatEther, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Wallet, Info } from 'lucide-react-native';
@@ -11,8 +11,9 @@ export default function StakeCard() {
   const [balance, setBalance] = useState('0.00');
   const [loading, setLoading] = useState(false);
   
-  const { login, authenticated, ready } = usePrivy() as any;
-  const { wallets } = useWallets();
+  const privy = usePrivy() as any; 
+  const { login, authenticated, ready } = privy; 
+  const wallets = privy.wallets || [];
   const activeWallet = wallets?.[0];
 
   const treasuryAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x000...') as `0x${string}`;

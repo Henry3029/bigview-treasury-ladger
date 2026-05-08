@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
+import { usePrivy } from '@privy-io/expo';
 import { ExternalLink, CheckCircle2, Clock } from 'lucide-react-native';
 
 interface HistoryItem {
@@ -14,10 +14,11 @@ export const RewardHistory = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const { authenticated } = usePrivy() as any;
-  const { wallets } = useWallets();
+  const privy = usePrivy() as any;
+  const { authenticated, user } = privy; 
   
-  const wallet = wallets?.[0];
+  const wallets = privy.wallets || [];
+  const wallet = wallets[0];
   const address = wallet?.address;
 
   useEffect(() => {

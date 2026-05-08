@@ -178,6 +178,11 @@ const styles = StyleSheet.create({
   avatarCircle: { width: 112, height: 112, borderRadius: 24, borderWidth: 4, borderColor: 'rgba(255,255,255,0.05)', backgroundColor: '#111', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
   avatarImg: { width: '100%', height: '100%' },
   cameraBtn: { position: 'absolute', bottom: 0, width: '100%', height: '25%', backgroundColor: '#FFD700', justifyContent: 'center', alignItems: 'center' },
+  copyBtn: { 
+    padding: 8, 
+    backgroundColor: 'rgba(255,255,255,0.05)', 
+    borderRadius: 10 
+  },
   userName: { fontSize: 24, fontWeight: '900', color: '#FFF', marginTop: 24, letterSpacing: -1 },
   networkBadge: { marginTop: 8, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingVertical: 6, backgroundColor: 'rgba(255, 215, 0, 0.1)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 215, 0, 0.2)' },
   pulseDot: { width: 6, height: 6, backgroundColor: '#FFD700', borderRadius: 3 },
