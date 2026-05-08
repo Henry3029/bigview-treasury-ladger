@@ -11,8 +11,10 @@ export default function EarnCard() {
   const [pool, setPool] = useState({ apy: "0", tvl: "0" });
   const [loading, setLoading] = useState(false);
   
-  // FIXED: Explicit destructuring from usePrivy
-  const { login, authenticated } = usePrivy();
+  // FIXED: Using the discovered bypass for login and authenticated
+  const privy = usePrivy() as any;
+  const login = privy.login;
+  const authenticated = privy.authenticated;
 
   useEffect(() => {
     const fetchAeroData = async () => {
@@ -34,7 +36,7 @@ export default function EarnCard() {
     if (!authenticated) return login();
     setLoading(true);
     
-    // Blockchain logic via Viem to be added here
+    // Future implementation: Blockchain logic via Viem 
     setTimeout(() => setLoading(false), 2000);
   };
 

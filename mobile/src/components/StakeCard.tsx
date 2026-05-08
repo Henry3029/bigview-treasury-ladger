@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { usePrivy } from '@privy-io/expo';
+import { usePrivy, useWallets } from '@privy-io/expo';
 import { createPublicClient, createWalletClient, custom, parseEther, formatEther, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Wallet, Info } from 'lucide-react-native';
@@ -10,33 +10,36 @@ export default function StakeCard() {
   const [amount, setAmount] = useState('');
   const [balance, setBalance] = useState('0.00');
   const [loading, setLoading] = useState(false);
-  const { login, authenticated, ready, user } = usePrivy();
+  
+  // FIXED: Use useWallets to get the provider-capable wallet object
+  const { login, authenticated, ready } = usePrivy() as any;
+  const { wallets } = useWallets();
+  const activeWallet = wallets?.[0];
 
-  const treasuryAddress = process.env.EXPO_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+  const treasuryAddress = (process.env.EXPO_PUBLIC_TREASURY_ADDRESS || '0x000...') as `0x${string}`;
 
   const fetchBalance = async () => {
-    if (!user?.wallet?.address) return;
+    if (!activeWallet?.address) return;
     const publicClient = createPublicClient({ chain: baseSepolia, transport: http() });
     try {
-      const bal = await publicClient.getBalance({ address: user.wallet.address as `0x${string}` });
-      setBalance(parseFloat(formatEther(bal)).toFixed(2));
+      const bal = await publicClient.getBalance({ address: activeWallet.address as `0x${string}` });
+      setBalance(parseFloat(formatEther(bal)).toFixed(4));
     } catch (e) { console.error(e); }
   };
 
   useEffect(() => {
     if (ready && authenticated) fetchBalance();
-  }, [ready, authenticated]);
+  }, [ready, authenticated, activeWallet?.address]);
 
   const handleStake = async () => {
     if (!authenticated) return login();
-    if (!amount || isNaN(Number(amount))) return;
+    if (!amount || isNaN(Number(amount)) || !activeWallet) return;
 
     setLoading(true);
     try {
-      const wallet = user?.wallet; // Privy Expo handles the active wallet reference
-      const provider = await wallet?.getEthereumProvider();
+      const provider = await activeWallet.getEthereumProvider();
       const walletClient = createWalletClient({
-        account: wallet?.address as `0x${string}`,
+        account: activeWallet.address as `0x${string}`,
         chain: baseSepolia,
         transport: custom(provider)
       });

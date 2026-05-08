@@ -5,7 +5,11 @@ import { Gift, ChevronRight, Repeat } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function DashboardButtons() {
-  const { login, authenticated } = usePrivy();
+  // FIXED: Applying the 'as any' bypass
+  const privy = usePrivy() as any;
+  const login = privy.login;
+  const authenticated = privy.authenticated;
+
   const navigation = useNavigation<any>();
 
   const handleSwap = () => {

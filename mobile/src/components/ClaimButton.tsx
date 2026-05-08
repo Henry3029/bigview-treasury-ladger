@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { usePrivy } from '@privy-io/expo'; // useWallets is usually inside usePrivy in recent Expo versions
+import { usePrivy } from '@privy-io/expo';
 import { encodeFunctionData, createWalletClient, custom, type Address, createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import treasuryAbi from '../constants/abis/BigViewTreasuryV2.json';
@@ -10,8 +10,12 @@ export const ClaimButton = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'success' | 'error' | 'info' | null>(null);
 
-  // Get everything from one hook to ensure Type safety
-  const { login, authenticated, wallets } = usePrivy();
+  // FIXED: Cast to any to bypass strict Type checking for properties the compiler isn't seeing
+  const privy = usePrivy() as any;
+  const login = privy.login;
+  const authenticated = privy.authenticated;
+  const wallets = privy.wallets;
+  
   const wallet = wallets && wallets.length > 0 ? wallets[0] : null;
 
   const notify = (text: string, type: 'success' | 'error' | 'info') => {

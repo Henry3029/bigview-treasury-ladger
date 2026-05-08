@@ -13,9 +13,12 @@ interface HistoryItem {
 export const RewardHistory = () => {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const { authenticated } = usePrivy();
+  
+  const { authenticated } = usePrivy() as any;
   const { wallets } = useWallets();
-  const wallet = wallets[0];
+  
+  // FIXED: Safe access to the first connected wallet
+  const wallet = wallets?.[0];
   const address = wallet?.address;
 
   useEffect(() => {
@@ -108,7 +111,7 @@ const styles = StyleSheet.create({
   emptyText: { color: 'rgba(255,255,255,0.3)', fontSize: 12 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
   title: { color: '#FFF', fontSize: 18, fontWeight: '900' },
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,215,0,0.05)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWeight: 1, borderColor: 'rgba(255,215,0,0.1)' },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,215,0,0.05)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,215,0,0.1)' },
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#FFD700' },
   badgeText: { color: '#FFD700', fontSize: 8, fontWeight: '900', textTransform: 'uppercase' },
   card: { backgroundColor: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },

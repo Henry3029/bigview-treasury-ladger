@@ -6,12 +6,14 @@ import * as Clipboard from 'expo-clipboard';
 import ProfileDrawer from './ProfileDrawer';
 
 export default function MobileHeader({ onNotificationClick }: { onNotificationClick: () => void }) {
-  const { user, authenticated, login } = usePrivy();
+  // FIXED: Cast to any to access properties
+  const privy = usePrivy() as any;
+  const { user, authenticated, login } = privy;
+  
   const address = user?.wallet?.address;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // FIX: Use snake_case for linked_accounts
   const googleImage = user?.linked_accounts?.find(
     (acc: any) => acc.type === 'google_oauth'
   )?.picture;
@@ -64,7 +66,12 @@ export default function MobileHeader({ onNotificationClick }: { onNotificationCl
         </View>
       </View>
 
-      <ProfileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <ProfileDrawer 
+        isOpen={isDrawerOpen} 
+        onClose={() => setIsDrawerOpen(false)} 
+        avatarUrl={null} 
+        setAvatarUrl={() => {}} 
+      />
     </>
   );
 }

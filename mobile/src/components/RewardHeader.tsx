@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { usePrivy } from '@privy-io/expo'; // Removed useWallets
+import { usePrivy } from '@privy-io/expo';
 import { createWalletClient, custom, publicActions, type Address } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { CheckCircle2, Zap } from 'lucide-react-native';
@@ -12,8 +12,10 @@ interface Props {
 }
 
 export const RewardHeader = ({ totalEarned, pending }: Props) => {
-  // FIXED: Pull wallets directly from usePrivy
-  const { authenticated, login, wallets } = usePrivy();
+  // FIXED: Destructure from 'as any' cast
+  const privy = usePrivy() as any;
+  const { authenticated, login, wallets } = privy;
+  
   const [isProcessing, setIsProcessing] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
@@ -21,7 +23,7 @@ export const RewardHeader = ({ totalEarned, pending }: Props) => {
 
   const handleClaim = async () => {
     if (!authenticated) return login();
-    const wallet = wallets?.[0]; // Safer access
+    const wallet = wallets?.[0]; 
     if (!wallet) return;
 
     try {
@@ -108,6 +110,6 @@ const styles = StyleSheet.create({
   availValue: { fontSize: 20, fontWeight: '900', color: '#FFD700' },
   availSymbol: { fontSize: 10, fontWeight: '900', color: 'rgba(255,255,255,0.2)' },
   claimBtn: { flex: 1, height: 48, backgroundColor: '#FFD700', borderRadius: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 8 },
-  claimBtnText: { color: '#000', fontWeight: '900', fontSize: 10 }, // FIXED TYPO HERE
-  disabledBtn: { backgroundColor: 'rgba(255,255,255,0.05)' }, // FIXED RFGBA TYPO HERE
+  claimBtnText: { color: '#000', fontWeight: '900', fontSize: 10 },
+  disabledBtn: { backgroundColor: 'rgba(255,255,255,0.05)' },
 });

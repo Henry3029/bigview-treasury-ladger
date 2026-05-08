@@ -12,15 +12,16 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
   avatarUrl: string | null, 
   setAvatarUrl: (url: string | null) => void 
 }) {
-  const { authenticated, user, logout } = usePrivy();
+  // FIXED: Cast to any for properties
+  const privy = usePrivy() as any;
+  const { authenticated, user, logout } = privy;
+
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  // FIXED: Changed linkedAccounts to linked_accounts (snake_case)
   const googleImage = user?.linked_accounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
-  
-  // FIXED: Correct address path for the Expo SDK
-  const activeAddress = user?.linked_accounts?.find((acc: any) => acc.type === 'wallet')?.address;
+  const walletAccount = user?.linked_accounts?.find((acc: any) => acc.type === 'wallet');
+  const activeAddress = walletAccount?.address;
 
   const notify = (msg: string) => {
     setMessage(msg);
