@@ -5,7 +5,7 @@ import { ReceiptText, History, Wallet } from 'lucide-react-native';
 import TreasuryTable from '../components/TreasuryTable';
 
 export default function HistoryScreen() {
-  const { user, authenticated, login } = usePrivy();
+  const { user, authenticated, login } = usePrivy() as any; 
   const address = user?.wallet?.address;
 
   return (

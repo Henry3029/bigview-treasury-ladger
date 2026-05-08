@@ -9,7 +9,7 @@ import {
   Alert,
   ScrollView 
 } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
+import { usePrivy } from '@privy-io/expo';
 import { createWalletClient, createPublicClient, custom, http, parseUnits, formatUnits } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { Coins, Flame, ShieldAlert, Activity } from 'lucide-react-native';
@@ -23,8 +23,9 @@ export default function AdminMintScreen() {
   const [totalSupply, setTotalSupply] = useState('0');
   const [isProcessing, setIsProcessing] = useState(false);
   
-  const { user, authenticated, login } = usePrivy();
-  const { wallets } = useWallets();
+  const privy = usePrivy() as any; 
+  const { user, authenticated, login } = privy; 
+  const  wallets  = privy.wallets || [];
   const wallet = wallets[0]; 
 
   const tokenAddress = process.env.EXPO_PUBLIC_TOKEN_ADDRESS as `0x${string}`;

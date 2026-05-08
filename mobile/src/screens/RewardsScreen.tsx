@@ -21,7 +21,7 @@ import tokenAbi from '../constants/abis/BigViewTreasuryV2.json';
 const { width } = Dimensions.get('window');
 
 export default function RewardsScreen() {
-  const { user, authenticated } = usePrivy();
+  const { user, authenticated } = usePrivy() as any; 
   const address = user?.wallet?.address;
 
   const [pending, setPending] = useState("0.00");

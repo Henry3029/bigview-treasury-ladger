@@ -8,7 +8,7 @@ import {
   ScrollView, 
   Dimensions 
 } from 'react-native';
-import { usePrivy, useWallets } from '@privy-io/expo';
+import { usePrivy } from '@privy-io/expo';
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { 
@@ -23,9 +23,10 @@ import {
 const { width } = Dimensions.get('window');
 
 export default function ProfileScreen() {
-  const { login, logout, authenticated, ready, user } = usePrivy();
-  const { wallets } = useWallets();
-  const [balance, setBalance] = useState("0.0000");
+  const privy = usePrivy() as any; 
+  const { login, logout, authenticated, ready, user } = privy; 
+  const wallets = privy.wallets || [];
+  const [balance, setBalance] = useState("0.00");
 
   const address = user?.wallet?.address || wallets[0]?.address;
   const googlePicture = user?.linkedAccounts?.find((acc) => acc.type === 'google_oauth')?.picture;
