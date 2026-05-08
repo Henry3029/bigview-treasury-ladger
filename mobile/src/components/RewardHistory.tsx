@@ -17,7 +17,6 @@ export const RewardHistory = () => {
   const { authenticated } = usePrivy() as any;
   const { wallets } = useWallets();
   
-  // FIXED: Safe access to the first connected wallet
   const wallet = wallets?.[0];
   const address = wallet?.address;
 

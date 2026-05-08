@@ -11,7 +11,6 @@ export default function StakeCard() {
   const [balance, setBalance] = useState('0.00');
   const [loading, setLoading] = useState(false);
   
-  // FIXED: Use useWallets to get the provider-capable wallet object
   const { login, authenticated, ready } = usePrivy() as any;
   const { wallets } = useWallets();
   const activeWallet = wallets?.[0];

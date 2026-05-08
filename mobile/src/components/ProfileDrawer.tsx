@@ -12,16 +12,16 @@ export default function ProfileDrawer({ isOpen, onClose, avatarUrl, setAvatarUrl
   avatarUrl: string | null, 
   setAvatarUrl: (url: string | null) => void 
 }) {
-  // FIXED: Cast to any for properties
-  const privy = usePrivy() as any;
-  const { authenticated, user, logout } = privy;
+  const { authenticated, user, logout } = usePrivy() as any;
 
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const googleImage = user?.linked_accounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
-  const walletAccount = user?.linked_accounts?.find((acc: any) => acc.type === 'wallet');
-  const activeAddress = walletAccount?.address;
+  // Use optional chaining and casting to handle linked_accounts structure
+  const linkedAccounts = (user as any)?.linked_accounts || (user as any)?.linkedAccounts || [];
+  const googleImage = linkedAccounts.find((acc: any) => acc.type === 'google_oauth')?.picture;
+  const walletAccount = linkedAccounts.find((acc: any) => acc.type === 'wallet');
+  const activeAddress = walletAccount?.address || (user as any)?.wallet?.address;
 
   const notify = (msg: string) => {
     setMessage(msg);
