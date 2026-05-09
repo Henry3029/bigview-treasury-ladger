@@ -3,7 +3,7 @@ import {View, Text} from 'react-native';
 
 type statusType = 'success' | 'error' | 'info'; 
 
-export const Notify = (message: string, status: statusType): string => {
+export const Notify = (message: string, status: statusType): React.JSX.Element => {
 
 if(!message) return "null";
 

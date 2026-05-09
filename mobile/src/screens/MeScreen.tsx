@@ -7,15 +7,15 @@ import {
   HelpCircle, 
   LogOut, 
   ChevronRight, 
-  Github, 
-  Twitter, 
+  GithubIcon, // CHANGED from Github
+  TwitterIcon, // CHANGED from Twitter
   ExternalLink 
 } from 'lucide-react-native';
 import { usePrivy } from '@privy-io/expo';
 import StatusBadge from '../components/StatusBadge';
 
 export default function MeScreen() {
-  const { logout, user } = usePrivy();
+  const { logout, user } = usePrivy() as any; // Cast to any to prevent potential type mismatches
 
   const handleShare = async () => {
     try {
@@ -33,7 +33,8 @@ export default function MeScreen() {
             <View style={styles.avatarGlow} />
             <User size={40} color="#FFD700" strokeWidth={1.5} />
           </View>
-          <Text style={styles.userName}>Henry</Text>
+          {/* Using user data if available, falling back to Henry */}
+          <Text style={styles.userName}>{user?.email?.address?.split('@')[0] || "Henry"}</Text>
           <StatusBadge />
         </View>
 
@@ -47,8 +48,8 @@ export default function MeScreen() {
 
           <MenuSection title="Support & Community">
             <MenuLink icon={<HelpCircle size={18} />} label="Help Center" onPress={() => {}} />
-            <MenuLink icon={<Github size={18} />} label="Open Source" onPress={() => {}} />
-            <MenuLink icon={<Twitter size={18} />} label="Twitter / X" onPress={() => {}} />
+            <MenuLink icon={<GithubIcon size={18} />} label="Open Source" onPress={() => {}} />
+            <MenuLink icon={<TwitterIcon size={18} />} label="Twitter / X" onPress={() => {}} />
             <MenuLink icon={<ExternalLink size={18} />} label="Share App" onPress={handleShare} />
           </MenuSection>
 
@@ -66,7 +67,7 @@ export default function MeScreen() {
   );
 }
 
-// --- Sub-Components (Professional Pattern) ---
+// --- Sub-Components ---
 
 function MenuSection({ title, children }: { title: string, children: React.ReactNode }) {
   return (

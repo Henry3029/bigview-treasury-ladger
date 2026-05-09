@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   bvwIcon: { width: 24, height: 24, backgroundColor: '#FFD700', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
   bvwText: { color: '#000', fontSize: 8, fontWeight: '900' },
   
-  mainBody: { px: 24, paddingHorizontal: 24, marginTop: -20 },
+  mainBody: {paddingHorizontal: 24, marginTop: -20 },
   iconGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 40 },
   gridItem: { alignItems: 'center', gap: 8 },
   iconBox: { width: 64, height: 64, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },

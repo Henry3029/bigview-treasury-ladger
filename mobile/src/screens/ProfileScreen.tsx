@@ -29,7 +29,7 @@ export default function ProfileScreen() {
   const [balance, setBalance] = useState("0.00");
 
   const address = user?.wallet?.address || wallets[0]?.address;
-  const googlePicture = user?.linkedAccounts?.find((acc) => acc.type === 'google_oauth')?.picture;
+  const googlePicture = user?.linkedAccounts?.find((acc: any) => acc.type === 'google_oauth')?.picture;
 
   useEffect(() => {
     const fetchBalance = async () => {
