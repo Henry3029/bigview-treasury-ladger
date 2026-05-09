@@ -3,9 +3,9 @@ import {View, Text} from 'react-native';
 
 type statusType = 'success' | 'error' | 'info'; 
 
-export const Notify = (message: string, status: statusType): React.JSX.Element => {
+export const Notify = (message: string, status: statusType): React.JSX.Element | null => {
 
-if(!message) return "null";
+if(!message) return null;
 
 const getStatusColor = () => {
 if(status === 'success') return 'green';

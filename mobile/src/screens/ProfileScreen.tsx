@@ -141,7 +141,24 @@ const styles = StyleSheet.create({
   loginBtn: { width: '100%', height: 50, backgroundColor: '#FFD700', borderRadius: 25, alignItems: 'center', justifyContent: 'center' },
   loginBtnText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
   
+  // FIX FOR ERROR 2: Removed nested claimBtn and replaced 'py'
   brandBox: { backgroundColor: '#4ADE80', paddingTop: 60, paddingBottom: 32, paddingHorizontal: 24, overflow: 'hidden' },
+  
+  // Create a separate style for the content area mentioned in the error
+  content: { 
+    padding: 20, 
+    paddingVertical: 12 // This replaces the 'py' error shown in screenshot 20260509-101912.png
+  },
+
+  // This must be its own top-level property, NOT inside 'content'
+  claimBtn: {
+    marginTop: 16,
+    backgroundColor: '#FFD700',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center'
+  },
+
   blurCircle: { position: 'absolute', top: -100, right: -100, width: 256, height: 256, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 128 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 10 },
   userInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
