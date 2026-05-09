@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   boosterTopLine: { position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#FFD700', borderTopLeftRadius: 24, borderTopRightRadius: 24 },
   boosterApy: { color: '#FFF', fontSize: 24, fontWeight: '900', marginBottom: 4 },
   boosterSubtitle: { color: 'rgba(255,255,255,0.2)', fontSize: 10, fontWeight: '900', marginBottom: 20 },
-  claimBtn: { backgroundColor: '#FFD700', py: 10, borderRadius: 50, alignItems: 'center', paddingVertical: 10 },
+  claimBtn: { backgroundColor: '#FFD700', borderRadius: 50, alignItems: 'center', paddingVertical: 10 },
   claimBtnText: { color: '#000', fontWeight: '900', fontSize: 10 },
   
   questCard: { backgroundColor: '#1E293B', padding: 24, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   questInfo: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   questIconBox: { width: 48, height: 48, backgroundColor: '#000', borderRadius: 16, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
   questTitle: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  questBonus: { color: '#34D399', fontSize: 10, fontWeight: '900', mt: 4 },
-  goBtn: { paddingHorizontal: 24, paddingVertical: 10, backgroundColor: '#000', borderRadius: 50, borderWIdth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  questBonus: { color: '#34D399', fontSize: 10, fontWeight: '900', marginTop: 4 },
+  goBtn: { paddingHorizontal: 24, paddingVertical: 10, backgroundColor: '#000', borderRadius: 50, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   goText: { color: '#FFF', fontSize: 10, fontWeight: '900' }
 });

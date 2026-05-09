@@ -7,8 +7,8 @@ import {
   HelpCircle, 
   LogOut, 
   ChevronRight, 
-  GithubIcon, // CHANGED from Github
-  TwitterIcon, // CHANGED from Twitter
+  Code2,// CHANGED from Github
+  Send, // CHANGED from Twitter
   ExternalLink 
 } from 'lucide-react-native';
 import { usePrivy } from '@privy-io/expo';
@@ -48,8 +48,8 @@ export default function MeScreen() {
 
           <MenuSection title="Support & Community">
             <MenuLink icon={<HelpCircle size={18} />} label="Help Center" onPress={() => {}} />
-            <MenuLink icon={<GithubIcon size={18} />} label="Open Source" onPress={() => {}} />
-            <MenuLink icon={<TwitterIcon size={18} />} label="Twitter / X" onPress={() => {}} />
+            <MenuLink icon={<Code2 size={18} />} label="Open Source" onPress={() => {}} />
+            <MenuLink icon={<Send size={18} />} label="Twitter / X" onPress={() => {}} />
             <MenuLink icon={<ExternalLink size={18} />} label="Share App" onPress={handleShare} />
           </MenuSection>
 
