@@ -5,20 +5,20 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "bigviewapp", // CRITICAL: This is your App URL Scheme
-    "userInterfaceStyle": "dark", // Updated to dark to match Bigview branding
+    "scheme": "bigviewapp", 
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000" // Matches Bigview dark theme
+      "backgroundColor": "#000000" 
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.henry.bigviewapp" // CRITICAL: Use this in Privy Dashboard
+      "bundleIdentifier": "com.henry.bigviewapp" 
     },
     "android": {
-      "package": "com.henry.bigviewapp", // CRITICAL: Use this in Privy Dashboard
+      "package": "com.henry.bigviewapp", 
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
