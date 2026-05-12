@@ -41,7 +41,7 @@ export default function AddLiquidity() {
       const provider = await wallet.getEthereumProvider();
       const walletClient = createWalletClient({
         account: wallet.address as `0x${string}`,
-        chain: baseSepolia,
+        chain: baseSepolia, //done
         transport: custom(provider)
       });
 
