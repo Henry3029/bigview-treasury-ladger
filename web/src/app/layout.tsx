@@ -1,9 +1,8 @@
 import '@/styles/globals.css';
 import Providers from './providers'; 
 import { Inter } from 'next/font/google';
-import WelcomeBanner from '@/components/WelcomeBanner';
-import BottomNav from '@/components/BottomNav';
-import MobileHeaderWrapper from '@/components/MobileHeaderWrapper';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -25,24 +24,21 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} font-inter antialiased text-text-color bg-violet-main-background overflow-x-hidden`}>
         <Providers>
-          <WelcomeBanner />
+          <Header />
 
           <div className="flex flex-col h-dvh overflow-hidden">
             {/* The Header now sits at the top of every page */}
-            <MobileHeaderWrapper />
+            
 
             <main className="flex-grow w-full overflow-y-auto pb-20 lg:pb-0">
               {children}
             </main>
 
-            <footer className="hidden lg:block px-8 text-center text-[10px] tracking-tight text-white/20 border-t border-white/5">
-              © 2026 Bigview Treasury-Ledger • v2.0
-            </footer>
-
             <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-color-ash/40 backdrop-blur-xl border-t border-white/5">
-              <BottomNav />
+              
             </div>
           </div>
+          <Footer />
         </Providers>
       </body>
     </html>
