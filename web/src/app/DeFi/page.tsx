@@ -2,33 +2,39 @@
 import { useState, useEffect } from 'react';
 import DefiOpportunities from '@/components/DefiOpportunities';
 import TVLDisplay from '@/components/TVLDisplay'; 
+import { fetchLiveProtocolStats } from '@/services/bigviewStats'; 
+import LoadingSpinner from '@/components/LoadingSpinner'; 
 
 export default function DeFiPage() {
+	const { user } = usePrivy();
+	const userAddress = user?.wallet?.address;
   // Real-time protocol metrics (No placeholders, updates live)
-  const [deployedBvw, setDeployedBvw] = useState<number>(20245282);
-  const [holderCount, setHolderCount] = useState<number>(14956);
-  const [sharePercentage, setSharePercentage] = useState<number>(34.2);
-
-  // Simulate real-time on-chain data tracking updates from Base blocks
+  const [deployedBvw, setDeployedBvw] = useState<number>(0);
+  const [holderCount, setHolderCount] = useState<number>(0);
+  const [sharePercentage, setSharePercentage] = useState<number>(00.0);
+  const [loading, setLoading] = useState<boolean>(true);
+  
   useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulate small amounts of BVW being deployed/withdrawn from pools
-      setDeployedBvw(prev => prev + Math.floor((Math.random() - 0.3) * 12));
+    async function loadRealMetrics() {
+      const data = await fetchLiveProtocolStats(userAddress);
       
-      // Gradually adjust share percentage to match market changes
-      setSharePercentage(prev => {
-        const change = (Math.random() - 0.5) * 0.05;
-        return parseFloat((prev + change).toFixed(2));
-      });
+      // Update your variables with real data on a clean new line!
+      setDeployedBvw(data.deployedBvw);
+      setSharePercentage(data.sharePercentage);
+      setHolderCount(data.holderCount);
+      setLoading(false);
+    }
+    
+    loadRealMetrics();
 
-      // Occasional new unique wallet addresses jumping into DeFi integration
-      if (Math.random() > 0.92) {
-        setHolderCount(prev => prev + 1);
-      }
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, []);
+    // If you want it to check for updates on new Base blocks, 
+    // you can poll every 12 seconds safely without risking memory leaks!
+    const interval = setInterval(loadRealMetrics, 12000);
+    return () => clearInterval(interval); // Cleaned up cleanly using the rule you mastered!
+  }, [userAddress]);
+  
+  if (loading) return <div> <LoadingSpinner /></div>
+  
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 text-gray-800 dark:text-white">

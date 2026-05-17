@@ -7,52 +7,43 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BigViewToken is ERC20, ERC20Permit, ERC20Votes, Ownable {
-    // Mapping to manage multiple authorized minters (like your Treasury)
+    
+    error NotMinter();
+
     mapping(address => bool) public isMinter;
 
+    // Renamed to reflect its status as your protocol's official LST
     constructor() 
-        ERC20("BigView", "BVW") 
-        ERC20Permit("BigView") 
+        ERC20("Liquid Staked cbETH", "BVW") 
+        ERC20Permit("Liquid Staked cbETH") 
         Ownable(msg.sender) 
     {}
 
-    /**
-     * @notice Authorizes a contract (like the Treasury) to mint tokens
-     */
     function addMinter(address _minter) external onlyOwner {
         isMinter[_minter] = true;
     }
 
-    /**
-     * @notice Removes a minter if needed for security
-     */
     function removeMinter(address _minter) external onlyOwner {
         isMinter[_minter] = false;
     }
 
-    /**
-     * @notice Mints tokens. Only authorized minters can call this.
-     */
     function mint(address to, uint256 amount) external {
-        require(isMinter[msg.sender], "Not authorized to mint");
+        if (!isMinter[msg.sender]) revert NotMinter();
         _mint(to, amount);
     }
 
-    // --- Required Overrides for ERC20Votes & ERC20Permit ---
+    // Used when users burn BVW to permissionlessly withdraw their cbETH
+    function burn(address from, uint256 amount) external {
+        if (!isMinter[msg.sender]) revert NotMinter();
+        _burn(from, amount);
+    }
 
-    function _update(address from, address to, uint256 value)
-        internal
-        override(ERC20, ERC20Votes)
-    {
+    // --- Required Overrides ---
+    function _update(address from, address to, uint256 value) internal override(ERC20, ERC20Votes) {
         super._update(from, to, value);
     }
 
-    function nonces(address owner)
-        public
-        view
-        override(ERC20Permit, Nonces)
-        returns (uint256)
-    {
+    function nonces(address owner) public view override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }

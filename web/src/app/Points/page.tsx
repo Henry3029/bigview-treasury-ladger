@@ -4,8 +4,8 @@ import Leaderboard from '/@components/Leaderboard';
 
 export default function PointsPage() {
   // Real-time network state (Simulating live synced data from Base/ETH blocks)
-  const [totalPoints, setTotalPoints] = useState<number>(90642180530);
-  const [totalUsers, setTotalUsers] = useState<number>(45048);
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
 
   // Simulate real-time updates synced with new blocks
   useEffect(() => {

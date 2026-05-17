@@ -2,6 +2,7 @@
 
 import ProtocolStatsHub from '@/components/ProtocolStatsHub';
 import BigviewStats from '@/components/BigviewStats';
+import CycleStatsTable from '@/components/CycleStatsTable'; 
 
 export default function AnalyticsPage() {
   return (
@@ -25,6 +26,10 @@ export default function AnalyticsPage() {
       {/* Deep Dive Grid (The deep forest green metrics panel tracking Base infrastructure) */}
       <section className="pt-2">
         <BigviewStats />
+      </section>
+      
+      <section className="pt-2">
+      <CycleStatsTable />
       </section>
 
     </div>

@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./BigViewToken.sol";
 
-contract BigViewTreasury is ReentrancyGuard {
+contract BigViewTreasuryV3 is ReentrancyGuard {
     
     // --- State Variables ---
     BigViewToken public immutable bvwToken; // Your LST (stSTX equivalent)

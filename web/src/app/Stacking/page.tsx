@@ -1,15 +1,40 @@
 'use client';
 import { useState } from 'react';
-import TVLDefault from '../components /TVLDefault';
+import TVLDisplay from '@/components /TVLDisplay';
+import getLiveEthPrice from '@/utils/cryptoPrice'; 
+import { calculateRealYieldRates } from '@/utils/protocolCalculations';
 
 export default function StakingPage() {
   const [stakeAmount, setStakeAmount] = useState<string>('0.00');
   const [selectedOption, setSelectedOption] = useState<number>(1); // 1, 2, or 3
+  const [yieldRates, setYieldRates] = useState<number[]>([0.0352, 0.0291, 0.0310]);
+  const [ethPrice, setEthPrice] = useState<number>(3450);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    async function loadAllNetworkData() {
+      try {
+        // Run both internet requests at the same time parallelly 
+        const [realPrice, realRates] = await Promise.all([
+          getLiveEthPrice(),
+          calculateRealYieldRates()
+        ]);
+        // 3. Assign the real internet responses directly to your variables!
+        setEthPrice(realPrice);
+        setYieldRates(realRates);
+        setIsLoading(false);
+        } catch (error) {
+        console.error("Error loading live data, using fallbacks.", error);
+        setIsLoading(false); // Stop loading even if it fails so the page still works
+      }
+    }
+
+    loadAllNetworkData();
+  }, []);
+        
 
   // Dynamic calculations based on input
-  const ethPrice = 2545.30; // Fetch this from your CoinGecko util
   const usdValue = (parseFloat(stakeAmount) || 0) * ethPrice;
-  const yieldRates = [0.0352, 0.0291, 0.0310]; // APYs for 1, 2, 3
   const potentialYield = (parseFloat(stakeAmount) || 0) * yieldRates[selectedOption - 1];
 
   return (
@@ -63,8 +88,8 @@ export default function StakingPage() {
         {/* Option Cards */}
         <div className="space-y-4">
           {[
-            { id: 1, title: 'Liquid Staking with stETH Yield', desc: 'Get yield immediately. Stay liquid with BVW token. Earn points.', apy: '3.52%' },
-            { id: 2, title: 'Liquid Staking with cbBTC/cbETH Yield', desc: 'Earn points and cbBTC/cbETH claimable daily.', apy: '2.91%' },
+            { id: 1, title: 'Liquid Staking with cbETH Yield', desc: 'Get yield immediately. Stay liquid with BVW token. Earn points.', apy: '3.52%' },
+            { id: 2, title: 'Liquid Staking with cbETH Yield', desc: 'Earn points and cbETH claimable daily.', apy: '2.91%' },
             { id: 3, title: 'Native Staking with ETH Yield', desc: 'Start earning yield next cycle. No liquidity between 2-week cycles.', apy: '3.10%' }
           ].map((opt) => (
             <div 
