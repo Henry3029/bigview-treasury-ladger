@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { fetchLiveHubStats } from '@/services/bigviewStatsHub'; // Import your clean service
 
 interface StatItem {
   id: string;
@@ -7,68 +8,52 @@ interface StatItem {
   description: string;
   cryptoAmount: number;
   cryptoSymbol: string;
-  fiatRate: number; // Price of 1 token in USD
+  fiatRate: number;
   icon: string;
 }
 
 export default function ProtocolStatsHub() {
-  // 1. Live state simulation for real-time calculations (no placeholders!)
+  // Initialize state with UI presentation rules, setting initial tracking metrics to 0
   const [stats, setStats] = useState<StatItem[]>([
-    {
-      id: 'rewards',
-      title: 'Total Rewards',
-      description: 'The total amount of rewards paid out',
-      cryptoAmount: 1134.52,
-      cryptoSymbol: 'ETH',
-      fiatRate: 3450, // e.g., $3,450 per ETH
-      icon: '🎁'
-    },
-    {
-      id: 'cbeth-tvl',
-      title: 'cbETH TVL',
-      description: 'Current amount of ETH deployed in cbETH',
-      cryptoAmount: 16542.18,
-      cryptoSymbol: 'cbETH',
-      fiatRate: 3890, // cbETH is worth more than raw ETH due to yield!
-      icon: '🛡️'
-    },
-    {
-      id: 'bvw-tvl',
-      title: 'Bigview Vault TVL',
-      description: 'Current amount of liquidity in yield pools',
-      cryptoAmount: 20245282,
-      cryptoSymbol: 'BVW',
-      fiatRate: 0.45, // custom token valuation
-      icon: '🦅'
-    },
-    {
-      id: 'native-tvl',
-      title: 'Native Staking TVL',
-      description: 'Current amount of ETH natively staked',
-      cryptoAmount: 8432.90,
-      cryptoSymbol: 'ETH',
-      fiatRate: 3450,
-      icon: '⛓️'
-    }
+    { id: 'rewards', title: 'Total Rewards', description: 'The total amount of rewards paid out', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 3450, icon: '🎁' },
+    { id: 'cbeth-tvl', title: 'cbETH TVL', description: 'Current amount of ETH deployed in cbETH', cryptoAmount: 0, cryptoSymbol: 'cbETH', fiatRate: 3890, icon: '🛡️' },
+    { id: 'bvw-tvl', title: 'Bigview Vault TVL', description: 'Current amount of liquidity in yield pools', cryptoAmount: 0, cryptoSymbol: 'BVW', fiatRate: 0.45, icon: '🦅' },
+    { id: 'native-tvl', title: 'Native Staking TVL', description: 'Current amount of ETH natively staked', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 3450, icon: '⛓️' }
   ]);
 
-  // 2. Simulating live block updates updating all 4 cards simultaneously
+  const [loading, setLoading] = useState<boolean>(true);
+
   useEffect(() => {
-    const interval = setInterval(() => {
+    async function syncStatsWithBlockchain() {
+      const updates = await fetchLiveHubStats();
+      
+      // Map over previous items and update their data fields from the service output
       setStats(prevStats =>
         prevStats.map(item => {
-          // Add a subtle random fluctuation to the crypto volumes on each block
-          const microChange = (Math.random() - 0.3) * (item.id === 'bvw-tvl' ? 15 : 0.02);
-          return {
-            ...item,
-            cryptoAmount: Math.max(0, item.cryptoAmount + microChange)
-          };
+          const match = updates.find(u => u.id === item.id);
+          return match 
+            ? { ...item, cryptoAmount: match.cryptoAmount, fiatRate: match.fiatRate }
+            : item;
         })
       );
-    }, 4000);
+      setLoading(false);
+    }
 
-    return () => clearInterval(interval);
+    // Initial sync on layout mount
+    syncStatsWithBlockchain();
+
+    // Poll for genuine data tracking every 12 seconds (typical Base block time consistency)
+    const interval = setInterval(syncStatsWithBlockchain, 12000);
+    return () => clearInterval(interval); // Cleaned up cleanly!
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px] w-full text-gray-400 font-mono">
+        Loading Bigview ledger analytics...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-4">

@@ -1,50 +1,69 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { fetchLiveTelemetry, TelemetryData } from '@/services/bigviewTelemetry'; 
+import { getLiveEthPrice } from '@/utils/cryptoPrice'; 
 
 export default function BigviewStats() {
-  // Live dynamic protocol state logic (No placeholders or hardcoding)
-  const [ethPrice, setEthPrice] = useState<number>(3450);
-  const [cbEthExchangeRate, setCbEthExchangeRate] = useState<number>(1.1294);
-  const [totalBvwSupply, setTotalBvwSupply] = useState<number>(59245282);
-  const [bvwInDefi, setBvwInDefi] = useState<number>(20245282);
-  const [uniqueHolders, setUniqueHolders] = useState<number>(14956);
-  
-  // Real-time network telemetry block tracking
-  const [currentBaseBlock, setCurrentBaseBlock] = useState<number>(25101911);
+  // 1. Maintain ONE single, predictable source of truth for your metrics
+  const [telemetry, setTelemetry] = useState<TelemetryData>({
+    currentBaseBlock: 0,
+    bvwInDefi: 0,
+    totalBvwSupply: 0,
+    uniqueHolders: 0,
+    ethPrice: 3450.00, 
+    cbEthExchangeRate: 1.1274
+  });
+  const [loading, setLoading] = useState<boolean>(true);
 
+  // 2. Clean, managed synchronizer loop
   useEffect(() => {
-    // Sync block updates to simulate instant L2 sub-second activity
-    const interval = setInterval(() => {
-      // 1. Simulate base network block counting rising
-      setCurrentBaseBlock(prev => prev + 1);
+    async function syncTelemetry() {
+      try {
+        // Fetch both network stats and spot price data concurrently
+        const [liveData, liveEthPrice] = await Promise.all([
+          fetchLiveTelemetry(),
+          getLiveEthPrice()
+        ]);
 
-      // 2. Simulate raw ETH capital expanding/contracting within our vaults
-      setBvwInDefi(prev => {
-        const delta = (Math.random() - 0.45) * 8.5; 
-        return Math.max(1500000, prev + delta);
-      });
-
-      // 3. Scale overall mint supply dynamically as incoming stakes confirm
-      setTotalBvwSupply(prev => prev + (Math.random() > 0.7 ? Math.random() * 4 : 0));
-
-      // 4. Minor wallet onboarding updates
-      if (Math.random() > 0.95) {
-        setUniqueHolders(prev => prev + 1);
+        // Combine them into a single, unified state payload
+        setTelemetry({
+          ...liveData,
+          ethPrice: liveEthPrice // Overwrite the baseline price with the real-time utility feed
+        });
+      } catch (error) {
+        console.error("Telemetry sync cycle failed:", error);
+      } finally {
+        setLoading(false);
       }
-    }, 2000); // Fast interval to reflect active Layer 2 environment
+    }
 
-    return () => clearInterval(interval);
+    syncTelemetry();
+
+    // Query your infrastructure service every 4 seconds for sub-second block confirmations
+    const interval = setInterval(syncTelemetry, 4000);
+    return () => clearInterval(interval); 
   }, []);
+
+  // 3. Unpack your clean telemetry properties cleanly with zero variable naming collisions
+  const { currentBaseBlock, bvwInDefi, totalBvwSupply, uniqueHolders, ethPrice, cbEthExchangeRate } = telemetry;
 
   // --- AUTOMATED ON-CHAIN CALCULATION GRID INTERPOLATIONS ---
   const idleBvwVaults = totalBvwSupply - bvwInDefi;
   const cbEthPriceInUsd = ethPrice * cbEthExchangeRate;
   
-  // Total Value Locked equivalents
   const tvlInUsd = totalBvwSupply * cbEthPriceInUsd;
   const defiTvlInUsd = bvwInDefi * cbEthPriceInUsd;
   const idleTvlInUsd = idleBvwVaults * cbEthPriceInUsd;
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] w-full text-emerald-400 font-mono">
+        Connecting to Base Rollup Sequence...
+      </div>
+    );
+  }
+
+  // Your return block remains down here completely untouched and operational!
   return (
     <div className="w-full max-w-4xl mx-auto bg-[#142e26] border border-emerald-900/30 rounded-3xl p-6 text-white space-y-8 shadow-xl">
       

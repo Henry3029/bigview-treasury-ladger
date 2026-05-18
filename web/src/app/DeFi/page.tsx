@@ -33,7 +33,7 @@ export default function DeFiPage() {
     return () => clearInterval(interval); // Cleaned up cleanly using the rule you mastered!
   }, [userAddress]);
   
-  if (loading) return <div> <LoadingSpinner /></div>
+  if (loading) return <LoadingSpinner />
   
 
   return (
