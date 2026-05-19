@@ -13,10 +13,11 @@ contract DeployTreasury is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // 3. Deploy the contract passing the arguments directly in clean Solidity math
+        // 3. Deploy the contract passing the arguments directly in clean Solidity math
         new BigViewTreasury(
-            0x28D549A2517FCB78f63408899af99EED055ab86, // Your Token
-            0x4200000000000000000000000000000000000006, // cbETH
-            0xa24112B301B9eb4475633523590DBd0e591D3C56  // Your Deployer Pool
+            0x28D549A2517FCB78f63408899af99EED055ab86, // Exact token checksum
+            0x4200000000000000000000000000000000000006, // Exact cbETH address
+            0xa24112B301B9eb4475633523590DBd0e591D3C56  // Exact deployer pool checksum
         );
 
         vm.stopBroadcast();
