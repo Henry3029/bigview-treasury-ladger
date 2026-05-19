@@ -10,7 +10,7 @@ export default function BigviewStats() {
     bvwInDefi: 0,
     totalBvwSupply: 0,
     uniqueHolders: 0,
-    ethPrice: 3450.00, 
+    ethPrice: 0, 
     cbEthExchangeRate: 0
   });
   const [loading, setLoading] = useState<boolean>(true);
