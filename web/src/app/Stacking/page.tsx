@@ -7,8 +7,8 @@ import { calculateRealYieldRates } from '@/utils/protocolCalculations';
 export default function StakingPage() {
   const [stakeAmount, setStakeAmount] = useState<string>('0.00');
   const [selectedOption, setSelectedOption] = useState<number>(1); // 1, 2, or 3
-  const [yieldRates, setYieldRates] = useState<number[]>([0.0352, 0.0291, 0.0310]);
-  const [ethPrice, setEthPrice] = useState<number>(3450);
+  const [yieldRates, setYieldRates] = useState<number[]>([0, 0, 0]);
+  const [ethPrice, setEthPrice] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   
   useEffect(() => {

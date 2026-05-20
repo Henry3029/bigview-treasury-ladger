@@ -5,7 +5,7 @@ import { formatEther } from 'viem';
 import { publicClient } from '@/utils/viemClient'; // Your existing viem setup
 import LoadingSpinner from './LoadingSpinner';
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
+const CONTRACT_ADDRESS: `0x${string}` = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}` || "0x0000000000000000000000000000000000000000";
 
 export default function TVLDisplay() {
   const [tvl, setTvl] = useState<string | null>(null);
@@ -16,7 +16,7 @@ export default function TVLDisplay() {
       try {
         // 1. Get the balance of the contract in Wei
         const balance = await publicClient.getBalance({ 
-          address: CONTRACT_ADDRESS 
+          address: CONTRACT_ADDRESS;
         });
 
         // 2. Fetch price (Simple example using a public API)

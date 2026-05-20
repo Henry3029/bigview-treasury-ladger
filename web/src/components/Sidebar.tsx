@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePrivy } from '@privy-io/react-auth';
 import LoadingSpinner from './LoadingSpinner'; 
 import { X } from 'lucide-react'; // Don't forget to import the icon!
+import shortAddress from '@/utils/shortAddress'; 
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,7 +12,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-	const { authenticated, login, ready, address } = usePrivy();
+	const { authenticated, login, ready, user} = usePrivy();
+	const userAddress = user?.wallet?.address;
 	
 	
   return (
@@ -56,9 +58,9 @@ onClick={onClose}/>
           </button>
           ) : (
           <span className="font-mono bg-gray-100 p-2 rounded">
-        {shortAddress(address)}
+        {shortAddress(userAddress)}
       </span>
-      )
+      );
           </div>
           )};
     </div>

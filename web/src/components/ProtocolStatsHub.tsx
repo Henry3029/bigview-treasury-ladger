@@ -15,10 +15,10 @@ interface StatItem {
 export default function ProtocolStatsHub() {
   // Initialize state with UI presentation rules, setting initial tracking metrics to 0
   const [stats, setStats] = useState<StatItem[]>([
-    { id: 'rewards', title: 'Total Rewards', description: 'The total amount of rewards paid out', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 3450, icon: '🎁' },
-    { id: 'cbeth-tvl', title: 'cbETH TVL', description: 'Current amount of ETH deployed in cbETH', cryptoAmount: 0, cryptoSymbol: 'cbETH', fiatRate: 3890, icon: '🛡️' },
-    { id: 'bvw-tvl', title: 'Bigview Vault TVL', description: 'Current amount of liquidity in yield pools', cryptoAmount: 0, cryptoSymbol: 'BVW', fiatRate: 0.45, icon: '🦅' },
-    { id: 'native-tvl', title: 'Native Staking TVL', description: 'Current amount of ETH natively staked', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 3450, icon: '⛓️' }
+    { id: 'rewards', title: 'Total Rewards', description: 'The total amount of rewards paid out', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 0, icon: '🎁' },
+    { id: 'cbeth-tvl', title: 'cbETH TVL', description: 'Current amount of ETH deployed in cbETH', cryptoAmount: 0, cryptoSymbol: 'cbETH', fiatRate: 0, icon: '🛡️' },
+    { id: 'bvw-tvl', title: 'Bigview Vault TVL', description: 'Current amount of liquidity in yield pools', cryptoAmount: 0, cryptoSymbol: 'BVW', fiatRate: 0, icon: '🦅' },
+    { id: 'native-tvl', title: 'Native Staking TVL', description: 'Current amount of ETH natively staked', cryptoAmount: 0, cryptoSymbol: 'ETH', fiatRate: 0, icon: '⛓️' }
   ]);
 
   const [loading, setLoading] = useState<boolean>(true);
