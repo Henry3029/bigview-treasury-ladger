@@ -28,16 +28,16 @@ export async function fetchLiveHubStats(): Promise<LiveStatUpdate[]> {
     // (Assuming your contract tracks rewards, cbETH balances, and vault assets)
     const [rawRewards, rawCbEth, rawBvw, rawNative] = await Promise.all([
       publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalRewardsPaid' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'cbEthBalance' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalStaked' }), // BVW Vault TVL
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'nativeEthBalance' })
+      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'members' }),
+      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalStakedcbETH' }), // BVW Vault TVL
+      publicClient.readContract({ address: TREASURY_ADDRESS, })
     ]);
 
     // 2. Fetch live fiat prices from an API utility or hardcode production feeds
     // (Using realistic mock market feeds here as a clean fallback)
-    const ethPriceUsd = 3450.00;
-    const cbEthPriceUsd = 3890.00;
-    const bvwPriceUsd = 0.45;
+    const ethPriceUsd = 0;
+    const cbEthPriceUsd = 0;
+    const bvwPriceUsd = 0;
 
     // 3. Construct and return the clean array mapping straight to your state positions
     return [

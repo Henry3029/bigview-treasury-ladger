@@ -58,7 +58,7 @@ export default function CycleStatsTable() {
   // It will cleanly loop over the `cycleHistory` array variable we set from the service
 
   // Slice the list depending on whether the user has toggled Expand or Collapse
-  const visibleRows: CycleRow[] = isExpanded ? setCycleHistory : setCycleHistory.slice(0, 6);
+  const visibleRows: CycleRow[] = isExpanded ? CycleHistory : CycleHistory.slice(0, 6);
 
   // Helper calculation function to convert baseline tokens depending on the active selection tab
   const getConvertedValue = (amountInBvw: number, targetAsset: AssetType) => {

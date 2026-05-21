@@ -28,7 +28,7 @@ export async function fetchLiveProtocolStats(userAddress?: string): Promise<Live
     const rawTotalStaked = await publicClient.readContract({
       address: TREASURY_ADDRESS,
       abi: TREASURY_ABI,
-      functionName: 'totalStaked',
+      functionName: 'totalStakedcbETH',
     });
     const totalStaked = Number(formatEther(rawTotalStaked as bigint));
 
@@ -38,7 +38,7 @@ export async function fetchLiveProtocolStats(userAddress?: string): Promise<Live
       const rawUserBalance = await publicClient.readContract({
         address: TREASURY_ADDRESS,
         abi: TREASURY_ABI,
-        functionName: 'userBalances',
+        functionName: 'members',
         args: [userAddress as `0x${string}`],
       });
       const userBalance = Number(formatEther(rawUserBalance as bigint));
@@ -51,7 +51,7 @@ export async function fetchLiveProtocolStats(userAddress?: string): Promise<Live
     const rawHolderCount = await publicClient.readContract({
       address: TREASURY_ADDRESS,
       abi: TREASURY_ABI,
-      functionName: 'getHolderCount', // Assumes your contract tracks this variable
+      functionName: 'totalMembersCount', // Assumes your contract tracks this variable
     });
     const holderCount = Number(rawHolderCount);
 

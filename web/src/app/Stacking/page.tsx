@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import TVLDisplay from '@/components/TVLDisplay';
-import getLiveEthPrice from '@/utils/cryptoPrice'; 
+import { getLiveEthPrice } from '@/utils/cryptoPrice'; 
 import { calculateRealYieldRates } from '@/utils/protocolCalculations';
 
 export default function StakingPage() {

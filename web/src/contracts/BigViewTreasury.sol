@@ -16,6 +16,7 @@ contract BigViewTreasury is ReentrancyGuard {
     
     uint256 public totalMembersCount;
     uint256 public totalStakedcbETH;
+    uint256 public totalRewardsPaid;
 
     // --- Real-time Native ETH Reward Tracking (Paid by Signers) ---
     uint256 public rewardPerTokenStored;
@@ -26,6 +27,14 @@ contract BigViewTreasury is ReentrancyGuard {
         bool isMember;
         uint256 cbEthAmount; // Tracks how much cbETH they locked up
     }
+    
+    struct CycleSnapshot {
+    uint256 cycleId;
+    uint256 totalYieldDistributed;
+    uint256 timestamp;
+}
+
+CycleSnapshot[] public cycles;
 
     mapping(address => Member) public members;
     
@@ -124,7 +133,10 @@ contract BigViewTreasury is ReentrancyGuard {
 
         // Take a 5% protocol fee from the validation yield payout
         uint256 devFee = (reward * 5) / 100;
+        
         uint256 userShare = reward - devFee;
+        
+        totalRewardsPaid += userShare;
 
         (bool feeSent, ) = devWallet.call{value: devFee}("");
         (bool userSent, ) = msg.sender.call{value: userShare}("");

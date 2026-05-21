@@ -29,7 +29,7 @@ export async function fetchCycleHistory(): Promise<CycleRow[]> {
     const latestCycleRaw = await publicClient.readContract({
       address: TREASURY_ADDRESS,
       abi: TREASURY_ABI,
-      functionName: 'currentCycleId',
+      functionName: 'rewardPerTokenStored',
     });
     const latestCycle = Number(latestCycleRaw);
 
@@ -45,7 +45,7 @@ export async function fetchCycleHistory(): Promise<CycleRow[]> {
         publicClient.readContract({
           address: TREASURY_ADDRESS,
           abi: TREASURY_ABI,
-          functionName: 'getCycleData',
+          functionName: 'cycles',
           args: [BigInt(targetCycleId)],
         })
       );
