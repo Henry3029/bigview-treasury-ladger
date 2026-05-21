@@ -1,10 +1,8 @@
 // services/bigviewCycles.ts
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { TREASURY_ABI } from '@/constants/contracts'; // Import ONLY the ABI from constants
-
-// Fetch your address securely from environment variables
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY the ABI from constants
+import { TREASURY_ADDRESS } from '@/config/env'; 
 
 const publicClient = createPublicClient({
   chain: baseSepolia,
@@ -57,7 +55,7 @@ export async function fetchCycleHistory(): Promise<CycleRow[]> {
     const rawCyclesResults = await Promise.all(cyclePromises);
 
     // 3. Map the raw array values from your contract tuples into structured JavaScript objects
-    return rawCyclesResults.map((rawRow: any, index) => {
+    return rawCyclesResults.map((rawRow: any, index: number) => {
       const targetCycleId = latestCycle - index;
       
       return {

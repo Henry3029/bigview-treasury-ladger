@@ -1,3 +1,4 @@
+import { createPublicClient } from 'viem'; 
 // Example: The Aerodrome or Uniswap Pool address where BVW is traded
 const BVW_POOL_ADDRESS = process.env.NEXT_PUBLIC_BVW_POOL_ADDRESS as `0x${string}`;
 
@@ -10,6 +11,8 @@ const POOL_MINI_ABI = [
     outputs: [{ name: '_reserve0', type: 'uint112' }, { name: '_reserve1', type: 'uint112' }]
   }
 ] as const;
+
+const publicClient = createPublicClient;
 
 export async function fetchBvwMarketPrice(): Promise<number> {
   try {

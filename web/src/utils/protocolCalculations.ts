@@ -3,7 +3,7 @@ import { createPublicClient, http, formatEther } from 'viem';
 import { base } from 'viem/chains';
 
 const client = createPublicClient({ chain: base, transport: http() });
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "";
+const TREASURY_ADDRESS: `0x${string}` = process.env.NEXT_PUBLIC_TREASURY_ADDRESS ||  
 const abi = [{ name: 'totalStakedcbETH', type: 'function', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] }] as const;
 
 // This is the long calculation function you described!

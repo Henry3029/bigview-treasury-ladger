@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Leaderboard from '/@components/Leaderboard'; 
+import Leaderboard from '@/components/Leaderboard'; 
 
 export default function PointsPage() {
   // Real-time network state (Simulating live synced data from Base/ETH blocks)

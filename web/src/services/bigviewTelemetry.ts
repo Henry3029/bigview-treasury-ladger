@@ -1,9 +1,8 @@
 // services/bigviewTelemetry.ts
 import { createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { TREASURY_ABI } from '@/constants/contracts'; // Import ONLY the ABI
-
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY the ABI
+import { TREASURY_ADDRESS } from '@/config/env'; 
 
 const publicClient = createPublicClient({
   chain: baseSepolia,

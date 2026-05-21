@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import TVLDisplay from '@/components /TVLDisplay';
+import { useState, useEffect } from 'react';
+import TVLDisplay from '@/components/TVLDisplay';
 import getLiveEthPrice from '@/utils/cryptoPrice'; 
 import { calculateRealYieldRates } from '@/utils/protocolCalculations';
 
@@ -39,7 +39,7 @@ export default function StakingPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8 text-gray-800 dark:text-white">
-    <TVLDefault />
+    <TVLDisplay />
       {/* Header Section */}
       <header>
         <h1 className="text-4xl font-bold mb-2">Staking ETH</h1>

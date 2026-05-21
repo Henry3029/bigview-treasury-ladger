@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { usePrivy } from '@privy-io/react-auth'; 
 import DefiOpportunities from '@/components/DefiOpportunities';
 import TVLDisplay from '@/components/TVLDisplay'; 
 import { fetchLiveProtocolStats } from '@/services/bigviewStats'; 
@@ -11,7 +12,7 @@ export default function DeFiPage() {
   // Real-time protocol metrics (No placeholders, updates live)
   const [deployedBvw, setDeployedBvw] = useState<number>(0);
   const [holderCount, setHolderCount] = useState<number>(0);
-  const [sharePercentage, setSharePercentage] = useState<number>(00.0);
+  const [sharePercentage, setSharePercentage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   
   useEffect(() => {

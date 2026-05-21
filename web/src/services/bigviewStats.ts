@@ -1,10 +1,8 @@
 // services/bigviewStats.ts
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { TREASURY_ABI } from '@/constants/contracts'; // 1. ONLY import ABI from constants
-
-// 2. Fetch the deployment location securely from your environment variables
-const TREASURY_ADDRESS = process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`;
+import { TREASURY_ABI } from '@/utils/constants'; // 1. ONLY import ABI from constants
+import { TREASURY_ADDRESS } from '@/config/env'; 
 
 const publicClient = createPublicClient({
   chain: baseSepolia,
@@ -24,7 +22,7 @@ export interface LiveStatsResult {
  */
 export async function fetchLiveProtocolStats(userAddress?: string): Promise<LiveStatsResult> {
   try {
-    if (!TREASURY_ADDRESS) throw new Error("TREASURY_ADDRESS is not configured in .env");
+    if (!TREASURY_ABI) throw new Error("TREASURY_ADDRESS is not configured in .env");
 
     // A. Read the real Total Volume Locked from the contract state
     const rawTotalStaked = await publicClient.readContract({

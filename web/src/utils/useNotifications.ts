@@ -1,12 +1,12 @@
 import { publicClient } from '@/utils/viemClient'; 
 // Use 'type' for imports that are only used for labels to keep the file light
-import type { NotificationDropdown } from '@/components/NotificationDropdown'; 
 import { parseAbiItem } from 'viem';
+import { TREASURY_ADDRESS } from '@/config/env'; 
 
 export async function getLiveNotifications(userAddress: string): Promise<Notification[]> {
   try {
     const logs = await publicClient.getLogs({
-      address: process.env.NEXT_PUBLIC_TREASURY_ADDRESS as `0x${string}`,
+      address: TREASURY_ADDRESS;
       // 1. Updated to match your actual Solidity event name
       event: parseAbiItem('event Staked(address indexed user, uint256 ethAmount, uint256 bvwEarned)'),
       // 2. Updated 'to' to 'user' to match the event parameter
