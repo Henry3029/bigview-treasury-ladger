@@ -1,10 +1,8 @@
-import { createPublicClient } from 'viem'; import { formatEther } from 'viem'; 
-
-// The official cbETH Token Contract Address on Base Mainnet
-const CBETH_ADDRESS = '0x2Ae3F1Ec7F1F5012CFEab0185abd7ef84Df8DE33'; 
+import { createPublicClient, http, formatEther } from 'viem'; 
+import { baseSepolia } from 'viem/chain'; import { CBETH_TOKEN_ADDRESS } from '@/config/env';
 
 // Minimal ABI snippet needed to read the exchange rate
-const CBETH_MINI_ABI = [
+const CBETH_TOKEN_ABI = [
   {
     name: 'exchangeRate',
     type: 'function',
@@ -14,13 +12,16 @@ const CBETH_MINI_ABI = [
   }
 ] as const;
 
-const publicClient = createPublicClient;
+const publicClient = createPublicClient({
+	chain: baseSepolia, 
+	transport: http(),
+	})
 
 export async function fetchLiveExchangeRate(): Promise<number> {
   try {
     const rawRate = await publicClient.readContract({
-      address: CBETH_ADDRESS,
-      abi: CBETH_MINI_ABI,
+      address: CBETH_TOKEN_ADDRESS,
+      abi: CBETH_TOKEN_ABI,
       functionName: 'exchangeRate',
     });
 

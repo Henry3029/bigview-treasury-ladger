@@ -12,7 +12,7 @@ export async function getLiveNotifications(userAddress: string): Promise<Notific
       event: parseAbiItem('event Staked(address indexed user, uint256 ethAmount, uint256 bvwEarned)'),
       // 2. Updated 'to' to 'user' to match the event parameter
       args: { user: userAddress as `0x${string}` }, 
-      fromBlock: 'earliest'
+      fromBlock: 'earliest',
     });
 
     return logs.map(log => {

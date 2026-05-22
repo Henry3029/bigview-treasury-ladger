@@ -1,5 +1,5 @@
 // services/bigviewTelemetry.ts
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, erc20Abi, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY the ABI
 import { TREASURY_ADDRESS, TOKEN_ADDRESS } from '@/config/env'; 
@@ -38,10 +38,10 @@ export async function fetchLiveTelemetry(): Promise<TelemetryData> {
     const liveCbEthExchangeRate = 1.1274; // 1 cbETH = 1.1274 ETH due to staking yield growth
 
     return {
-      currentBaseBlock: Number(blockNumber),
-      bvwInDefi: Number(rawInDefi),
-      totalBvwSupply: Number(rawSupply),
-      uniqueHolders: Number(rawHolders),
+      currentBaseBlock: Number(formatEther(blockNumber)),
+      bvwInDefi: Number(formatEther(rawInDefi)),
+      totalBvwSupply: Number(formatEther(rawSupply)),
+      uniqueHolders: Number(formatEther(rawHolders)),
       ethPrice: liveEthPrice,
       cbEthExchangeRate: liveCbEthExchangeRate
     };

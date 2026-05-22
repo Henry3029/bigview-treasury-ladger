@@ -6,8 +6,7 @@ import { createWalletClient, createPublicClient, custom, http, parseUnits, forma
 import { baseSepolia } from 'viem/chains';
 import { Coins, Flame, ShieldAlert, Activity, Loader2 } from 'lucide-react';
 
-// Using your V2 ABI
-import tokenAbi from '@/constants/abis/BigViewTreasuryV2.json';
+import { TOKEN_ABI } from '@/utils/constants'; 
 
 export default function AdminTokenPage() {
   const [amount, setAmount] = useState('');
@@ -32,7 +31,7 @@ export default function AdminTokenPage() {
     try {
       const data = await publicClient.readContract({
         address: tokenAddress,
-        abi: tokenAbi,
+        abi: TOKEN_ABI,
         functionName: 'totalSupply',
       });
       setTotalSupply(formatUnits(data as bigint, 18));
@@ -64,7 +63,7 @@ export default function AdminTokenPage() {
       // Execute Contract Write
       const hash = await walletClient.writeContract({
         address: tokenAddress,
-        abi: tokenAbi,
+        abi: TOKEN_ABI,
         functionName: action,
         args: [units],
       });

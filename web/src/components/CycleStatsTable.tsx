@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { fetchCycleHistory, CycleRow } from '@/services/bigviewCycles'; // Clean service import
+import { fetchCycleHistory, CycleRow } from '@/services/bigviewCycles'; 
 import { getLiveEthPrice } from '@/utils/cryptoPrice';
 import { fetchBvwMarketPrice } from '@/services/fetchBvwMarketPrice';
 import { fetchLiveExchangeRate } from '@/services/fetchLiveExchangeRate';
@@ -11,14 +11,12 @@ export default function CycleStatsTable() {
   const [activeAsset, setActiveAsset] = useState<AssetType>('BVW');
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   
-  // 1. Clean, dynamic state stores
   const [cycleHistory, setCycleHistory] = useState<CycleRow[]>([]);
   const [ethPrice, setEthPrice] = useState<number>(0);
-  const [ cbEthExchangeRate, setCbEthExchangeRate ] = useState<number>(0);
-  const [ bvwExchangeRate, setBvwExchangeRate ] = useState<number>(0);
+  const [cbEthExchangeRate, setCbEthExchangeRate] = useState<number>(0); // 🚀 FIXED: Cleaned up spacing
+  const [bvwExchangeRate, setBvwExchangeRate] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // 2. Fetch the on-chain cycle logs on mounting
   useEffect(() => {
     async function syncTableData() {
       try {
@@ -26,12 +24,13 @@ export default function CycleStatsTable() {
           fetchCycleHistory(),
           getLiveEthPrice(),
           fetchLiveExchangeRate(),
-        fetchBvwMarketPrice()
+          fetchBvwMarketPrice()
         ]);
         
         setCycleHistory(historyLogs);
         setEthPrice(liveEthPrice);
-  setCbEthExchangeRate(liveCbEthRate);     setBvwExchangeRate(liveBvwPrice);
+        setCbEthExchangeRate(liveCbEthRate);     
+        setBvwExchangeRate(liveBvwPrice);
       } catch (error) {
         console.error("Failed to sync structural table rows:", error);
       } finally {
@@ -41,7 +40,6 @@ export default function CycleStatsTable() {
 
     syncTableData();
     
-    // History tables don't need sub-second updates, a soft check every 30 seconds is plenty
     const interval = setInterval(syncTableData, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -54,25 +52,22 @@ export default function CycleStatsTable() {
     );
   }
 
-  // Your calculation engines and table layout maps continue directly below completely unchanged!
-  // It will cleanly loop over the `cycleHistory` array variable we set from the service
+  // 🚀 FIXED: Swapped 'CycleHistory' for 'cycleHistory' to match state name
+  const visibleRows: cycleRow[] = isExpanded ? cycleHistory : cycleHistory.slice(0, 6);
 
-  // Slice the list depending on whether the user has toggled Expand or Collapse
-  const visibleRows: CycleRow[] = isExpanded ? CycleHistory : CycleHistory.slice(0, 6);
-
-  // Helper calculation function to convert baseline tokens depending on the active selection tab
+  // Helper calculation function
   const getConvertedValue = (amountInBvw: number, targetAsset: AssetType) => {
     if (targetAsset === 'BVW') return amountInBvw;
     
-    // Calculate raw dollar value first to maintain strict structural financial accounting parity
     const totalUsdValue = amountInBvw * bvwExchangeRate;
     
+    // 🚀 FIXED: Added safety fallback guards to prevent division by zero (Infinity/NaN)
     if (targetAsset === 'ETH') {
-      return totalUsdValue / ethPrice;
+      return ethPrice > 0 ? totalUsdValue / ethPrice : 0;
     }
     if (targetAsset === 'cbETH') {
       const cbEthPriceUsd = ethPrice * cbEthExchangeRate;
-      return totalUsdValue / cbEthPriceUsd;
+      return cbEthPriceUsd > 0 ? totalUsdValue / cbEthPriceUsd : 0;
     }
     return amountInBvw;
   };
@@ -112,7 +107,6 @@ export default function CycleStatsTable() {
       <div className="w-full overflow-x-auto border border-gray-200 dark:border-white/10 rounded-2xl bg-white dark:bg-black/10">
         <table className="w-full text-left border-collapse min-w-[700px]">
           
-          {/* Table Heads */}
           <thead>
             <tr className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-xs font-bold uppercase tracking-wider text-gray-400">
               <th className="py-4 px-6 text-left">Cycle</th>
@@ -123,10 +117,8 @@ export default function CycleStatsTable() {
             </tr>
           </thead>
 
-          {/* Table Bodies with Live Conversion Calculus */}
           <tbody className="divide-y divide-gray-200 dark:divide-white/5 font-mono text-sm">
             {visibleRows.map((row) => {
-              // Dynamically adjust math totals natively depending on asset filter states selected above
               const activeInflow = getConvertedValue(row.netInflow, activeAsset);
               const activeTotalStaked = getConvertedValue(row.totalStaked, activeAsset);
 
@@ -135,7 +127,7 @@ export default function CycleStatsTable() {
                   <td className="py-4 px-6 font-bold text-gray-400">#{row.cycle}</td>
                   <td className="py-4 px-6 font-sans text-gray-500 dark:text-gray-300">{row.dates}</td>
                   
-                  {/* Net Inflow (handles negative red withdrawals cleanly) */}
+                  {/* Net Inflow */}
                   <td className={`py-4 px-6 text-right font-bold ${activeInflow < 0 ? 'text-rose-500' : ''}`}>
                     {activeInflow.toLocaleString(undefined, { maximumFractionDigits: activeAsset === 'BVW' ? 0 : 2 })}
                   </td>
@@ -145,7 +137,7 @@ export default function CycleStatsTable() {
                     {Math.floor(activeTotalStaked).toLocaleString()}
                   </td>
 
-                  {/* Rewards Row - Always hard locked strictly to raw Ethereum yield performance */}
+                  {/* Rewards Row */}
                   <td className="py-4 px-6 text-right font-bold text-emerald-400">
                     {row.rewards.toFixed(2)} ETH
                   </td>

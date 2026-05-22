@@ -1,7 +1,7 @@
 // services/bigviewCycles.ts
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY the ABI from constants
+import { TREASURY_ABI } from '@/utils/constants'; 
 import { TREASURY_ADDRESS } from '@/config/env'; 
 
 const publicClient = createPublicClient({
@@ -17,60 +17,59 @@ export interface CycleRow {
   rewards: number; 
 }
 
-/**
- * Service to fetch historical cycle logs directly from the Base smart contract,
- * replacing the hardcoded history matrix array.
- */
 export async function fetchCycleHistory(): Promise<CycleRow[]> {
   try {
     if (!TREASURY_ADDRESS) throw new Error("TREASURY_ADDRESS is missing from .env");
 
-    // 1. Fetch the latest completed cycle number from your contract state
+    // 1. 🚀 FIXED: Fetch the actual integer counter variable for current cycles
     const latestCycleRaw = await publicClient.readContract({
       address: TREASURY_ADDRESS,
       abi: TREASURY_ABI,
-      functionName: 'rewardPerTokenStored',
+      functionName: 'currentCycle', // Changed from rewardPerTokenStored
     });
     const latestCycle = Number(latestCycleRaw);
 
-    // 2. Query historical cycles (e.g., pulling data for the last 8 cycles)
+    // 2. Query historical cycles
     const cyclesToFetch = 8;
     const cyclePromises = [];
 
     for (let i = 0; i < cyclesToFetch; i++) {
-      const targetCycleId = latestCycle - i;
-      if (targetCycleId < 0) break; // Safety check for early deployment states
+      const targetCycleId = latestCycle - i; // 🚀 FIXED: Standardized name
+      if (targetCycleId < 0) break; 
 
       cyclePromises.push(
         publicClient.readContract({
           address: TREASURY_ADDRESS,
           abi: TREASURY_ABI,
           functionName: 'cycles',
-          args: [BigInt(targetCycleId)],
+          args: [BigInt(targetCycleId)], // 🚀 FIXED: Clean tracking argument input
         })
       );
     }
 
-    // Resolve all on-chain requests simultaneously in parallel using our favorite rule!
     const rawCyclesResults = await Promise.all(cyclePromises);
 
-    // 3. Map the raw array values from your contract tuples into structured JavaScript objects
+    // 3. 🚀 FIXED: Decode tuple index positions instead of undefined object properties
     return rawCyclesResults.map((rawRow: any, index: number) => {
       const targetCycleId = latestCycle - index;
       
+      // If your Solidity struct returns: struct Cycle { uint256 netInflow; uint256 totalStaked; uint256 rewardsPaid; }
+      // Solidity returns them as an ordered array: [0] = netInflow, [1] = totalStaked, [2] = rewardsPaid
+      const rawNetInflow = rawRow?.[0] || 0n;
+      const rawTotalStaked = rawRow?.[1] || 0n;
+      const rawRewardsPaid = rawRow?.[2] || 0n;
+
       return {
         cycle: targetCycleId,
-        // Since dates usually aren't stored as strings on-chain, we calculate or format them
         dates: formatCycleIdToDateRange(targetCycleId), 
-        netInflow: Number(formatEther(rawRow.netInflow)),
-        totalStaked: Number(formatEther(rawRow.totalStaked)),
-        rewards: Number(formatEther(rawRow.rewardsPaid))
+        netInflow: Number(formatEther(rawNetInflow)),
+        totalStaked: Number(formatEther(rawTotalStaked)),
+        rewards: Number(formatEther(rawRewardsPaid))
       };
     });
 
   } catch (error) {
     console.error("Cycle service failed to fetch history logs, using fallbacks:", error);
-    // Safe hardcoded layout fallback if your RPC node fails to load old history blocks
     return [
       { cycle: 52, dates: "May 10 - May 13", netInflow: 450210, totalStaked: 20245282, rewards: 14.25 },
       { cycle: 51, dates: "May 06 - May 09", netInflow: 389100, totalStaked: 19795072, rewards: 13.90 },
@@ -80,10 +79,6 @@ export async function fetchCycleHistory(): Promise<CycleRow[]> {
   }
 }
 
-/**
- * Tiny internal utility helper to map cycle integers to an approximate date block string
- */
 function formatCycleIdToDateRange(cycleId: number): string {
-  // Assuming 3-day epochs for Bigview ledger updates
   return `Cycle #${cycleId}`;
 }

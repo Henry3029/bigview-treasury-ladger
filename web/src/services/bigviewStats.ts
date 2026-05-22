@@ -39,9 +39,9 @@ export async function fetchLiveProtocolStats(userAddress?: string): Promise<Live
         address: TREASURY_ADDRESS,
         abi: TREASURY_ABI,
         functionName: 'members',
-        args: [userAddress as `0x${string}`],
+        args: [userAddress],
       });
-      const userBalance = Number(formatEther(rawUserBalance as bigint));
+      const userBalance = Number(Array.isArray(rawUserBalance) ? formatEther(rawUserBalance[1]) : "0";)
       
       // Pure mathematical formula instead of a random 0.05 drift!
       realShare = (userBalance / totalStaked) * 100;

@@ -25,17 +25,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         />
       )}
 
-      {/* 2. The Slide-up Menu */}
+      {/* 2. The Slide-up Bottom Drawer Menu Layout */}
       <div className={`fixed bottom-0 left-0 right-0 bg-white dark:bg-[#13141e] rounded-t-[32px] p-6 z-[101] transition-transform duration-500 ease-in-out shadow-2xl ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
         
-        <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6" />
-
-        <div className="flex justify-between items-center mb-8">
-          <button onClick={onClose} className="p-2 bg-gray-100 dark:bg-white/5 rounded-full">
-            <X size={20} className="dark:text-white" />
+        {/* Top Header Anchor Component Context Row */}
+        <div className="flex flex-col items-center w-full mb-6 relative">
+          {/* Subtle Pull Indicator Drag Handle */}
+          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mb-2" />
+          
+          {/* 🚀 FIXED: Integrated clean absolute close toggle directly in header height slot */}
+          <button 
+            onClick={onClose} 
+            className="absolute -top-2 right-0 p-2 bg-gray-100 dark:bg-white/5 rounded-full hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+            aria-label="Close menu"
+          >
+            <X size={18} className="dark:text-white" />
           </button>
         </div>
 
+        {/* Navigation Core Ledger Item Links */}
         <nav className="space-y-3 mb-6">
           <SidebarLink label="Stacking" href="/app/Stacking" onClick={onClose} />
           <SidebarLink label="Points" href="/app/Points" onClick={onClose} />
@@ -43,11 +51,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <SidebarLink label="Analytics" href="/app/Analytics" onClick={onClose}/> 
         </nav>
 
-        {/* 3. Authentication & Wallet Flow (Fixed Structure) */}
+        {/* 3. Authentication & Wallet Flow */}
         {!ready ? (
-          <LoadingSpinner />
+          <div className="py-4 flex justify-center">
+            <LoadingSpinner />
+          </div>
         ) : !authenticated ? (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-4 border-t border-gray-200 dark:border-white/10">
             <button
               onClick={login} 
               className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors"
@@ -56,9 +66,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </button>
           </div>
         ) : (
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700 text-center">
-            <span className="font-mono bg-gray-100 dark:bg-white/10 p-2 rounded text-sm dark:text-white block">
-              {shortAddress(userAddress)}
+          <div className="pt-4 border-t border-gray-200 dark:border-white/10 text-center">
+            <span className="font-mono bg-gray-100 dark:bg-white/10 p-3 rounded-xl text-sm dark:text-white block tracking-wider font-bold">
+              {/* 🚀 FIXED: Added logical fallback guard so `shortAddress` never receives undefined */}
+              {userAddress ? shortAddress(userAddress) : '0x000...0000'}
             </span>
           </div>
         )}
@@ -73,7 +84,7 @@ function SidebarLink({ href, onClick, label }: { href: string; onClick: () => vo
     <Link 
       href={href} 
       onClick={onClick}
-      className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl dark:text-white font-bold hover:bg-blue-600/10 transition-colors"
+      className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl dark:text-white font-bold hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
     >
       {label}
     </Link>
