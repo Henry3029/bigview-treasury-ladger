@@ -2,7 +2,7 @@
 import { createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY the ABI
-import { TREASURY_ADDRESS } from '@/config/env'; 
+import { TREASURY_ADDRESS, TOKEN_ADDRESS } from '@/config/env'; 
 
 const publicClient = createPublicClient({
   chain: baseSepolia,
@@ -28,13 +28,13 @@ export async function fetchLiveTelemetry(): Promise<TelemetryData> {
     // 1. Fetch data from the blockchain and external sources concurrently
     const [blockNumber, rawInDefi, rawSupply, rawHolders] = await Promise.all([
       publicClient.getBlockNumber(),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'bvwDeployedInDefi' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalSupply' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'uniqueHoldersCount' })
+      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalStakedcbETH' }),
+      publicClient.readContract({ address: TOKEN_ADDRESS, abi: erc20Abi, functionName: 'totalSupply' }),
+      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalMembersCount' })
     ]);
 
-    // 2. Fetch or compute pricing parameters (Simulating Coinbase wrapped ETH math engine)
-    const liveEthPrice = 3450.00;
+    // 2. Fetch or compute pricing parameters (Siemulating Coinbase wrapped ETH math engine)
+    const liveEthPrice = 0;
     const liveCbEthExchangeRate = 1.1274; // 1 cbETH = 1.1274 ETH due to staking yield growth
 
     return {
