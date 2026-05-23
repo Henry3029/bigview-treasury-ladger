@@ -15,7 +15,7 @@ contract DeployTreasury is Script {
         // 3. Deploy the contract passing the arguments directly in clean Solidity math
         new BigViewTreasury(
             0x28D549A2517FCB78f634088999aF99EED055ab86, // Your Token
-            0x787ba86C5605569c879B93350ca72C277e2134e1D // cbETH
+            0x787ba86C560569c879B93350ca72C277e2134e1D, // cbETH
             0xa24112B301B9eb4475633523590DBd0e591D3C56  // Your Deployer Pool
         );
 
