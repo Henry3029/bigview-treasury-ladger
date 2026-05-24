@@ -144,6 +144,12 @@ CycleSnapshot[] public cycles;
 
         emit EthRewardsClaimed(msg.sender, userShare);
     }
+    
+    function getExchangeRate() external view returns (uint256) {
+    // For now on testnet, return a fixed simulation rate
+    // When you go to mainnet, you can replace this with a Chainlink price feed or live calculation!
+    return 1050000000000000000; 
+}
 
     /**
      * @notice Call this when Signer nodes send raw ETH yields back to the contract

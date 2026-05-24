@@ -1,16 +1,7 @@
 import { createPublicClient, http, formatEther } from 'viem'; 
-import { baseSepolia } from 'viem/chain'; import { CBETH_TOKEN_ADDRESS } from '@/config/env';
+import { baseSepolia } from 'viem/chain'; import { TREASURY_ADDRESS } from '@/config/env';
+import { TREASURY_ABI } from '@/utils/constants'; 
 
-// Minimal ABI snippet needed to read the exchange rate
-const CBETH_TOKEN_ABI = [
-  {
-    name: 'exchangeRate',
-    type: 'function',
-    stateMutability: 'view',
-    inputs: [],
-    outputs: [{ type: 'uint256' }]
-  }
-] as const;
 
 const publicClient = createPublicClient({
 	chain: baseSepolia, 
@@ -20,9 +11,9 @@ const publicClient = createPublicClient({
 export async function fetchLiveExchangeRate(): Promise<number> {
   try {
     const rawRate = await publicClient.readContract({
-      address: CBETH_TOKEN_ADDRESS,
-      abi: CBETH_TOKEN_ABI,
-      functionName: 'exchangeRate',
+      address: TREASURY_ADDRESS,
+      abi: TREASURY_ABI,
+      functionName: 'getExchangeRate',
     });
 
     // The contract returns the rate multiplied by 10^18 (Wei format)
