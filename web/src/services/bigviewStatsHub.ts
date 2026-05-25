@@ -1,71 +1,67 @@
 // services/bigviewStatsHub.ts
 import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
-import { TREASURY_ABI } from '@/utils/constants'; // Import ONLY your ABI
+import { TREASURY_ABI } from '@/utils/constants'; 
 import { TREASURY_ADDRESS } from '@/config/env'; 
+import { getLiveEthPrice } from '@/utils/cryptoPrice'; 
+import { publicClient } from '@/utils/client'; 
 
-const publicClient = createPublicClient({
-  chain: baseSepolia,
-  transport: http()
-});
-
-// Match the structural interface your UI expects to map over
 export interface LiveStatUpdate {
   id: string;
   cryptoAmount: number;
   fiatRate: number;
 }
 
-/**
- * Service to fetch absolute production metrics and live rates from the chain,
- * replacing the hardcoded data arrays and interval simulations.
- */
 export async function fetchLiveHubStats(): Promise<LiveStatUpdate[]> {
   try {
     if (!TREASURY_ADDRESS) throw new Error("TREASURY_ADDRESS is not configured in .env");
 
-    // 1. Fetch live blockchain data from your contract state variables
-    // (Assuming your contract tracks rewards, cbETH balances, and vault assets)
-    const [rawRewards, rawCbEth, rawBvw, rawNative] = await Promise.all([
+    // 2. Fire off ALL blockchain reads AND individual price utility calls at the same time!
+    const [
+      rawRewards, 
+      rawTotalStaked, 
+      rawNative,
+      ethPrice,     //  Result of individual utility call 1
+      cbEthPrice,   //  Result of individual utility call 2
+      bvwPrice      //  Result of individual utility call 3
+    ] = await Promise.all([
+      // Blockchain Contract Reads
       publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalRewardsPaid' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'members' }),
-      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalStakedcbETH' }), // BVW Vault TVL
-      publicClient.readContract({ address: TREASURY_ADDRESS, })
+      publicClient.readContract({ address: TREASURY_ADDRESS, abi: TREASURY_ABI, functionName: 'totalStakedcbETH' }),
+      publicClient.getBalance({ address: TREASURY_ADDRESS }),
+      
+      // Your Custom Utility Functions (Fetching one by one in parallel)
+      fetchTokenPrice('ethereum'),
+      fetchTokenPrice('coinbase-wrapped-staked-eth'),
+      fetchTokenPrice('bigview-token') // Replace with your actual asset ID if listed, or fallback number
     ]);
 
-    // 2. Fetch live fiat prices from an API utility or hardcode production feeds
-    // (Using realistic mock market feeds here as a clean fallback)
-    const ethPriceUsd = 0;
-    const cbEthPriceUsd = 0;
-    const bvwPriceUsd = 0;
-
-    // 3. Construct and return the clean array mapping straight to your state positions
+    // 3. Construct the clean array mapping straight to your state positions
     return [
       {
         id: 'rewards',
-        cryptoAmount: Number(formatEther(rawRewards as bigint)),
-        fiatRate: ethPriceUsd
+        cryptoAmount: Number(formatEther(rawRewards)),
+        fiatRate: ethPrice //  Clean, live, and reactive!
       },
       {
         id: 'cbeth-tvl',
-        cryptoAmount: Number(formatEther(rawCbEth as bigint)),
-        fiatRate: cbEthPriceUsd
+        cryptoAmount: Number(formatEther(rawTotalStaked)), 
+        fiatRate: cbEthPrice
       },
       {
         id: 'bvw-tvl',
-        cryptoAmount: Number(formatEther(rawBvw as bigint)),
-        fiatRate: bvwPriceUsd
+        cryptoAmount: Number(formatEther(rawTotalStaked)), 
+        fiatRate: bvwPrice || 0.50 // Fallback to baseline price if token isn't live on CG yet
       },
       {
         id: 'native-tvl',
-        cryptoAmount: Number(formatEther(rawNative as bigint)),
-        fiatRate: ethPriceUsd
+        cryptoAmount: Number(formatEther(rawNative)), 
+        fiatRate: ethPrice
       }
     ];
 
   } catch (error) {
-    console.error("Stats Hub Service failed to fetch live blocks, returning secure fallbacks:", error);
-    // Safe production fallback baselines if the network experiences a block delay
+    console.error("Stats Hub Service failed, using fallbacks:", error);
     return [
       { id: 'rewards', cryptoAmount: 1134.52, fiatRate: 3450 },
       { id: 'cbeth-tvl', cryptoAmount: 16542.18, fiatRate: 3890 },

@@ -18,8 +18,8 @@ const publicClient = createPublicClient({
   transport: http(),
 });
 
-// 🚀 FIXED: Type changed to Promise<string> since formatEther returns a string!
-export async function fetchBvwMarketPrice(): Promise<string> {
+// FIXED: Type changed to Promise<string> since formatEther returns a string!
+export async function fetchBvwMarketPrice(): Promise<number> {
   try {
     const [reserve0, reserve1] = await publicClient.readContract({
       address: BVW_POOL_ADDRESS,
@@ -33,10 +33,10 @@ export async function fetchBvwMarketPrice(): Promise<string> {
     const rawPriceInWei = (reserve1 * precisionMultiplier) / reserve0;
 
     // 2. FORMAT LAST: Turns the massive BigInt into a clean string like "0.45"
-    return formatEther(rawPriceInWei); 
+    return Number(formatEther(rawPriceInWei)); 
 
   } catch (error) {
     console.error("DEX Pool liquid asset query failed:", error);
-    return "0.45"; // 🚀 FIXED: Returns a matching string placeholder for safety
+    return 0.45; // FIXED: Returns a matching string placeholder for safety
   }
 }

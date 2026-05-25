@@ -20,7 +20,7 @@ export interface LiveStatsResult {
  * Service to fetch absolute real metrics from the Base blockchain,
  * replacing the arbitrary math simulations completely.
  */
-export async function fetchLiveProtocolStats(userAddress?: string): Promise<LiveStatsResult> {
+export async function fetchLiveProtocolStats(userAddress?: `0x${string}`): Promise<LiveStatsResult> {
   try {
     if (!TREASURY_ABI) throw new Error("TREASURY_ADDRESS is not configured in .env");
 
@@ -39,9 +39,9 @@ export async function fetchLiveProtocolStats(userAddress?: string): Promise<Live
         address: TREASURY_ADDRESS,
         abi: TREASURY_ABI,
         functionName: 'members',
-        args: [userAddress],
+        args: [userAddress as `0x${string}`],
       });
-      const userBalance = Number(Array.isArray(rawUserBalance) ? formatEther(rawUserBalance[1]) : "0";)
+      const userBalance = Number(Array.isArray(rawUserBalance) ? formatEther(rawUserBalance[1]) : "0")
       
       // Pure mathematical formula instead of a random 0.05 drift!
       realShare = (userBalance / totalStaked) * 100;

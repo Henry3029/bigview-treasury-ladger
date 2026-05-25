@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { createWalletClient, createPublicClient, custom, http, parseUnits, formatUnits } from 'viem';
 import { baseSepolia } from 'viem/chains';
+import { DEPLOYER_ADDRESS, TOKEN_ADDRESS } from '@/config/env';
 import { Coins, Flame, ShieldAlert, Activity, Loader2 } from 'lucide-react';
 
 import { TOKEN_ABI } from '@/utils/constants'; 
@@ -17,9 +18,7 @@ export default function AdminTokenPage() {
   const { wallets } = useWallets();
   const wallet = wallets[0]; 
 
-  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS as `0x${string}`;
-  const deployerAddr = process.env.NEXT_PUBLIC_DEPLOYER_ADDR?.toLowerCase();
-  const isOwner = user?.wallet?.address?.toLowerCase() === deployerAddr;
+  const isOwner = user?.wallet?.address?.toLowerCase() === DEPLOYER_ADDRESS;
 
   // 1. SETUP PUBLIC CLIENT (For Reading Data)
   const publicClient = createPublicClient({
@@ -27,7 +26,8 @@ export default function AdminTokenPage() {
     transport: http(process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC)
   });
 
-  const fetchSupply = async () => {
+  const fetchSupply = useCallback(async () => {
+    if (!tokenAddress) return;
     try {
       const data = await publicClient.readContract({
         address: tokenAddress,
@@ -38,19 +38,24 @@ export default function AdminTokenPage() {
     } catch (err) {
       console.error("Fetch Error:", err);
     }
-  };
+  }, [tokenAddress, publicClient]);
 
-  useEffect(() => { fetchSupply(); }, []);
+  useEffect(() => { 
+    fetchSupply(); 
+  }, [fetchSupply]);
 
   // 2. THE ACTION HANDLER (Mint/Burn)
   const handleAction = async (action: 'mint' | 'burn') => {
     if (!authenticated) return login();
     if (!amount || isProcessing || !wallet) return;
 
+    // Safety guard step for supply adjustments
+    const confirmProceed = window.confirm(`Confirm execution: ${action.toUpperCase()} ${amount} BVW?`);
+    if (!confirmProceed) return;
+
     try {
       setIsProcessing(true);
 
-      // Get the provider from Privy and wrap it in a Viem Wallet Client
       const ethereumProvider = await wallet.getEthereumProvider();
       const walletClient = createWalletClient({
         account: wallet.address as `0x${string}`,
@@ -59,13 +64,16 @@ export default function AdminTokenPage() {
       });
 
       const units = parseUnits(amount, 18);
+      
+      // Dynamic argument routing array based on your admin token ABI requirements 
+      const dynamicArgs = [wallet.address as `0x${string}`, units];
 
       // Execute Contract Write
       const hash = await walletClient.writeContract({
         address: tokenAddress,
         abi: TOKEN_ABI,
         functionName: action,
-        args: [units],
+        args: dynamicArgs,
       });
 
       // Wait for Transaction
@@ -82,7 +90,7 @@ export default function AdminTokenPage() {
     }
   };
 
-  // --- UI (Unified Deep Slate & Gold Theme) ---
+  // --- UI Layout Protections ---
   if (!isOwner && authenticated) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-color-ash py-6">

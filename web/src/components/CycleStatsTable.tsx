@@ -13,7 +13,7 @@ export default function CycleStatsTable() {
   
   const [cycleHistory, setCycleHistory] = useState<CycleRow[]>([]);
   const [ethPrice, setEthPrice] = useState<number>(0);
-  const [cbEthExchangeRate, setCbEthExchangeRate] = useState<number>(0); // 🚀 FIXED: Cleaned up spacing
+  const [cbEthExchangeRate, setCbEthExchangeRate] = useState<number>(0); // FIXED: Cleaned up spacing
   const [bvwExchangeRate, setBvwExchangeRate] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -52,8 +52,8 @@ export default function CycleStatsTable() {
     );
   }
 
-  // 🚀 FIXED: Swapped 'CycleHistory' for 'cycleHistory' to match state name
-  const visibleRows: cycleRow[] = isExpanded ? cycleHistory : cycleHistory.slice(0, 6);
+  // FIXED: Swapped 'CycleHistory' for 'cycleHistory' to match state name
+  const visibleRows: CycleRow[] = isExpanded ? cycleHistory : cycleHistory.slice(0, 6);
 
   // Helper calculation function
   const getConvertedValue = (amountInBvw: number, targetAsset: AssetType) => {
@@ -61,7 +61,7 @@ export default function CycleStatsTable() {
     
     const totalUsdValue = amountInBvw * bvwExchangeRate;
     
-    // 🚀 FIXED: Added safety fallback guards to prevent division by zero (Infinity/NaN)
+    // FIXED: Added safety fallback guards to prevent division by zero (Infinity/NaN)
     if (targetAsset === 'ETH') {
       return ethPrice > 0 ? totalUsdValue / ethPrice : 0;
     }

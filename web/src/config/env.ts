@@ -7,7 +7,8 @@
 // Raw values from .env
 const rawTreasury = process.env.NEXT_PUBLIC_TREASURY_ADDRESS;
 const rawToken = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
-const rawCbEth = process.env.NEXT_PUBLIC_CBETH_TOKEN_ADDRESS
+const rawCbEth = process.env.NEXT_PUBLIC_CBETH_TOKEN_ADDRESS;
+const rawDeployer = process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS.toLowerCase();
 
 // Strict Fallbacks (Useful for local testing or if .env fails)
 const ZERO_ADDRESS: `0x${string}` = "0x0000000000000000000000000000000000000000";
@@ -15,6 +16,7 @@ const ZERO_ADDRESS: `0x${string}` = "0x0000000000000000000000000000000000000000"
 export const TREASURY_ADDRESS = (rawTreasury as `0x${string}`) || ZERO_ADDRESS;
 export const TOKEN_ADDRESS = (rawGovernanceToken as `0x${string}`) || ZERO_ADDRESS;
 export const CBETH_TOKEN_ADDRESS = (rawCbEth as `0x${string}`) || ZERO_ADDRESS;
+export const DEPLOYER_ADDRESS = (rawDeployer as `0x${string}`) || ZERO_ADDRESS;
 
 
 // ==========================================
