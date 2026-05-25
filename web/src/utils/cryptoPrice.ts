@@ -1,6 +1,6 @@
 // utils/cryptoPrice.ts
 
-export async function getLiveEthPrice(tokenId: string): Promise<number> {
+export async function getLiveTokenPrice(tokenId: string): Promise<number> {
   try {
     // Calling CoinGecko's public endpoint
     const response = await fetch(

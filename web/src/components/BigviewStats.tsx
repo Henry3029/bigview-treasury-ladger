@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { fetchLiveTelemetry, TelemetryData } from '@/services/bigviewTelemetry'; 
-import { getLiveEthPrice } from '@/utils/cryptoPrice'; 
+import { getLiveTokenPrice } from '@/utils/cryptoPrice'; 
 
 export default function BigviewStats() {
   // 1. Maintain ONE single, predictable source of truth for your metrics
@@ -22,7 +22,7 @@ export default function BigviewStats() {
         // Fetch both network stats and spot price data concurrently
         const [liveData, liveEthPrice] = await Promise.all([
           fetchLiveTelemetry(),
-          getLiveEthPrice()
+          getLiveTokenPrice("ethereum")
         ]);
 
         // Combine them into a single, unified state payload

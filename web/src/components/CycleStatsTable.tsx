@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { fetchCycleHistory, CycleRow } from '@/services/bigviewCycles'; 
-import { getLiveEthPrice } from '@/utils/cryptoPrice';
+import { getLiveTokenPrice } from '@/utils/cryptoPrice';
 import { fetchBvwMarketPrice } from '@/services/fetchBvwMarketPrice';
 import { fetchLiveExchangeRate } from '@/services/fetchLiveExchangeRate';
 
@@ -22,7 +22,7 @@ export default function CycleStatsTable() {
       try {
         const [historyLogs, liveEthPrice, liveCbEthRate, liveBvwPrice] = await Promise.all([
           fetchCycleHistory(),
-          getLiveEthPrice(),
+          getLiveTokenPrice("ethereum"),
           fetchLiveExchangeRate(),
           fetchBvwMarketPrice()
         ]);
