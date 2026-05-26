@@ -4,6 +4,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { baseSepolia } from "viem/chains"; 
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+	console.log("MY PRIVY ID IS:", process.env.NEXT_PUBLIC_PRIVY_APP_ID);
   return (
   <PrivyProvider
     appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""} 
