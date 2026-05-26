@@ -1,5 +1,5 @@
 import { createPublicClient, http, formatEther } from 'viem'; 
-import { baseSepolia } from 'viem/chain'; import { TREASURY_ADDRESS } from '@/config/env';
+import { baseSepolia } from 'viem/chains'; import { TREASURY_ADDRESS } from '@/config/env';
 import { TREASURY_ABI } from '@/utils/constants'; 
 
 

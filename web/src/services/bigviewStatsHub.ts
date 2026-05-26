@@ -3,7 +3,7 @@ import { createPublicClient, http, formatEther } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { TREASURY_ABI } from '@/utils/constants'; 
 import { TREASURY_ADDRESS } from '@/config/env'; 
-import { getLiveEthPrice } from '@/utils/cryptoPrice'; 
+import { getLiveTokenPrice } from '@/utils/cryptoPrice'; 
 import { publicClient } from '@/utils/client'; 
 
 export interface LiveStatUpdate {
@@ -31,9 +31,9 @@ export async function fetchLiveHubStats(): Promise<LiveStatUpdate[]> {
       publicClient.getBalance({ address: TREASURY_ADDRESS }),
       
       // Your Custom Utility Functions (Fetching one by one in parallel)
-      fetchTokenPrice('ethereum'),
-      fetchTokenPrice('coinbase-wrapped-staked-eth'),
-      fetchTokenPrice('bigview-token') // Replace with your actual asset ID if listed, or fallback number
+      getLiveTokenPrice('ethereum'),
+      getLiveTokenPrice('coinbase-wrapped-staked-eth'),
+      getLiveTokenPrice('bigview-token') // Replace with your actual asset ID if listed, or fallback number
     ]);
 
     // 3. Construct the clean array mapping straight to your state positions

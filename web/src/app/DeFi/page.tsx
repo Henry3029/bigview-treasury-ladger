@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function DeFiPage() {
 	const { user } = usePrivy();
-	const userAddress = user?.wallet?.address;
+	const userAddress = user?.wallet?.address as bigint;
   // Real-time protocol metrics (No placeholders, updates live)
   const [deployedBvw, setDeployedBvw] = useState<number>(0);
   const [holderCount, setHolderCount] = useState<number>(0);

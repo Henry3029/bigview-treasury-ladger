@@ -5,7 +5,7 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
     // Calling CoinGecko's public endpoint
     const response = await fetch(
       `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`
-      { next: { revalidate: 60 } } // Cache the price for 60 seconds to avoid spamming
+      { next: { revalidate: 60, } } // Cache the price for 60 seconds to avoid spamming
     );
     
     // FIXED: Guard clause to catch rate-limits (429) or server errors (500) safely
@@ -29,4 +29,5 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
     if (tokenId === 'bigview-token') return 0.50;
     
     return 3450.00; // Default fallback for 'ethereum'
+  }
   }

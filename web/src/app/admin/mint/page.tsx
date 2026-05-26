@@ -27,10 +27,10 @@ export default function AdminTokenPage() {
   });
 
   const fetchSupply = useCallback(async () => {
-    if (!tokenAddress) return;
+    if (!TOKEN_ADDRESS) return;
     try {
       const data = await publicClient.readContract({
-        address: tokenAddress,
+        address: TOKEN_ADDRESS,
         abi: TOKEN_ABI,
         functionName: 'totalSupply',
       });
@@ -38,7 +38,7 @@ export default function AdminTokenPage() {
     } catch (err) {
       console.error("Fetch Error:", err);
     }
-  }, [tokenAddress, publicClient]);
+  }, [TOKEN_ADDRESS, publicClient]);
 
   useEffect(() => { 
     fetchSupply(); 
@@ -65,12 +65,13 @@ export default function AdminTokenPage() {
 
       const units = parseUnits(amount, 18);
       
-      // Dynamic argument routing array based on your admin token ABI requirements 
-      const dynamicArgs = [wallet.address as `0x${string}`, units];
+      const dynamicArgs = action === 'mint' 
+        ? [wallet.address as `0x${string}`, units]  // Mint needs: address, amount
+        : [units];                                  // Burn only needs: amount
 
       // Execute Contract Write
       const hash = await walletClient.writeContract({
-        address: tokenAddress,
+        address: TOKEN_ADDRESS,
         abi: TOKEN_ABI,
         functionName: action,
         args: dynamicArgs,
