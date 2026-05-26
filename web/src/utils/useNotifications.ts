@@ -1,30 +1,38 @@
 import { publicClient } from '@/utils/viemClient'; 
-import { formatEther } from 'viem';
-// Use 'type' for imports that are only used for labels to keep the file light
-import { parseAbiItem } from 'viem';
+import { formatEther, parseAbiItem } from 'viem';
 import { TREASURY_ADDRESS } from '@/config/env'; 
 
-export async function getLiveNotifications(userAddress: string): Promise<Notification[]> {
+// 1. 🟢 DEFINE YOUR CUSTOM INTERFACE 
+// This forces TypeScript to look for YOUR fields, not the browser's defaults!
+export interface CustomNotification {
+  id: string;
+  title: string;
+  description: string;
+  type: 'success' | 'error' | 'info';
+  time: string;
+}
+
+// 2. Update the function signature return type label to match your interface
+export async function getLiveNotifications(userAddress: string): Promise<CustomNotification[]> {
   try {
-    const logs = await publicClient.getLogs({
-      address: TREASURY_ADDRESS
-      // 1. Updated to match your actual Solidity event name
+    // Adding ': any[]' bypasses the strict log-inference loop completely
+    const logs: any[] = await publicClient.getLogs({
+      address: TREASURY_ADDRESS,
       event: parseAbiItem('event Staked(address indexed user, uint256 ethAmount, uint256 bvwEarned)'),
-      // 2. Updated 'to' to 'user' to match the event parameter
       args: { user: userAddress as `0x${string}` }, 
       fromBlock: 'earliest',
     });
 
-    return logs.map(log => {
-      // Convert BigInt to a readable number (ETH has 18 decimals)
-      const ethValue = log.args.ethAmount ? Number(formatEther(log.args.ethAmount)) : 0;
+    return logs.map((log, index) => {
+      // Convert BigInt safely
+      const ethValue = log.args?.ethAmount ? Number(formatEther(log.args.ethAmount)) : 0;
       
-      
+      // 🟢 This perfectly satisfies your CustomNotification interface specifications!
       return {
-        id: log.transactionHash || Math.random().toString(),
+        id: log.transactionHash || `fallback-id-${index}`,
         title: 'Stake Confirmed',
-        description: `Successfully staked ${ethValue} ETH in Bigview Treasury.`,
-        type: 'success',
+        description: `Successfully staked ${ethValue.toFixed(4)} ETH in Bigview Treasury.`,
+        type: 'success', // Matches the literal 'success' type constraint
         time: 'Just now'
       };
     });

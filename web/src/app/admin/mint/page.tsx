@@ -64,17 +64,21 @@ export default function AdminTokenPage() {
       });
 
       const units = parseUnits(amount, 18);
-      
-      const dynamicArgs = action === 'mint' 
-        ? [wallet.address as `0x${string}`, units]  // Mint needs: address, amount
-        : [units];                                  // Burn only needs: amount
 
       // Execute Contract Write
       const hash = await walletClient.writeContract({
         address: TOKEN_ADDRESS,
         abi: TOKEN_ABI,
         functionName: action,
-        args: dynamicArgs,
+        args: // Execute Contract Write
+      const hash = await walletClient.writeContract({
+        address: TOKEN_ADDRESS,
+        abi: TOKEN_ABI,
+        functionName: action,
+        // 🟢 FIXED: Inline conditional matching guarantees perfect tuple lengths to TypeScript
+        args: action === 'mint' 
+          ? [wallet.address as `0x${string}`, units] as const
+          : [units] as const,
       });
 
       // Wait for Transaction

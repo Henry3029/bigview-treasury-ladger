@@ -4,7 +4,7 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
   try {
     // Calling CoinGecko's public endpoint
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`,
       { next: { revalidate: 60, } } // Cache the price for 60 seconds to avoid spamming
     );
     

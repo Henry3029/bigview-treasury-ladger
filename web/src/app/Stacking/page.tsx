@@ -17,7 +17,7 @@ export default function StakingPage() {
     async function loadAllNetworkData() {
       try {
         const [realPrice, realRates] = await Promise.all([
-          getLiveEthPrice(),
+          getLiveTokenPrice(),
           calculateRealYieldRates()
         ]);
         setEthPrice(realPrice);
