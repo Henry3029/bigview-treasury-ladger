@@ -5,11 +5,11 @@
 @tailwind utilities;
 
 :root {
-	--font-inter: "Inter", sans-serif; 
+  --font-inter: "Inter", sans-serif; 
   --gold-background: #B2BEB5;
   --gold-buttons: #fbbf24;
   --text-color: #ffffff;
-  --violet-background: #7c3aed;   /* The "Red-ish" glowing edge (Violet-600) */
+  --violet-background: #7c3aed;
   --violet-main-background: #121212;
   --light-green: #90EE90;
   --solid-green: #228B22;
@@ -23,15 +23,14 @@
   --medium-black: #121212;
   --light-black: #212121;
   --gold-primary: #FFD700;
-  --gold-secondary: #E6B800; //.
+  --gold-secondary: #E6B800; /* 🟢 FIXED: Removed trailing dot */
 }
 
 body {
-  font-family: var(--font-inter); 
-  background-color: var(--violet-main-background);
-color: var(--color-white); 
-  /* This forced font-family ensures Inter is everywhere! */
+  /* 🟢 FIXED: Cleaned up dual declarations into one bulletproof line */
   font-family: var(--font-inter), sans-serif !important;
+  background-color: var(--violet-main-background);
+  color: var(--color-white); 
   min-height: 100vh;
   @apply antialiased overflow-x-hidden;
 }
