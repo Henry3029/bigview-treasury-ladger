@@ -1,16 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatEther, erc20Abi } from 'viem'; // 🚀 FIXED: Imported standard ERC-20 ABI
+import { formatEther, erc20Abi } from 'viem'; // FIXED: Imported standard ERC-20 ABI
 import { publicClient } from '@/utils/viemClient'; 
 import LoadingSpinner from './LoadingSpinner';
-import { TREASURY_ADDRESS } from '@/config/env';
+import { TREASURY_ADDRESS, CBETH_TOKEN_ADDRESS } from '@/config/env';
 
 const CONTRACT_ADDRESS = TREASURY_ADDRESS;
-
-// 🚀 FIXED: Add the official cbETH contract address on Base network
-// (Mainnet/Base cbETH address: 0xc1C630E521f19aBb3074880655D3b356EE175429)
-const CBETH_TOKEN_ADDRESS = '0xc1C630E521f19aBb3074880655D3b356EE175429'; 
 
 export default function TVLDisplay() {
   const [tvl, setTvl] = useState<string | null>(null);
@@ -19,7 +15,7 @@ export default function TVLDisplay() {
   useEffect(() => {
     async function getTVL() {
       try {
-        // 1. 🚀 FIXED: Query the exact cbETH token holdings inside your Treasury, NOT native ETH balance
+        // 1. FIXED: Query the exact cbETH token holdings inside your Treasury, NOT native ETH balance
         const balance = await publicClient.readContract({
           address: CBETH_TOKEN_ADDRESS,
           abi: erc20Abi,
@@ -30,14 +26,14 @@ export default function TVLDisplay() {
         // 2. Fetch price from CoinGecko
         const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
         
-        // 🚀 FIXED: Guard clause to catch API rate-limits safely before trying to read JSON data
+        // FIXED: Guard clause to catch API rate-limits safely before trying to read JSON data
         if (!response.ok) {
           throw new Error("CoinGecko API failure or rate limit hit");
         }
 
         const data = await response.json();
         
-        // 🚀 FIXED: Optional chaining protection fallback
+        // FIXED: Optional chaining protection fallback
         const ethPrice = data?.ethereum?.usd || 3450.00;
 
         // 3. Calculate USD Value safely
