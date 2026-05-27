@@ -19,7 +19,7 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
     if (data?.[tokenId]?.usd) {
       return data[tokenId].usd;
     }
-    
+    console.log("CRITICAL COINGECKO INSPECTION:", data);
     throw new Error("Unexpected JSON data layout structure from CoinGecko");
   } catch (error) {
     console.error(`Failed to fetch ${tokenId} price, using safety asset fallbacks:`, error);
