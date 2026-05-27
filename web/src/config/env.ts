@@ -7,11 +7,12 @@ import { getAddress } from 'viem';
 // ==========================================
 
 // Raw values from .env
-const rawTreasury = getAddress(process.env.NEXT_PUBLIC_TREASURY_ADDRESS);
-const rawToken = getAddress(process.env.NEXT_PUBLIC_TOKEN_ADDRESS);
-const rawCbEth = getAddress(process.env.NEXT_PUBLIC_CBETH_TOKEN_ADDRESS);
-const rawDeployer = getAddress(process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS);
+// Replace lines 10-13 with this:
 
+const rawTreasury = getAddress(process.env.NEXT_PUBLIC_TREASURY_ADDRESS || "0x0000000000000000000000000000000000000000");
+const rawToken = getAddress(process.env.NEXT_PUBLIC_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000");
+const rawCbEth = getAddress(process.env.NEXT_PUBLIC_CBETH_TOKEN_ADDRESS || "0x0000000000000000000000000000000000000000");
+const rawDeployer = getAddress(process.env.NEXT_PUBLIC_DEPLOYER_ADDRESS || "0x0000000000000000000000000000000000000000");
 // Strict Fallbacks (Useful for local testing or if .env fails)
 const ZERO_ADDRESS: `0x${string}` = "0x0000000000000000000000000000000000000000";
 
