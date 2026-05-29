@@ -3,13 +3,14 @@ import { useState, useEffect } from 'react';
 import TVLDisplay from '@/components/TVLDisplay';
 import { getLiveTokenPrice } from '@/utils/cryptoPrice'; 
 import { calculateRealYieldRates } from '@/utils/protocolCalculations';
+export const dynamic = 'force-dynamic';
 
 type AssetType = 'BVW' | 'cbETH' | 'ETH';
 
 export default function StakingPage() {
-  const [stakeAmount, setStakeAmount] = useState<string>(''); // 🚀 CHANGED: Clear empty string for better placeholder behavior
+  const [stakeAmount, setStakeAmount] = useState<string>(''); // CHANGED: Clear empty string for better placeholder behavior
   const [selectedOption, setSelectedOption] = useState<number>(1); // 1, 2, or 3
-  const [yieldRates, setYieldRates] = useState<number[]>([0.0352, 0.0291, 0.0310]); // 🚀 FIXED: Use realistic decimal rates as initial/fallback values
+  const [yieldRates, setYieldRates] = useState<number[]>([0.0352, 0.0291, 0.0310]); // FIXED: Use realistic decimal rates as initial/fallback values
   const [ethPrice, setEthPrice] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   

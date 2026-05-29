@@ -19,9 +19,11 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
     if (data?.[tokenId]?.usd) {
       return data[tokenId].usd;
     }
-    console.log("CRITICAL COINGECKO INSPECTION:", data);
     throw new Error("Unexpected JSON data layout structure from CoinGecko");
   } catch (error) {
+  	console.log("=========================================");
+  console.log("🚨 CHASE THE GHOST LOG HERE:", error);
+  console.log("=========================================");
     console.error(`Failed to fetch ${tokenId} price, using safety asset fallbacks:`, error);
     
     // Dynamic fallbacks based on which keyword token was sent in!
