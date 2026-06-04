@@ -1,3 +1,4 @@
+import { COINGECKO } from '@/utils/cryptoPrice'; 
 // utils/cryptoPrice.ts
 
 export async function getLiveTokenPrice(tokenId: string): Promise<number> {
@@ -5,25 +6,27 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
     // Calling CoinGecko's public endpoint
     const response = await fetch(
       `https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`,
+      {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+      // CHOOSE ONE OF THE KEYS BELOW BASED ON YOUR PLAN:
+      'x-cg-demo-api-key': COINGECKO,  // Use this if you are on the FREE Demo plan
+      // 'x-cg-pro-api-key': apiKey, // Use this if you are on a PAID Pro plan
+    },
       { next: { revalidate: 60, } } // Cache the price for 60 seconds to avoid spamming
     );
     
-    // FIXED: Guard clause to catch rate-limits (429) or server errors (500) safely
-    if (!response.ok) {
-      throw new Error(`CoinGecko API responded with status: ${response.status}`);
-    }
-    
     const data = await response.json();
+    
+    console.log(" RAW COINGECKO RESPONSE:", JSON.stringify(data));
     
     // FIXED: Added optional chaining (?.) for deep object structural protection
     if (data?.[tokenId]?.usd) {
       return data[tokenId].usd;
     }
-    throw new Error("Unexpected JSON data layout structure from CoinGecko");
+
   } catch (error) {
-  	console.log("=========================================");
-  console.log("🚨 CHASE THE GHOST LOG HERE:", error);
-  console.log("=========================================");
     console.error(`Failed to fetch ${tokenId} price, using safety asset fallbacks:`, error);
     
     // Dynamic fallbacks based on which keyword token was sent in!

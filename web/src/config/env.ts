@@ -28,6 +28,7 @@ export const DEPLOYER_ADDRESS = (rawDeployer as `0x${string}`) || ZERO_ADDRESS;
 
 export const PRIVY_APP_ID = process.env.NEXT_PUBLIC_PRIVY_APP_ID || "missing-privy-id";
 export const RPC_URL = process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC || "https://eth-sepolia.g.alchemy.com/v2/...";
+export const COINGECKO = process.env.NEXT_PUBLIC_COINGECKO_API_KEY
 
 // Convert string numbers from .env into actual numbers safely
 export const CHAIN_ID = Number(process.env.NEXT_PUBLIC_CHAIN_ID) || 11155111; // Defaults to Sepolia
