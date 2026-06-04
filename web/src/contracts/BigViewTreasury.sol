@@ -1,161 +1,131 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.26;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+// Import OpenZeppelin's ReentrancyGuard for security
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "./BigViewToken.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20";
 
 contract BigViewTreasury is ReentrancyGuard {
     
     // --- State Variables ---
-    BigViewToken public immutable bvwToken; // Your LST (stSTX equivalent)
-    IERC20 public immutable cbETHToken;     // The Input Asset (STX equivalent)
-    
-    address public devWallet;
-    address public majorPoolAddress; // Signer Node delegation address
-    
-    uint256 public totalMembersCount;
-    uint256 public totalStakedcbETH;
-    uint256 public totalRewardsPaid;
+    address public majorPoolAddress;
+    address public devFeeAddress;
+    uint256 public constant DEV_FEE_PERCENT = 5; // 5% fee
 
-    // --- Real-time Native ETH Reward Tracking (Paid by Signers) ---
-    uint256 public rewardPerTokenStored;
-    mapping(address => uint256) public userRewardPerTokenPaid;
-    mapping(address => uint256) public ethRewardsAccumulated;
-
-    struct Member {
-        bool isMember;
-        uint256 cbEthAmount; // Tracks how much cbETH they locked up
-    }
-    
-    struct CycleSnapshot {
-    uint256 cycleId;
-    uint256 totalYieldDistributed;
-    uint256 timestamp;
-}
-
-CycleSnapshot[] public cycles;
-
-    mapping(address => Member) public members;
-    
-    // --- Events ---
-    event Staked(address indexed user, uint256 cbEthAmount, uint256 bvwMinted);
-    event Withdrawn(address indexed user, uint256 bvwBurned, uint256 cbEthReturned);
-    event EthRewardsClaimed(address indexed user, uint256 amount);
-
-    // --- Errors ---
-    error NotAuthorized();
-    error NoStake();
-    error TransferFailed();
-    error InvalidAmount();
-    error NothingToClaim();
-
-    modifier updateReward(address account) {
-        if (account != address(0)) {
-            ethRewardsAccumulated[account] = earned(account);
-            userRewardPerTokenPaid[account] = rewardPerTokenStored;
-        }
-        _;
+    // --- Data Structures ---
+    struct UserRecord {
+        address userAddress;
+        uint256 rewardClaimed;
+        uint256 failedClaimsCount;
+        uint256 successfulClaimsCount;
     }
 
-    constructor(address _bvwToken, address _cbETH, address _majorPool) {
-        bvwToken = BigViewToken(_bvwToken);
-        cbETHToken = IERC20(_cbETH);
-        devWallet = msg.sender;
-        majorPoolAddress = _majorPool;
+    // --- Mappings (The Global Maps) ---
+    // Tracks the raw underlying principal amount deposited by each user
+    mapping(address => uint256) public userBalances;
+    
+    // Tracks the structural metrics and history for each user
+    mapping(address => UserRecord) public userRecords;
+
+    // --- Events (Good for frontend tracking) ---
+    event Deposited(address indexed user, uint256 amount);
+    event RewardReceived(uint256 totalReward);
+    event RewardClaimed(address indexed user, uint256 netReward, uint256 feeCut);
+    event Unstaked(address indexed user, uint256 amount);
+
+    // --- Constructor ---
+    constructor(address _majorPoolAddress, address _devFeeAddress) {
+        require(_majorPoolAddress != address(0), "Invalid pool address");
+        require(_devFeeAddress != address(0), "Invalid dev address");
+        majorPoolAddress = _majorPoolAddress;
+        devFeeAddress = _devFeeAddress;
     }
 
-    function earned(address account) public view returns (uint256) {
-        return ((members[account].cbEthAmount * (rewardPerTokenStored - userRewardPerTokenPaid[account])) / 1e18) + ethRewardsAccumulated[account];
-    }
+    // --- Core Functions ---
 
     /**
-     * @notice Stake cbETH, get back liquid BVW tokens instantly 1:1
+     * @notice Collects user deposit and instantly forwards it to the major pool.
      */
-    function stake(uint256 _amount) external nonReentrant updateReward(msg.sender) {
-        if (_amount == 0) revert InvalidAmount();
+    function deposit(address _user, uint256 _amount) external nonReentrant {
+        require(_amount > 0, "Amount must be greater than 0");
+        require(_user != address(0), "Invalid user address");
 
-        // 1. Pull cbETH from user's wallet into this Treasury
-        bool success = cbETHToken.transferFrom(msg.sender, address(this), _amount);
-        if (!success) revert TransferFailed();
+        // 1. Update the global user balance map
+        userBalances[_user] += _amount;
 
-        // 2. Manage Protocol Membership
-        if (!members[msg.sender].isMember) {
-            members[msg.sender].isMember = true;
-            totalMembersCount += 1;
+        // 2. Initialize the user struct if it's their first time
+        if (userRecords[_user].userAddress == address(0)) {
+            userRecords[_user].userAddress = _user;
         }
 
-        members[msg.sender].cbEthAmount += _amount;
-        totalStakedcbETH += _amount;
+        // 3. Collect the deposit from the caller (Assumes native/wrapped token transfer)
+        // For simplicity, using a token pattern here. If using raw native ETH, you would use msg.value instead.
+        bool success = IERC20(majorPoolAddress).transferFrom(msg.sender, majorPoolAddress, _amount);
+        require(success, "Transfer to major pool failed");
 
-        // 3. 90/10 Split routing of the collateral asset
-        uint256 poolShare = (_amount * 90) / 100;
-        uint256 devShare = _amount - poolShare;
-
-        bool sendToPool = cbETHToken.transfer(majorPoolAddress, poolShare);
-        bool sendToDev = cbETHToken.transfer(devWallet, devShare);
-        if (!sendToPool || !sendToDev) revert TransferFailed();
-
-        // 4. Mint the Liquid LST token straight back to the user's wallet
-        bvwToken.mint(msg.sender, _amount);
-
-        emit Staked(msg.sender, _amount, _amount);
+        emit Deposited(_user, _amount);
     }
 
     /**
-     * @notice Unstake: Burn your BVW to permissionlessly reclaim your underlying cbETH
+     * @notice Receives rewards back from the major pool.
+     * @dev In production, this would be restricted or automatically triggered by the pool.
      */
-    function unstake(uint256 _bvwAmount) external nonReentrant updateReward(msg.sender) {
-        if (_bvwAmount == 0 || members[msg.sender].cbEthAmount < _bvwAmount) revert InvalidAmount();
-
-        // 1. Update accounting states
-        members[msg.sender].cbEthAmount -= _bvwAmount;
-        totalStakedcbETH -= _bvwAmount;
-
-        // 2. Destroy the user's receipt LST tokens
-        bvwToken.burn(msg.sender, _bvwAmount);
-
-        // 3. Return the underlying cbETH collateral from the protocol vaults
-        bool success = cbETHToken.transfer(msg.sender, _bvwAmount);
-        if (!success) revert TransferFailed();
-
-        emit Withdrawn(msg.sender, _bvwAmount, _bvwAmount);
-    }
-
-    /**
-     * @notice Claim native ETH validation rewards generated by the Signers
-     */
-    function claimEthRewards() external nonReentrant updateReward(msg.sender) {
-        uint256 reward = ethRewardsAccumulated[msg.sender];
-        if (reward == 0) revert NothingToClaim();
-
-        ethRewardsAccumulated[msg.sender] = 0;
-
-        // Take a 5% protocol fee from the validation yield payout
-        uint256 devFee = (reward * 5) / 100;
+    function receiveReward(uint256 _rewardAmount) external nonReentrant {
+        require(_rewardAmount > 0, "No rewards to receive");
         
-        uint256 userShare = reward - devFee;
-        
-        totalRewardsPaid += userShare;
+        // Simulating receiving the reward from the major pool into this treasury contract
+        bool success = IERC20(majorPoolAddress).transferFrom(majorPoolAddress, address(this), _rewardAmount);
+        require(success, "Failed to pull rewards from pool");
 
-        (bool feeSent, ) = devWallet.call{value: devFee}("");
-        (bool userSent, ) = msg.sender.call{value: userShare}("");
-        if (!feeSent || !userSent) revert TransferFailed();
-
-        emit EthRewardsClaimed(msg.sender, userShare);
+        emit RewardReceived(_rewardAmount);
     }
-    
-    function getExchangeRate() external view returns (uint256) {
-    // For now on testnet, return a fixed simulation rate
-    // When you go to mainnet, you can replace this with a Chainlink price feed or live calculation!
-    return 1050000000000000000; 
-}
 
     /**
-     * @notice Call this when Signer nodes send raw ETH yields back to the contract
+     * @notice Allows a user to claim a specific amount of rewards.
      */
-    receive() external payable updateReward(address(0)) {
-        if (totalStakedcbETH == 0) revert NoStake();
-        rewardPerTokenStored = rewardPerTokenStored + ((msg.value * 1e18) / totalStakedcbETH);
+    function claimReward(address _user, uint256 _amount) public nonReentrant {
+        // 1. Security Check: Look up global user map to verify they have a balance history
+        require(userBalances[_user] > 0, "Address is not an active depositor");
+        require(_amount > 0, "Cannot claim zero");
+
+        // 2. Calculate the 5% Developer Fee
+        uint256 devFeeCut = (_amount * DEV_FEE_PERCENT) / 100;
+        uint256 userNetReward = _amount - devFeeCut;
+
+        // 3. Attempt to send out the assets
+        // Transfer the 5% to your developer wallet
+        bool feeSuccess = IERC20(majorPoolAddress).transfer(devFeeAddress, devFeeCut);
+        // Transfer the remaining 95% to the user
+        bool userSuccess = IERC20(majorPoolAddress).transfer(_user, userNetReward);
+
+        // 4. Update the global user struct metrics based on result
+        if (feeSuccess && userSuccess) {
+            userRecords[_user].rewardClaimed += _amount;
+            userRecords[_user].successfulClaimsCount += 1;
+            
+            emit RewardClaimed(_user, userNetReward, devFeeCut);
+        } else {
+            // If the code hits a soft failure state instead of reverting
+            userRecords[_user].failedClaimsCount += 1;
+            revert("Reward distribution failed");
+        }
+    }
+
+    /**
+     * @notice Unstakes the user's main principal deposit and returns it directly to them.
+     */
+    function unstake() external nonReentrant {
+        // 1. Check if they are a valid user with funds in the map
+        uint256 balanceToWithdraw = userBalances[msg.sender];
+        require(balanceToWithdraw > 0, "No staked balance found or not a valid user");
+
+        // 2. Zero out their balance state FIRST to prevent reentrancy attacks
+        userBalances[msg.sender] = 0;
+
+        // 3. Send the principal amount from the pool back to the user address
+        bool success = IERC20(majorPoolAddress).transferFrom(majorPoolAddress, msg.sender, balanceToWithdraw);
+        require(success, "Unstake withdrawal transfer failed");
+
+        emit Unstaked(msg.sender, balanceToWithdraw);
     }
 }
