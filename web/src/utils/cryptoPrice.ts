@@ -9,7 +9,7 @@ export async function getLiveTokenPrice(tokenId: string): Promise<number> {
         headers: {
           'accept': 'application/json',
           'x-cg-demo-api-key': COINGECKO, 
-        },
+        } as HeadersInit,
         next: { revalidate: 60 } 
       }
     );
