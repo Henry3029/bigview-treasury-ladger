@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
+/*contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
     
     address public majorPoolAddress;
     address public devFeeAddress;
@@ -107,3 +107,4 @@ contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable, OwnableUp
         emit Unstaked(msg.sender, balanceToWithdraw);
     }
 }
+*/
