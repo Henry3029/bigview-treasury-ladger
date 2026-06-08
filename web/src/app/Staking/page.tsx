@@ -1,149 +1,131 @@
-'use client';
-import { useState, useEffect } from 'react';
-import TVLDisplay from '@/components/TVLDisplay';
-import { getLiveTokenPrice } from '@/utils/cryptoPrice'; 
-import { calculateRealYieldRates } from '@/utils/protocolCalculations';
-export const dynamic = 'force-dynamic';
+import { useState, ChangeEvent } from "react";
+import { createPublicClient, http, formatEther } from "viem";
+import { baseSepolia } from "viem/chains"; // Using Base Sepolia testnet for safety
 
-type AssetType = 'BVW' | 'cbETH' | 'ETH';
+// 1. Setup the public client outside the component to avoid re-creating it on every render
+const publicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(),
+});
 
-export default function StakingPage() {
-  const [stakeAmount, setStakeAmount] = useState<string>(''); // CHANGED: Clear empty string for better placeholder behavior
-  const [selectedOption, setSelectedOption] = useState<number>(1); // 1, 2, or 3
-  const [yieldRates, setYieldRates] = useState<number[]>([0.0352, 0.0291, 0.0310]); // FIXED: Use realistic decimal rates as initial/fallback values
-  const [ethPrice, setEthPrice] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  
-  useEffect(() => {
-    async function loadAllNetworkData() {
-      try {
-        const [realPrice, realRates] = await Promise.all([
-          getLiveTokenPrice(),
-          calculateRealYieldRates()
-        ]);
-        setEthPrice(realPrice);
-        setYieldRates(realRates);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error loading live data, using fallbacks.", error);
-        setIsLoading(false); 
-      }
+// Mocking contract details for compilation stability
+const CONTRACT_ADDRESS = "0xYourPermanentProxyAddressHere";
+const CONTRACT_ABI = [
+  {
+    inputs: [{ name: "_user", type: "address" }, { name: "_amount", type: "uint256" }],
+    name: "deposit",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  }
+] as const;
+
+export default function StakingComponent() {
+  // 2. State Variables
+  const [amount, setAmount] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // 3. Input Validation Handler
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAmount(value);
+
+    const numericValue = parseFloat(value);
+
+    // Your validation check: prevent negative numbers, NaN, or values <= 0
+    if (isNaN(numericValue) || numericValue <= 0) {
+      setMessage("Invalid input: Amount must be greater than 0");
+      return;
     }
 
-    loadAllNetworkData();
-  }, []);
-        
-  // Dynamic calculation engines 
-  const parsedAmount = parseFloat(stakeAmount) || 0;
-  const usdValue = parsedAmount * ethPrice;
-  const potentialYield = parsedAmount * (yieldRates[selectedOption - 1] || 0);
+    // Clear error message if input becomes valid
+    setMessage("");
+  };
 
-  // Dynamic Array mapping to inject your live data responses!
-  const stakingOptions = [
-    { id: 1, title: 'Liquid Staking with cbETH Yield', desc: 'Get yield immediately. Stay liquid with BVW token. Earn points.', rate: yieldRates[0] },
-    { id: 2, title: 'Liquid Staking with cbETH Yield', desc: 'Earn points and cbETH claimable daily.', rate: yieldRates[1] },
-    { id: 3, title: 'Native Staking with ETH Yield', desc: 'Start earning yield next cycle. No liquidity between 2-week cycles.', rate: yieldRates[2] }
-  ];
+  // 4. Contract Call Handler
+  const handleContractCall = async () => {
+    const numericValue = parseFloat(amount);
+    
+    // Safety guard step before executing network calls
+    if (!amount || isNaN(numericValue) || numericValue <= 0) {
+      setMessage("Please enter a valid amount before staking.");
+      return;
+    }
+
+    setIsLoading(true);
+    setMessage("");
+
+    try {
+      // Convert standard human string input to BigInt wei logic (1 ETH = 10^18 Wei)
+      // Note: We parse the token unit here to send it down the line safely
+      const parsedAmount = BigInt(Math.floor(numericValue * 1e18));
+
+      // Simulating the contract read/simulation call via public client
+      const contractCall = await publicClient.simulateContract({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: "deposit",
+        args: ["0xUserAddressPlaceholder", parsedAmount], // user address and amount fields
+      });
+
+      console.log("Contract simulation successful:", contractCall);
+      setMessage("Simulation successful! Ready to broadcast transaction.");
+    } catch (error) {
+      console.error(error);
+      setMessage("Something went Wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-8 text-gray-800 dark:text-white">
-      <TVLDisplay />
-      
-      {/* Header Section */}
-      <header>
-        <h1 className="text-4xl font-bold mb-2">Staking ETH</h1>
-        <h3 className="text-lg text-gray-500">Start staking ETH, earn yield and unstake at any time, for the best price</h3>
-      </header>
-
-      {/* 2-Col-Grid: Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white/5 p-6 rounded-t-2xl border border-white/10">
-          <p className="text-sm text-gray-400">Available to stake</p>
-          <p className="text-2xl font-mono">0.00</p>
-          <p className="text-sm text-gray-500">$0.00</p>
-        </div>
-        <div className="bg-white/5 p-6 rounded-t-2xl border border-white/10">
-          <p className="text-sm text-gray-400">Staked (ETH)</p>
-          <p className="text-2xl font-mono">0.00</p>
-          <p className="text-sm text-gray-500">$0.00</p>
-        </div>
-        <div className="bg-white/5 p-6 rounded-t-2xl border border-white/10 col-span-2 sm:col-span-1">
-          <p className="text-sm text-gray-400">ETH Price</p>
-          <p className="text-2xl font-mono">${ethPrice.toLocaleString()}</p>
-          <p className="text-sm text-green-500">+1.2% (24h)</p>
-        </div>
-      </div>
-
-      {/* Main Interaction Card */}
-      <div className="bg-white rounded-3xl p-8 text-black shadow-xl">
-        <h2 className="text-2xl font-bold mb-6">Stake Amount</h2>
+    // Parent container div
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 p-6 text-white">
+      <div className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-6">
         
-        {/* Input Box */}
-        <div className="flex justify-between items-center bg-gray-100 p-4 rounded-2xl mb-8">
-          <input 
-            type="number" 
+        {/* Header Block with custom gold gradient theme styling */}
+        <div className="text-center p-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-black">
+          <h1 className="text-xl font-bold tracking-tight">
+            Stake ETH and earn yield in return
+          </h1>
+        </div>
+
+        {/* Input area element containing labels and placeholders */}
+        <div className="flex flex-col space-y-2">
+          <label className="text-sm font-medium text-slate-400">
+            Stake ETH
+          </label>
+          <input
+            type="number"
             placeholder="0.00"
-            value={stakeAmount} // 🚀 FIXED: Controlled input link
-            className="bg-transparent text-3xl font-bold outline-none w-full"
-            onChange={(e) => setStakeAmount(e.target.value)}
+            value={amount}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-800 focus:outline-none focus:border-amber-500 transition-colors text-white placeholder-slate-600 text-lg"
           />
-          <div className="text-right min-w-[100px]">
-            <p className="font-bold text-xl">ETH</p>
-            <p className="text-gray-400">~${usdValue.toFixed(2)}</p>
-          </div>
         </div>
 
-        <h3 className="text-lg font-semibold mb-4">Select Staking Option</h3>
-        
-        {/* Option Cards */}
-        <div className="space-y-4">
-          {stakingOptions.map((opt) => {
-            const isSelected = selectedOption === opt.id;
-            const displayApy = `${(opt.rate * 100).toFixed(2)}%`; // Converts e.g. 0.0352 to "3.52%"
+        {/* Action Button */}
+        <button
+          onClick={handleContractCall}
+          disabled={isLoading}
+          className="w-full py-3 px-4 rounded-xl font-semibold text-black bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 active:scale-[0.98] transition-all disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {isLoading ? "Processing..." : "Stake Funds"}
+        </button>
 
-            return (
-              <div 
-                key={opt.id}
-                onClick={() => setSelectedOption(opt.id)}
-                className={`relative p-6 rounded-2xl border cursor-pointer transition-all ${
-                  isSelected 
-                    ? 'bg-[#B8860B]/20 border-[#B8860B]' 
-                    : 'bg-white/50 border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                {isSelected && <div className="absolute top-4 right-4 text-[#B8860B] font-bold">✔</div>}
-                <h3 className="font-bold text-lg pr-6">{opt.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">{opt.desc}</p>
-                <div className="flex justify-between font-mono text-sm">
-                  <span className="text-green-600 font-bold">APR {displayApy}</span>
-                  <span className="font-bold text-gray-500">BVW</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Live Message State feedback window */}
+        {message && (
+          <div className={`p-3 rounded-lg text-center text-sm font-medium ${
+            message.includes("Wrong") || message.includes("Invalid") 
+              ? "bg-red-500/10 text-red-400 border border-red-500/20" 
+              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+          }`}>
+            {message}
+          </div>
+        )}
 
-        {/* Calculation Summary */}
-        <div className="mt-8 p-6 bg-gray-50 rounded-2xl space-y-2 text-sm font-medium">
-          <div className="flex justify-between">
-            <span>1. Conversion rate</span>
-            <span>1 ETH = 1.00 {selectedOption === 1 ? 'cbETH' : 'ETH'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>2. Potential Annual Yield</span>
-            <span className="font-mono">~{potentialYield.toFixed(4)} ETH</span>
-          </div>
-          <div className="flex justify-between">
-            <span>3. Receive</span>
-            <span className="font-mono">~{parsedAmount > 0 ? parsedAmount.toFixed(2) : '0.00'} BVW</span>
-          </div>
-          <div className="flex justify-between text-blue-600">
-            <span>4. Points Multiplier</span>
-            <span>1 ETH = 1 point per day</span>
-          </div>
-        </div>
       </div>
-       
     </div>
   );
 }
