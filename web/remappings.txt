@@ -1,1 +1,10 @@
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
+<<<<<<< HEAD
+=======
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+erc4626-tests/=lib/openzeppelin-contracts-upgradeable/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+halmos-cheatcodes/=lib/openzeppelin-contracts-upgradeable/lib/halmos-cheatcodes/src/
+openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/
+openzeppelin-contracts/=lib/openzeppelin-contracts/
+>>>>>>> 5c7ad96b7f46b9824fd0ae796279243ad10faf7f
