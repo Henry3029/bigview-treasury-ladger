@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+/*// SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
 // Import OpenZeppelin UPGRADEABLE contracts
@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/*contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
+contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, UUPSUpgradeable {
     
     address public majorPoolAddress;
     address public devFeeAddress;
