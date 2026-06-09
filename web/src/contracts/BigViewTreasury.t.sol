@@ -13,7 +13,10 @@ contract BigViewTest is Test {
 
     function setUp() public {
         // Pass our fake pool address to the constructor, when deploying
-        BigViewContract = new BigViewTreasury(poolAddress); 
+        BigViewContract = new BigViewTreasury(); 
+
+// 2. Initialize it immediately! BigViewContract.initialize(poolAddress); 
+
     }
 
     function test_DepositForwardToMajorPool() public {
