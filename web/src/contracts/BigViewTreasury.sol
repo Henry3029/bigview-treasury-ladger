@@ -8,7 +8,7 @@ import {Initializable} from "../../lib/openzeppelin-contracts/contracts/proxy/ut
 import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 
 // 2. This matches your line perfectly!
-contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable {
+contract BigViewTreasury is Initializable, ReentrancyGuard {
 
     address public majorPoolAddress;
 
@@ -20,7 +20,7 @@ contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable {
     // Replace your constructor logic with this initialize function!
     function initialize(address _majorPoolAddress) public initializer {
         // 3. FIXED: This sets up the reentrancy guard safety flags behind the scenes
-        __ReentrancyGuard_init(); 
+    
         
         majorPoolAddress = _majorPoolAddress;
     }
