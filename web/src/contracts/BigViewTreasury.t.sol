@@ -15,7 +15,8 @@ contract BigViewTest is Test {
         // Pass our fake pool address to the constructor, when deploying
         BigViewContract = new BigViewTreasury(); 
 
-// 2. Initialize it immediately! BigViewContract.initialize(poolAddress); 
+// 2. Initialize it immediately! BigViewContract.initialize(poolAddress);
+BigViewContract.initialize(poolAddress); 
 
     }
 
