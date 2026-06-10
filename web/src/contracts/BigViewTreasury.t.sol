@@ -17,7 +17,7 @@ contract BigViewTest is Test {
         BigViewTreasury implementation = new BigViewTreasury();
 
         // 2. Encode the initialization function call data with the poolAddress argument
-        bytes memory initData = abi.encodeWithSelector(
+        bytes memory initData = abi.encodeWithSelectogit r(
             BigViewTreasury.initialize.selector,
             poolAddress
         );
