@@ -2,10 +2,7 @@
 pragma solidity ^0.8.20;
 
 // 1. FIXED: Added '-upgradeable' to the root package name
-// Change your imports to use this specific curly-brace format:
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
-
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/ReentrancyGuardUpgradeable.sol";
 
 
 // 2. This matches your line perfectly!
