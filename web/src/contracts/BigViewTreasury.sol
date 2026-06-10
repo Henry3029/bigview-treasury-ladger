@@ -2,9 +2,10 @@
 pragma solidity ^0.8.20;
 
 // 1. FIXED: Added '-upgradeable' to the root package name
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuard.sol";
+import {Initializable} from "../../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 
+// 2. Point ReentrancyGuard to the second folder path where it ACTUALLY lives!
+import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 
 // 2. This matches your line perfectly!
 contract BigViewTreasury is Initializable, ReentrancyGuardUpgradeable {
