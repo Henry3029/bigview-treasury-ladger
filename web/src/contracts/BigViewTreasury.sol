@@ -11,6 +11,20 @@ import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/
 contract BigViewTreasury is Initializable, ReentrancyGuard {
 
     address public majorPoolAddress;
+mapping(address => uint256) public usersBalance; 
+    address public devFee; 
+
+    // 2. Corrected spelling 'struct', removed commas, added semicolons
+    struct UserState {
+        address usersAddress;
+        uint256 rewardClaimed; 
+        bool failedClaimed; 
+        bool successfulClaimed;
+    } // <-- No semicolon needed after the closing brace of a struct
+
+    // 3. To actually use your struct, you can map an address to it:
+    mapping(address => UserState) public userRecords;
+
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
