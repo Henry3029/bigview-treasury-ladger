@@ -47,4 +47,13 @@ bytes memory initData = abi.encodeWithSelector(
         // The poolAddress balance should now be EXACTLY 10 ether!
         assertEq(poolAddress.balance, 10 ether);
     }
+
+   // 5. Now your tests down here can use it!
+    function test_ReceiveRewards() public {
+        hoax(address(999), 100 ether);
+        BigViewContract.receiveReward{value: 100 ether}();
+        assertEq(address(BigViewContract).balance, 100 ether);
+    }
+
+
 }
