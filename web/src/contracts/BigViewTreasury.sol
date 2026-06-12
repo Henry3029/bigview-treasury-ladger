@@ -13,6 +13,9 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
     address public majorPoolAddress;
 mapping(address => uint256) public usersBalance; 
     address public devFee; 
+uint256 public totalRewards;
+
+event RewardReceived(address indexed sender, uint256 amount);
 
     // 2. Corrected spelling 'struct', removed commas, added semicolons
     struct UserState {
@@ -37,6 +40,8 @@ mapping(address => uint256) public usersBalance;
     
         
         majorPoolAddress = _majorPoolAddress;
+
+totalRewards = 0;
     }
 
     // Your deposit function can now safely use the nonReentrant modifier!
@@ -45,4 +50,14 @@ mapping(address => uint256) public usersBalance;
         (bool success, ) = majorPoolAddress.call{value: msg.value}("");
         require(success, "Transfer Failed");
     }
+
+function receiveReward() public payable {
+    require(msg.value > 0, "amount must be greater than zero");
+    
+    emit RewardReceived(msg.sender, msg.value);
+    
+    // FIXED: Added the missing semicolon at the end of this line
+    totalRewards += msg.value; 
+}
+
 }
