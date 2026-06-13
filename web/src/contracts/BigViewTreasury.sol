@@ -1,79 +1,68 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// 1. FIXED: Added '-upgradeable' to the root package name
 import {Initializable} from "../../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
-
-// 2. Point ReentrancyGuard to the second folder path where it ACTUALLY lives!
 import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 
-// 2. This matches your line perfectly!
 contract BigViewTreasury is Initializable, ReentrancyGuard {
 
     address public majorPoolAddress;
-mapping(address => uint256) public usersBalance; 
-    address public devFeeAddress; 
-uint256 public totalRewards;
+    address public devFeeAddress;
+    uint256 public totalRewards;
 
-event RewardReceived(address indexed sender, uint256 amount);
+    mapping(address => uint256) public usersBalance;
 
-    // 2. Corrected spelling 'struct', removed commas, added semicolons
+    event RewardReceived(address indexed sender, uint256 amount);
+
     struct UserState {
         address usersAddress;
-        uint256 rewardClaimed; 
-        bool failedClaimed; 
+        uint256 rewardClaimed;
+        bool failedClaimed;
         bool successfulClaimed;
-    } // <-- No semicolon needed after the closing brace of a struct
+    } 
 
-    // 3. To actually use your struct, you can map an address to it:
     mapping(address => UserState) public userRecords;
-
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    // Replace your constructor logic with this initialize function!
-    function initialize(address _majorPoolAddress, address _devFeeAddress) public initializer {
-        // 3. FIXED: This sets up the reentrancy guard safety flags behind the scenes
-    
-        
-        majorPoolAddress = _majorPoolAddress;
+    // FIXED: Ensured parameter names explicitly correspond to assignment order
+    function initialize(address _devFeeAddress, address _majorPoolAddress) public initializer {
+        // FIXED: Added OpenZeppelin internal initialization for ReentrancyGuard state
+        __ReentrancyGuard_init(); 
 
-totalRewards = 0;
-devFeeAddress = _devFeeAddress;
+        devFeeAddress = _devFeeAddress;
+        majorPoolAddress = _majorPoolAddress;
+        totalRewards = 0;
     }
 
-    // Your deposit function can now safely use the nonReentrant modifier!
     function deposit(address user) public payable nonReentrant {
         require(msg.value > 0, "can't deposit zero token");
         (bool success, ) = majorPoolAddress.call{value: msg.value}("");
         require(success, "Transfer Failed");
     }
 
-function receiveReward() public payable {
-    require(msg.value > 0, "amount must be greater than zero");
-    
-    emit RewardReceived(msg.sender, msg.value);
-    
-    // FIXED: Added the missing semicolon at the end of this line
-    totalRewards += msg.value; 
-}
+    function receiveReward() public payable {
+        require(msg.value > 0, "amount must be greater than zero");
+        emit RewardReceived(msg.sender, msg.value);
+        totalRewards += msg.value;
+    }
 
-function claimReward(uint256 rewardAmount) public {
-    require(address(this).balance >= rewardAmount, "Insufficient vault funds");
+    function claimReward(uint256 rewardAmount) public nonReentrant {
+        require(address(this).balance >= rewardAmount, "Insufficient vault funds");
 
-    // Calculate the 5% split using Solidity safe math rules
-uint256 devFee = (rewardAmount * 5) / 100;
-uint256 userCut = rewardAmount - devFee;
+        // Calculate the 5% split using Solidity safe math rules
+        uint256 devFee = (rewardAmount * 5) / 100;
+        uint256 userCut = rewardAmount - devFee;
 
-    // Send the remaining 95% to the claiming user
-    (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
-    require(userSuccess, "User Reward Transfer Failed");
+        // Send the 5% to the permanent developer address variable
+        (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
+        require(devSuccess, "Dev Fee Transfer Failed");
 
-// Send the 5% to the developer address
-    (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
-    require(devSuccess, "Dev Fee Transfer Failed");
-}
+        // Send the remaining 95% to the claiming user (msg.sender)
+        (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
+        require(userSuccess, "User Reward Transfer Failed");
+    }
 }
