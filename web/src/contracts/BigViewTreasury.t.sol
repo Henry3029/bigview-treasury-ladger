@@ -55,22 +55,27 @@ bytes memory initData = abi.encodeWithSelector(
         assertEq(address(BigViewContract).balance, 100 ether);
     }
 
-function test_ClaimReward() public {
-        // 1. CHEAT CODE: Fill the contract vault with 10 Ether first!
-        // This ensures the contract actually has money available to be claimed.
-        deal(address(BigViewContract), 10 ether);
+function test_ClaimRewardWithDevFee() public {
+        uint256 startingVaultAmount = 10 ether;
+        uint256 expectedDevFee = 0.5 ether;  // 5% of 10 Ether
+        uint256 expectedUserCut = 9.5 ether; // 95% of 10 Ether
 
-        // 2. HOAX: Pretend to be address(1) for the next transaction
+        // 1. SETUP: Fill the contract vault with 10 Ether
+        deal(address(BigViewContract), startingVaultAmount);
+
+        // 2. HOAX: Pretend to be user address(1)
         hoax(address(1));
 
-        // 3. ACT: Call the claim function. (No {value} needed, because the user isn't paying!)
-        BigViewContract.claimReward();
+// 3. ACT: Call the claim function with the 10 Ether amount
+        BigViewContract.claimReward(startingVaultAmount);
 
-        // 4. ASSERT: Prove the contract gave away its funds and is now empty
+        // 4. ASSERT 1: Prove the contract vault completely emptied out
         assertEq(address(BigViewContract).balance, 0 ether);
         
-        // 5. BONUS ASSERT: Prove that user address(1) actually received the 10 Ether!
-        assertEq(address(1).balance, 10 ether);
-    }
+        // 5. ASSERT 2: Prove the user exclusively received their 95% cut
+        assertEq(address(1).balance, expectedUserCut);
 
+        // 6. ASSERT 3: Prove the Developer address received their strict 5% fee
+        assertEq(devAddress.balance, expectedDevFee);
+    }
 }

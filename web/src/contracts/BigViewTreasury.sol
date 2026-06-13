@@ -12,7 +12,7 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
 
     address public majorPoolAddress;
 mapping(address => uint256) public usersBalance; 
-    address public devFee; 
+    address public devFeeAddress; 
 uint256 public totalRewards;
 
 event RewardReceived(address indexed sender, uint256 amount);
@@ -35,13 +35,14 @@ event RewardReceived(address indexed sender, uint256 amount);
     }
 
     // Replace your constructor logic with this initialize function!
-    function initialize(address _majorPoolAddress) public initializer {
+    function initialize(address _devFeeAddress, address _majorPoolAddress) public initializer {
         // 3. FIXED: This sets up the reentrancy guard safety flags behind the scenes
     
         
         majorPoolAddress = _majorPoolAddress;
 
 totalRewards = 0;
+devFeeAddress = _devFeeAddress;
     }
 
     // Your deposit function can now safely use the nonReentrant modifier!
@@ -58,6 +59,22 @@ function receiveReward() public payable {
     
     // FIXED: Added the missing semicolon at the end of this line
     totalRewards += msg.value; 
+}
+
+function claimReward(uint256 rewardAmount) public {
+    require(address(this).balance >= rewardAmount, "Insufficient vault funds");
+
+    // Calculate the 5% split using Solidity safe math rules
+    uint256 devFee = (rewardAmount * 5) / 100;
+    uint256 userCut = rewardAmount - devFee;
+
+    // Send the 5% to the developer address
+    (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
+    require(devSuccess, "Dev Fee Transfer Failed");
+
+    // Send the remaining 95% to the claiming user
+    (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
+    require(userSuccess, "User Reward Transfer Failed");
 }
 
 }
