@@ -18,10 +18,10 @@ contract BigViewTest is Test {
         // 2. Encode the initialization function call data with the poolAddress argument
 bytes memory initData = abi.encodeWithSelector(
             BigViewTreasury.initialize.selector,
-            poolAddress
+            poolAddress,
+address(99)
         );
 
-BigViewContract.initialize(address(99));
 
         // 3. Deploy the Proxy pointing to the implementation and pass the initialization payload!
         ERC1967Proxy proxy = new ERC1967Proxy(address(implementation), initData);
