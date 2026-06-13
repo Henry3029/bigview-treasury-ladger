@@ -19,6 +19,7 @@ contract BigViewTest is Test {
 bytes memory initData = abi.encodeWithSelector(
             BigViewTreasury.initialize.selector,
             poolAddress
+BigViewContract.initialize(address(99));
         );
 
 
