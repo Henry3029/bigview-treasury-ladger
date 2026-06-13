@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+// 1. Point to the EXACT paths you found in your terminal search!
 import {Initializable} from "../../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
 
@@ -28,11 +29,11 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
         _disableInitializers();
     }
 
-    // FIXED: Ensured parameter names explicitly correspond to assignment order
+    // 2. The initialize function using the precise paths you verified
     function initialize(address _devFeeAddress, address _majorPoolAddress) public initializer {
-        // FIXED: Added OpenZeppelin internal initialization for ReentrancyGuard state
-        __ReentrancyGuard_init(); 
-
+        // NOTE: Standard ReentrancyGuard does not require an internal __init function call,
+        // because its storage slots default to 0 (unlocked) on deployment automatically!
+        
         devFeeAddress = _devFeeAddress;
         majorPoolAddress = _majorPoolAddress;
         totalRewards = 0;
@@ -53,15 +54,12 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
     function claimReward(uint256 rewardAmount) public nonReentrant {
         require(address(this).balance >= rewardAmount, "Insufficient vault funds");
 
-        // Calculate the 5% split using Solidity safe math rules
         uint256 devFee = (rewardAmount * 5) / 100;
         uint256 userCut = rewardAmount - devFee;
 
-        // Send the 5% to the permanent developer address variable
         (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
         require(devSuccess, "Dev Fee Transfer Failed");
 
-        // Send the remaining 95% to the claiming user (msg.sender)
         (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
         require(userSuccess, "User Reward Transfer Failed");
     }
