@@ -59,7 +59,7 @@ contract BigViewTest is Test {
         deal(address(BigViewContract), startingVaultAmount);
 
         // 2. HOAX: Pretend to be user address(1) to claim rewards
-        hoax(address(1));
+        hoax(address(1), 0 ether);
 
         // 3. ACT: Call the claim function with the 10 Ether amount
         BigViewContract.claimReward(startingVaultAmount);
