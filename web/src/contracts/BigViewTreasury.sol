@@ -35,7 +35,7 @@ event RewardReceived(address indexed sender, uint256 amount);
     }
 
     // Replace your constructor logic with this initialize function!
-    function initialize(address _devFeeAddress, address _majorPoolAddress) public initializer {
+    function initialize(address _majorPoolAddress, address _devFeeAddress) public initializer {
         // 3. FIXED: This sets up the reentrancy guard safety flags behind the scenes
     
         
