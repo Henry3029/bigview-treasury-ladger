@@ -76,6 +76,6 @@ function test_ClaimRewardWithDevFee() public {
         assertEq(address(1).balance, expectedUserCut);
 
         // 6. ASSERT 3: Prove the Developer address received their strict 5% fee
-        assertEq(devFeeAddress.balance, expectedDevFee);
+        assertEq(address(99).balance, expectedDevFee);
     }
 }
