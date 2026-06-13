@@ -65,16 +65,15 @@ function claimReward(uint256 rewardAmount) public {
     require(address(this).balance >= rewardAmount, "Insufficient vault funds");
 
     // Calculate the 5% split using Solidity safe math rules
-    uint256 devFee = (rewardAmount * 5) / 100;
     uint256 userCut = rewardAmount - devFee;
-
-    // Send the 5% to the developer address
-    (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
-    require(devSuccess, "Dev Fee Transfer Failed");
+uint256 devFee = (rewardAmount * 5) / 100;
 
     // Send the remaining 95% to the claiming user
     (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
     require(userSuccess, "User Reward Transfer Failed");
-}
 
+// Send the 5% to the developer address
+    (bool devSuccess, ) = payable(devFeeAddress).call{value: devFee}("");
+    require(devSuccess, "Dev Fee Transfer Failed");
+}
 }
