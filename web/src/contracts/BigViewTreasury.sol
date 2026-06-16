@@ -14,6 +14,7 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
     mapping(address => uint256) public usersBalance;
 
     event RewardReceived(address indexed sender, uint256 amount);
+event RewardClaimed(address indexed receiver, uint256 amount);
 
     struct UserState {
         address usersAddress;
@@ -22,7 +23,7 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
         bool successfulClaimed;
     } 
 
-    mapping(address => UserState) public userRecords;
+    mapping(address => UserState) public userStates;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -53,6 +54,11 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
 
     function claimReward(uint256 rewardAmount) public nonReentrant {
         require(address(this).balance >= rewardAmount, "Insufficient vault funds");
+require(userStates[msg.sender].usersAddress == msg.sender, "else not a member");
+require(!userStates[msg.sender].successfulClaimed, "Rewards Already Claimed");
+
+userStates[msg.sender].rewardClaimed += 1;
+userStates[msg.sender].successfulClaimed = true;
 
         uint256 devFee = (rewardAmount * 5) / 100;
         uint256 userCut = rewardAmount - devFee;
@@ -62,5 +68,9 @@ contract BigViewTreasury is Initializable, ReentrancyGuard {
 
         (bool userSuccess, ) = payable(msg.sender).call{value: userCut}("");
         require(userSuccess, "User Reward Transfer Failed");
+
+emit RewardClaimed(msg.sender, rewardAmount); 
+
     }
+
 }
