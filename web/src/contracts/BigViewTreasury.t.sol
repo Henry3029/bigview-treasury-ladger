@@ -10,7 +10,7 @@ contract BigViewTest is Test {
 
     // Designated mock test addresses
     address public poolAddress = address(999);
-    address public devAddress = address(99);
+    address public devAddress = address(0xDDD);
 
     function setUp() public {
         // 1. Deploy the implementation contract blueprint
@@ -34,7 +34,8 @@ contract BigViewTest is Test {
         hoax(address(1), 100 ether);
 
         uint256 poolBalanceBefore = poolAddress.balance;
-        assertEq(poolBalanceBefore, 0);
+        assertEq(
+poolBalanceBefore, 0);
 
         // Act: Deposit funds through the proxy gateway
         BigViewContract.deposit{value: 10 ether}(address(1));
@@ -54,12 +55,20 @@ contract BigViewTest is Test {
         uint256 startingVaultAmount = 10 ether;
         uint256 expectedDevFee = 0.5 ether;  // 5% of 10 Ether
         uint256 expectedUserCut = 9.5 ether; // 95% of 10 Ether
+address user = address(1);
 
         // 1. SETUP: Fill the contract vault with 10 Ether using deal()
         deal(address(BigViewContract), startingVaultAmount);
 
+// Slot 0 is typically where your first mapping lives. Adjust if userStates is defined lower.
+        bytes32 userStateSlot = keccak256(abi.encode(user, uint256(0)));
+
+// This force-writes address(1) into the 'usersAddress' field of the struct
+        vm.store(address(BigViewContract), userStateSlot, bytes32(uint256(uint160(user))));
+
+
         // 2. HOAX: Pretend to be user address(1) to claim rewards
-        hoax(address(1), 0 ether);
+        hoax(user, 0 ether);
 
         // 3. ACT: Call the claim function with the 10 Ether amount
         BigViewContract.claimReward(startingVaultAmount);
@@ -68,7 +77,7 @@ contract BigViewTest is Test {
         assertEq(address(BigViewContract).balance, 0 ether);
 
         // 5. ASSERT 2: Prove the user exclusively received their 95% cut
-        assertEq(address(1).balance, expectedUserCut);
+        assertEq(user.balance, expectedUserCut);
 
         // 6. ASSERT 3: Prove the Developer address received their strict 5% fee
         assertEq(devAddress.balance, expectedDevFee);
