@@ -7,6 +7,8 @@ import {ReentrancyGuard} from "../../lib/openzeppelin-contracts/contracts/utils/
 
 contract BigViewTreasury is Initializable, ReentrancyGuard {
 
+mapping(address => UserState) public userStates;
+
     address public majorPoolAddress;
     address public devFeeAddress;
     uint256 public totalRewards;
@@ -23,7 +25,6 @@ event RewardClaimed(address indexed receiver, uint256 amount);
         bool successfulClaimed;
     } 
 
-    mapping(address => UserState) public userStates;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
