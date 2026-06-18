@@ -11,6 +11,7 @@ contract BigViewTest is Test {
     // Designated mock test addresses
     address public poolAddress = address(999);
     address public devAddress = address(0xDDD);
+address public user1 = address(1);
 
     function setUp() public {
         // 1. Deploy the implementation contract blueprint
@@ -82,4 +83,30 @@ address user = address(1);
         // 6. ASSERT 3: Prove the Developer address received their strict 5% fee
         assertEq(devAddress.balance, expectedDevFee);
     }
+
+// 🧪 TEST 1: Total Unstake (Withdrawing everything)
+    function test_TotalUnstake() public {
+        deal(address(BigViewContract), 100 ether);
+
+        hoax(user1);
+        BigViewContract.unstake(100 ether); // Pass the full amount
+
+        assertEq(address(BigViewContract).balance, 0 ether);
+        assertEq(user1.balance, 100 ether);
+    }
+
+// 🧪 TEST 2: Partial Unstake (Withdrawing a fraction)
+    function test_PartialUnstake() public {
+        // Start with 100 ether in the contract vault
+        deal(address(BigViewContract), 100 ether);
+
+        hoax(user1);
+        // User only pulls out 40 ether
+        BigViewContract.unstake(40 ether); 
+
+        // Assertions match the split math perfectly!
+        assertEq(address(BigViewContract).balance, 60 ether); // 100 - 40 left behind
+        assertEq(user1.balance, 40 ether);                    // 40 received
+    }
+
 }
