@@ -17,8 +17,10 @@ mapping(address => UserState) public userStates;
 
     event RewardReceived(address indexed sender, uint256 amount);
 event RewardClaimed(address indexed receiver, uint256 amount);
+event Unstaked(address indexed user, uint256 amount);
 
     struct UserState {
+uint256 stakedAmount;
         address usersAddress;
         uint256 rewardClaimed;
         bool failedClaimed;
@@ -72,6 +74,22 @@ userStates[msg.sender].successfulClaimed = true;
 
 emit RewardClaimed(msg.sender, rewardAmount); 
 
+    }
+
+function unstake(uint256 _amount) external {
+        // 1. Point directly to the caller's personal package in storage
+        UserState storage user = userStates[msg.sender];
+// 2. CHECK: Does the user actually have enough staked to pull this out?
+        require(user.stakedAmount >= _amount, "Insufficient staked balance");
+
+ // 3. EFFECTS: Update the struct field (State Change)
+        user.stakedAmount -= _amount;
+
+        // 4. INTERACTIONS: Securely transfer the crypto to msg.sender
+        (bool success, ) = msg.sender.call{value: _amount}("");
+        require(success, "Transfer failed");
+
+        emit Unstaked(msg.sender, _amount);
     }
 
 }
