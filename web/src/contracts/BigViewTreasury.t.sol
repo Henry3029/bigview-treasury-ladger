@@ -96,23 +96,23 @@ address user = address(1);
     }
 
 // 🧪 TEST 2: Partial Unstake (Withdrawing a fraction)
-    function test_PartialUnstake() public {
-        // Start with 100 ether in the contract vault
- deal(user1, 110);      	
+function test_PartialUnstake() public {
+    // 1. Create user1 explicitly and give them plenty of ether
+    address user1 = makeAddr("user1");
+    deal(user1, 150 ether); 
 
-// 2. Pretend to be user1 and STAKE the 100 ether into the contract
-    // (This automatically fills the contract vault AND updates the struct state!)
-    hoax(user1);
+    // 2. Deposit 100 ether as user1
+    vm.prank(user1);
     BigViewContract.deposit{value: 100 ether}(user1);
 
+    // 3. Unstake 40 ether as user1
+    vm.prank(user1);
+    BigViewContract.unstake(40 ether); // Or (user1, 40 ether) if your function requires the address!
 
-        hoax(user1);
-        // User only pulls out 40 ether
-        BigViewContract.unstake(40 ether); 
+    // 4. Assertions
+    assertEq(address(BigViewContract).balance, 60 ether); 
+    assertEq(user1.balance, 90 ether); // 150 starting - 100 deposited + 40 returned = 90
+}
 
-        // Assertions match the split math perfectly!
-        assertEq(address(BigViewContract).balance, 60 ether); // 100 - 40 left behind
-        assertEq(user1.balance, 50 ether);                    // 40 received
-    }
 
 }
