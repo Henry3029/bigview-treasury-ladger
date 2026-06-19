@@ -98,7 +98,8 @@ address user = address(1);
 // 🧪 TEST 2: Partial Unstake (Withdrawing a fraction)
     function test_PartialUnstake() public {
         // Start with 100 ether in the contract vault
-        deal(address(user1), 160 ether);
+deal(address(BigviewContract), 50 ether);
+        	
 
 // 2. Pretend to be user1 and STAKE the 100 ether into the contract
     // (This automatically fills the contract vault AND updates the struct state!)
