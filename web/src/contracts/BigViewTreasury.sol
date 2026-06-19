@@ -45,6 +45,7 @@ uint256 stakedAmount;
 
     function deposit(address user) public payable nonReentrant {
         require(msg.value > 0, "can't deposit zero token");
+userStates[msg.sender].stakedAmount += msg.value;
         (bool success, ) = majorPoolAddress.call{value: msg.value}("");
         require(success, "Transfer Failed");
     }
