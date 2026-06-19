@@ -103,7 +103,7 @@ address user = address(1);
 // 2. Pretend to be user1 and STAKE the 100 ether into the contract
     // (This automatically fills the contract vault AND updates the struct state!)
     hoax(user1);
-    BigViewContract.deposit(user1){value: 100 ether}();
+    BigViewContract.deposit{value: 100 ether}(user1);
 
 
         hoax(user1);
