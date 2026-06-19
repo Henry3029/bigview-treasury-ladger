@@ -97,16 +97,14 @@ address user = address(1);
 
 // 🧪 TEST 2: Partial Unstake (Withdrawing a fraction)
 function test_PartialUnstake() public {
-    // 1. Create user1 explicitly and give them plenty of ether
-    address user1 = makeAddr("user1");
-    deal(user1, 150 ether); 
+    // give this test contract some token
+    deal(address(this), 150 ether); 
 
-    // 2. Deposit 100 ether as user1
-    vm.prank(user1);
-    BigViewContract.deposit{value: 100 ether}(user1);
+    // 2. Deposit 100 ether as the contract
 
-    // 3. Unstake 40 ether as user1
-    vm.prank(user1);
+    BigViewContract.deposit{value: 100 ether}(address(this));
+
+    // 3. Unstake 40 ether, since we are not pranking, msg.sender is naturally this contract
     BigViewContract.unstake(40 ether); // Or (user1, 40 ether) if your function requires the address!
 
     // 4. Assertions
@@ -114,5 +112,5 @@ function test_PartialUnstake() public {
     assertEq(user1.balance, 90 ether); // 150 starting - 100 deposited + 40 returned = 90
 }
 
-
+receive() external payable {}
 }
